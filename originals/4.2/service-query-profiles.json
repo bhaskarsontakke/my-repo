@@ -1,0 +1,435 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service query-profiles"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "query-profiles"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/query/{id}": {
+      "get": {
+        "summary": "Run a query using the specified profile",
+        "description": "Append a Solr query string to the request, as in '/api/apollo/query/<id>?<solrQuery>'",
+        "operationId": "querySolrj",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The profile's ID",
+            "required": true,
+            "type": "string",
+            "pattern": ".*[/]"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/WriteableResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Run a query using the specified profile",
+        "description": "Use this method if the length of your query may exceed normal GET limitations.",
+        "operationId": "queryWithPost",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The profile's ID",
+            "required": true,
+            "type": "string",
+            "pattern": ".*"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/WriteableResponse"
+            }
+          }
+        }
+      }
+    },
+    "/query/{id}/signals": {
+      "post": {
+        "summary": "Send one or more signals for indexing",
+        "description": "",
+        "operationId": "submitSignal",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The profile's ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pipeline",
+            "in": "query",
+            "description": "An optional parameter to define a specific index pipeline to be used while indexing these signals. If none is defined, the pre-configured `_signals_ingest` pipeline will be used.  Note that the index pipeline must end with a Solr Indexer stage, and in this stage the `enforce_schema` property must be set to 'true'.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "commit",
+            "in": "query",
+            "description": "'True' to commit to Solr at the end of indexing.",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "async",
+            "in": "query",
+            "description": "'True' to index signals in asynchronous mode, which issues an autoCommit and does not report failures.",
+            "required": false,
+            "type": "boolean",
+            "default": false
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "JSON-formatted signals data",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Event"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Command": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "params": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ExperimentVariant": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "collection": {
+          "type": "string",
+          "readOnly": true
+        },
+        "queryPipeline": {
+          "type": "string",
+          "readOnly": true
+        },
+        "params": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ParamAndValue"
+          }
+        },
+        "weight": {
+          "type": "number",
+          "format": "double",
+          "readOnly": true
+        }
+      }
+    },
+    "Experiment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "uniqueIdParameter": {
+          "type": "string",
+          "readOnly": true
+        },
+        "baseSignalsCollection": {
+          "type": "string",
+          "readOnly": true
+        },
+        "variants": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ExperimentVariant"
+          }
+        },
+        "automaticallyAdjustTraffic": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "enabled": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "startTimestamp": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "runId": {
+          "type": "string",
+          "readOnly": true
+        },
+        "metrics": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ExperimentMetric"
+          }
+        }
+      }
+    },
+    "MediaType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "subtype": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "wildcardType": {
+          "type": "boolean",
+          "default": false
+        },
+        "wildcardSubtype": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "Event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "epoch": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "PipelineField": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "object"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "annotations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Annotation"
+          }
+        }
+      }
+    },
+    "ExperimentMetric": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "jobId": {
+          "type": "string"
+        },
+        "binary": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "primary": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        }
+      }
+    },
+    "WriteableResponse": {
+      "type": "object",
+      "properties": {
+        "contentType": {
+          "type": "string"
+        },
+        "contentCharset": {
+          "type": "string"
+        },
+        "mediaType": {
+          "$ref": "#/definitions/MediaType"
+        }
+      }
+    },
+    "Annotation": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "start": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "end": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "features": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "label": {
+          "type": "string",
+          "readOnly": true
+        },
+        "featureCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "PipelineDocument": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/PipelineField"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Command"
+          }
+        },
+        "hints": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ParamAndValue": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "readOnly": true
+        },
+        "value": {
+          "type": "string",
+          "readOnly": true
+        },
+        "policy": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "REPLACE",
+            "APPEND",
+            "REMOVE",
+            "DEFAULT"
+          ]
+        }
+      }
+    }
+  }
+}

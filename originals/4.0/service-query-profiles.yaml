@@ -1,0 +1,317 @@
+---
+swagger: "2.0"
+info:
+  version: "4.0.2-SNAPSHOT"
+  title: "Fusion Service query-profiles"
+basePath: "/api/apollo"
+tags:
+- name: "query-profiles"
+schemes:
+- "http"
+paths:
+  /query/{id}:
+    get:
+      summary: "Run a query using the specified profile"
+      description: "Append a Solr query string to the request, as in '/api/apollo/query/<id>?<solrQuery>'"
+      operationId: "querySolrj"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The profile's ID"
+        required: true
+        type: "string"
+        pattern: ".*[/]"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/WriteableResponse"
+    post:
+      summary: "Run a query using the specified profile"
+      description: "Use this method if the length of your query may exceed normal\
+        \ GET limitations."
+      operationId: "queryWithPost"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The profile's ID"
+        required: true
+        type: "string"
+        pattern: ".*"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/WriteableResponse"
+  /query/{id}/signals:
+    post:
+      summary: "Send one or more signals for indexing"
+      description: ""
+      operationId: "submitSignal"
+      consumes:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The profile's ID"
+        required: true
+        type: "string"
+      - name: "pipeline"
+        in: "query"
+        description: "An optional parameter to define a specific index pipeline to\
+          \ be used while indexing these signals. If none is defined, the pre-configured\
+          \ `_signals_ingest` pipeline will be used.  Note that the index pipeline\
+          \ must end with a Solr Indexer stage, and in this stage the `enforce_schema`\
+          \ property must be set to 'true'."
+        required: false
+        type: "string"
+      - name: "commit"
+        in: "query"
+        description: "'True' to commit to Solr at the end of indexing."
+        required: false
+        type: "boolean"
+      - name: "async"
+        in: "query"
+        description: "'True' to index signals in asynchronous mode, which issues an\
+          \ autoCommit and does not report failures."
+        required: false
+        type: "boolean"
+        default: false
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted signals data"
+        required: false
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/Event"
+      responses:
+        default:
+          description: "successful operation"
+definitions:
+  Command:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      params:
+        type: "object"
+        additionalProperties:
+          type: "string"
+  ExperimentVariant:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      pipeline:
+        type: "string"
+      params:
+        type: "array"
+        items:
+          $ref: "#/definitions/ParamAndValue"
+      collectionName:
+        type: "string"
+      traffic:
+        type: "number"
+        format: "double"
+  Experiment:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      description:
+        type: "string"
+      uniqueIdParam:
+        type: "string"
+      baseSignalsCollection:
+        type: "string"
+      variants:
+        type: "array"
+        items:
+          $ref: "#/definitions/ExperimentVariant"
+      metrics:
+        type: "array"
+        items:
+          $ref: "#/definitions/ExperimentMetric"
+      enabled:
+        type: "boolean"
+        default: false
+      startedDate:
+        type: "string"
+        format: "date-time"
+      runId:
+        type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  MediaType:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      subtype:
+        type: "string"
+      parameters:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      wildcardType:
+        type: "boolean"
+        default: false
+      wildcardSubtype:
+        type: "boolean"
+        default: false
+  Event:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      timestamp:
+        type: "string"
+      epoch:
+        type: "integer"
+        format: "int64"
+      type:
+        type: "string"
+      params:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  PipelineField:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      value:
+        type: "object"
+      annotations:
+        type: "array"
+        items:
+          $ref: "#/definitions/Annotation"
+      metadata:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      annotationsSize:
+        type: "integer"
+        format: "int32"
+      metadataNames:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+  ExperimentMetric:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      description:
+        type: "string"
+      primary:
+        type: "boolean"
+        default: false
+      jobId:
+        type: "string"
+      type:
+        type: "string"
+  WriteableResponse:
+    type: "object"
+    properties:
+      mediaType:
+        $ref: "#/definitions/MediaType"
+      contentCharset:
+        type: "string"
+      contentType:
+        type: "string"
+  Annotation:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      start:
+        type: "integer"
+        format: "int64"
+      end:
+        type: "integer"
+        format: "int64"
+      features:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      featureCount:
+        type: "integer"
+        format: "int32"
+  PipelineDocument:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      fields:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            $ref: "#/definitions/PipelineField"
+      metadata:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      hints:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          uniqueItems: true
+          items:
+            type: "string"
+      commands:
+        type: "array"
+        items:
+          $ref: "#/definitions/Command"
+      content:
+        type: "array"
+        items:
+          type: "string"
+          format: "byte"
+      flattenedFields:
+        type: "array"
+        items:
+          $ref: "#/definitions/PipelineField"
+      metadataNames:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      allFieldNames:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      reservedFieldNames:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      fieldNames:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+  ParamAndValue:
+    type: "object"
+    properties:
+      key:
+        type: "string"
+      value:
+        type: "string"
+      policy:
+        type: "string"
+        enum:
+        - "REPLACE"
+        - "APPEND"
+        - "REMOVE"
+        - "DEFAULT"

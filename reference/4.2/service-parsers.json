@@ -1,0 +1,1199 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service parsers"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "parsers"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/parsers": {
+      "get": {
+        "summary": "Get all entities",
+        "description": "",
+        "operationId": "getAllEntities",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Entity"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new entity",
+        "description": "",
+        "operationId": "createEntity",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "JSON-formatted configuration values",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/ParserConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Entity"
+            }
+          }
+        }
+      }
+    },
+    "/parsers/_schema": {
+      "get": {
+        "summary": "Get JSON schema for objects managed by this API",
+        "description": "",
+        "operationId": "getEntitySchema",
+        "produces": [
+          "application/schema+json; qs=1.0",
+          "application/json; qs=0.9"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ObjectType"
+            }
+          }
+        }
+      }
+    },
+    "/parsers/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parsers/{id}": {
+      "get": {
+        "summary": "Get the specified entity",
+        "description": "",
+        "operationId": "getEntity",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The entity ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Entity"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an entity",
+        "description": "",
+        "operationId": "updateEntity",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The entity ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "An entity tag to match",
+            "required": false,
+            "type": "string",
+            "default": "\"-1\""
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "JSON-formatted configuration values",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/ParserConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Entity"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an entity",
+        "description": "",
+        "operationId": "deleteEntity",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The entity ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "An entity tag to match",
+            "required": false,
+            "type": "string",
+            "default": "\"-1\""
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/parsers/{id}/parse": {
+      "post": {
+        "summary": "Parse the supplied stream using a direct POST",
+        "description": "The output is one or more PipelineDocuments",
+        "operationId": "parseFileDirect",
+        "consumes": [
+          "*/*"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The parser configuration ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "An integer value to capture the first N documents, similar to SQL 'limit'",
+            "required": false,
+            "type": "integer",
+            "default": 100,
+            "format": "int32"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The offset in the complete result set where the set of returned documents should begin, used for pagination, similar to SQL 'offset'",
+            "required": false,
+            "type": "integer",
+            "default": 0,
+            "format": "int32"
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "default": "application/octet-stream"
+          },
+          {
+            "name": "Content-Disposition",
+            "in": "header",
+            "description": "A presentation tag for the entity body",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The data to parse",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/InputStream"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ParserResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "BodyPart": {
+      "type": "object",
+      "properties": {
+        "contentDisposition": {
+          "$ref": "#/definitions/ContentDisposition"
+        },
+        "entity": {
+          "type": "object"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "mediaType": {
+          "$ref": "#/definitions/MediaType"
+        },
+        "messageBodyWorkers": {
+          "$ref": "#/definitions/MessageBodyWorkers"
+        },
+        "parent": {
+          "$ref": "#/definitions/MultiPart"
+        },
+        "providers": {
+          "$ref": "#/definitions/Providers"
+        },
+        "parameterizedHeaders": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ParameterizedHeader"
+            }
+          }
+        }
+      }
+    },
+    "Entity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "ParameterizedHeader": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "PropertyGroup": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "readOnly": true
+        },
+        "properties": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ParserErrorResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "Providers": {
+      "type": "object"
+    },
+    "ParserStageConfig": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "mediaTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pathPatterns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SyntaxAndPattern"
+          }
+        },
+        "errorHandling": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "IGNORE",
+            "LOG",
+            "FAIL",
+            "MARK"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "inheritMediaTypes": {
+          "type": "boolean",
+          "default": false
+        },
+        "outputFieldPrefix": {
+          "type": "string"
+        }
+      }
+    },
+    "ObjectType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "required": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "additionalProperties": {
+          "type": "object",
+          "readOnly": true
+        },
+        "minProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "maxProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "definitions": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        },
+        "propertyGroups": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/PropertyGroup"
+          }
+        }
+      }
+    },
+    "ParserDiagnostic": {
+      "type": "object",
+      "properties": {
+        "diagnosticId": {
+          "type": "string",
+          "readOnly": true
+        },
+        "parserStageId": {
+          "type": "string",
+          "readOnly": true
+        },
+        "parserStageType": {
+          "type": "string",
+          "readOnly": true
+        },
+        "filter": {
+          "type": "string",
+          "readOnly": true
+        },
+        "result": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "cause": {
+          "type": "string",
+          "readOnly": true
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        }
+      }
+    },
+    "MultiPart": {
+      "type": "object",
+      "properties": {
+        "contentDisposition": {
+          "$ref": "#/definitions/ContentDisposition"
+        },
+        "entity": {
+          "type": "object"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "mediaType": {
+          "$ref": "#/definitions/MediaType"
+        },
+        "messageBodyWorkers": {
+          "$ref": "#/definitions/MessageBodyWorkers"
+        },
+        "parent": {
+          "$ref": "#/definitions/MultiPart"
+        },
+        "providers": {
+          "$ref": "#/definitions/Providers"
+        },
+        "bodyParts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BodyPart"
+          }
+        },
+        "parameterizedHeaders": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ParameterizedHeader"
+            }
+          }
+        }
+      }
+    },
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "FormDataMultiPart": {
+      "type": "object",
+      "properties": {
+        "contentDisposition": {
+          "$ref": "#/definitions/ContentDisposition"
+        },
+        "entity": {
+          "type": "object"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "mediaType": {
+          "$ref": "#/definitions/MediaType"
+        },
+        "messageBodyWorkers": {
+          "$ref": "#/definitions/MessageBodyWorkers"
+        },
+        "parent": {
+          "$ref": "#/definitions/MultiPart"
+        },
+        "providers": {
+          "$ref": "#/definitions/Providers"
+        },
+        "bodyParts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BodyPart"
+          }
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/FormDataBodyPart"
+            }
+          }
+        },
+        "parameterizedHeaders": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ParameterizedHeader"
+            }
+          }
+        }
+      }
+    },
+    "MediaType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "subtype": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "wildcardType": {
+          "type": "boolean",
+          "default": false
+        },
+        "wildcardSubtype": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "AnyType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    },
+    "SyntaxAndPattern": {
+      "type": "object",
+      "properties": {
+        "syntax": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "GLOB",
+            "REGEX"
+          ]
+        },
+        "pattern": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "MessageBodyWorkers": {
+      "type": "object"
+    },
+    "InputStream": {
+      "type": "object"
+    },
+    "Annotation": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "start": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "end": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "features": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "label": {
+          "type": "string",
+          "readOnly": true
+        },
+        "featureCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "PipelineDocument": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/PipelineField"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Command"
+          }
+        },
+        "hints": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "ParserResponse": {
+      "type": "object",
+      "properties": {
+        "totalTimeMs": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "parsedStreams": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalDocuments": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PipelineDocument"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ParserErrorResponse"
+          }
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ParserDiagnostic"
+          }
+        }
+      }
+    },
+    "ContentDisposition": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modificationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "readDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "Command": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "params": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "FormDataBodyPart": {
+      "type": "object",
+      "properties": {
+        "contentDisposition": {
+          "$ref": "#/definitions/ContentDisposition"
+        },
+        "entity": {
+          "type": "object"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "mediaType": {
+          "$ref": "#/definitions/MediaType"
+        },
+        "messageBodyWorkers": {
+          "$ref": "#/definitions/MessageBodyWorkers"
+        },
+        "parent": {
+          "$ref": "#/definitions/MultiPart"
+        },
+        "providers": {
+          "$ref": "#/definitions/Providers"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "formDataContentDisposition": {
+          "$ref": "#/definitions/FormDataContentDisposition"
+        },
+        "simple": {
+          "type": "boolean",
+          "default": false
+        },
+        "parameterizedHeaders": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ParameterizedHeader"
+            }
+          }
+        }
+      }
+    },
+    "PipelineField": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "object"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "annotations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Annotation"
+          }
+        }
+      }
+    },
+    "FormDataContentDisposition": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modificationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "readDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "ParserConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "idField": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enableMediaTypeDetection": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "maxParserDepth": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "parserStages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ParserStageConfig"
+          }
+        }
+      }
+    },
+    "AnyTypeObjectObject": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    }
+  }
+}

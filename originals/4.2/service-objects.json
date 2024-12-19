@@ -1,0 +1,2204 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service objects"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "objects"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/objects/export": {
+      "get": {
+        "summary": "Export objects",
+        "description": "Omit parameters to export all objects",
+        "operationId": "exportJson",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json; qs=0.85"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "One or more of: collection, index-pipeline, query-pipeline, search-cluster, datasource, parser, group, link, task, job, spark, blob, data-model, experiment, zone, template, subscription,   appkit or app",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filterPolicy",
+            "in": "query",
+            "description": "One of: 'system' (filter system objects when exporting a particular type of object) or 'none' (export all objects of that type)",
+            "required": false,
+            "type": "string",
+            "default": "system",
+            "enum": [
+              "SYSTEM",
+              "NONE"
+            ]
+          },
+          {
+            "name": "deep",
+            "in": "query",
+            "description": "'True' to include all linked objects",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ExportContainer"
+            }
+          }
+        }
+      }
+    },
+    "/objects/import": {
+      "post": {
+        "summary": "Import one or more objects",
+        "description": "Validation is performed before import. Import starts only if validation succeeds.",
+        "operationId": "importData",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "importPolicy",
+            "in": "query",
+            "description": "One of: abort, merge, overwrite",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ABORT",
+              "MERGE",
+              "OVERWRITE"
+            ]
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The objects to import",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/FormDataMultiPart"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ImportResult"
+            }
+          }
+        }
+      }
+    },
+    "/objects/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/objects/substitutions": {
+      "post": {
+        "summary": "Returns variables declared in import file",
+        "description": "",
+        "operationId": "processSubstitutions",
+        "consumes": [
+          "application/zip"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Import zip file",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/InputStream"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ImportSubstitutions"
+            }
+          }
+        }
+      }
+    },
+    "/objects/validate": {
+      "post": {
+        "summary": "Validate objects",
+        "description": "",
+        "operationId": "validate",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The objects to validate",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/FormDataMultiPart"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ImportResult"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "SearchCluster": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "connectString": {
+          "type": "string",
+          "readOnly": true
+        },
+        "zkClientTimeout": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "zkConnectTimeout": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "cloud": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "bufferFlushInterval": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "bufferSize": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "concurrency": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "authConfig": {
+          "readOnly": true,
+          "$ref": "#/definitions/AuthConfig"
+        },
+        "validateCluster": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "BodyPart": {
+      "type": "object",
+      "properties": {
+        "contentDisposition": {
+          "$ref": "#/definitions/ContentDisposition"
+        },
+        "entity": {
+          "type": "object"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "mediaType": {
+          "$ref": "#/definitions/MediaType"
+        },
+        "messageBodyWorkers": {
+          "$ref": "#/definitions/MessageBodyWorkers"
+        },
+        "parent": {
+          "$ref": "#/definitions/MultiPart"
+        },
+        "providers": {
+          "$ref": "#/definitions/Providers"
+        },
+        "parameterizedHeaders": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ParameterizedHeader"
+            }
+          }
+        }
+      }
+    },
+    "QueryProfile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "queryPipeline": {
+          "type": "string",
+          "readOnly": true
+        },
+        "collection": {
+          "type": "string",
+          "readOnly": true
+        },
+        "searchHandler": {
+          "type": "string",
+          "readOnly": true
+        },
+        "params": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ParamAndValue"
+          }
+        },
+        "experiment": {
+          "readOnly": true,
+          "$ref": "#/definitions/ExperimentReference"
+        }
+      }
+    },
+    "Task": {
+      "type": "object",
+      "discriminator": "type",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "type": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "PropertyGroup": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "readOnly": true
+        },
+        "properties": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Schema": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "hints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ExportContainer": {
+      "type": "object",
+      "properties": {
+        "objects": {
+          "$ref": "#/definitions/FusionObjects"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SubstitutedProperty"
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/Metadata"
+        }
+      }
+    },
+    "AuthConfig": {
+      "type": "object",
+      "properties": {
+        "authType": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "NONE",
+            "BASIC",
+            "KERBEROS"
+          ]
+        },
+        "username": {
+          "type": "string",
+          "readOnly": true
+        },
+        "password": {
+          "type": "string",
+          "readOnly": true
+        },
+        "keyTab": {
+          "type": "string",
+          "readOnly": true
+        },
+        "principal": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "JobChainTriggerConfig": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/JobTriggerConfig"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "triggerType": {
+              "type": "string",
+              "readOnly": true,
+              "enum": [
+                "ON_SUCCESS",
+                "ON_FAILURE",
+                "ON_SUCCESS_OR_FAILURE"
+              ]
+            },
+            "otherJob": {
+              "type": "string",
+              "readOnly": true
+            }
+          }
+        }
+      ]
+    },
+    "Feature": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "collectionId": {
+          "type": "string"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "ConfigCallParams": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE"
+          ]
+        },
+        "queryParams": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "entity": {
+          "type": "string"
+        }
+      }
+    },
+    "JobConfig": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "readOnly": true,
+          "$ref": "#/definitions/FusionResource"
+        },
+        "enabled": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "triggers": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/JobTriggerConfig"
+          }
+        },
+        "default": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        }
+      }
+    },
+    "ObjectGroup": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "isSystem": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "IndexPipelineDefinition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "stages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StageConfig"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "MediaType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "subtype": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "wildcardType": {
+          "type": "boolean",
+          "default": false
+        },
+        "wildcardSubtype": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "ServiceCallTask": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Task"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "callParams": {
+              "readOnly": true,
+              "$ref": "#/definitions/ConfigCallParams"
+            }
+          }
+        }
+      ]
+    },
+    "AppkitApp": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "contextPath": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enabled": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "war": {
+          "type": "string",
+          "readOnly": true
+        },
+        "warMd5": {
+          "type": "string",
+          "readOnly": true
+        },
+        "warSize": {
+          "type": "integer",
+          "format": "int64",
+          "readOnly": true
+        },
+        "type": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "MessageBodyWorkers": {
+      "type": "object"
+    },
+    "Blob": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "path": {
+          "type": "string",
+          "readOnly": true
+        },
+        "dir": {
+          "type": "string",
+          "readOnly": true
+        },
+        "filename": {
+          "type": "string",
+          "readOnly": true
+        },
+        "contentType": {
+          "type": "string",
+          "readOnly": true
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64",
+          "readOnly": true
+        },
+        "modifiedTime": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "version": {
+          "type": "integer",
+          "format": "int64",
+          "readOnly": true
+        },
+        "md5": {
+          "type": "string",
+          "readOnly": true
+        },
+        "metadata": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "CronTrigger": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/JobTriggerConfig"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "expression": {
+              "type": "string",
+              "readOnly": true
+            }
+          }
+        }
+      ]
+    },
+    "Experiment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "uniqueIdParameter": {
+          "type": "string",
+          "readOnly": true
+        },
+        "baseSignalsCollection": {
+          "type": "string",
+          "readOnly": true
+        },
+        "variants": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ExperimentVariant"
+          }
+        },
+        "automaticallyAdjustTraffic": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "enabled": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "startTimestamp": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "runId": {
+          "type": "string",
+          "readOnly": true
+        },
+        "metrics": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ExperimentMetric"
+          }
+        }
+      }
+    },
+    "StageConfig": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true
+        },
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "skip": {
+          "type": "boolean",
+          "default": false
+        },
+        "label": {
+          "type": "string"
+        },
+        "condition": {
+          "type": "string"
+        }
+      }
+    },
+    "DataSource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "connector": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "pipeline": {
+          "type": "string"
+        },
+        "parserId": {
+          "type": "string"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "AppkitAppExportContainer": {
+      "type": "object",
+      "properties": {
+        "appkitApp": {
+          "readOnly": true,
+          "$ref": "#/definitions/AppkitApp"
+        },
+        "editingSessions": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/EditingSession"
+          }
+        }
+      }
+    },
+    "FusionResource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "APPKIT_APP",
+            "WEBAPP_ADMIN_APP",
+            "APP",
+            "COLLECTION",
+            "INDEX_PIPELINE",
+            "INDEX_STAGE",
+            "QUERY_STAGE",
+            "QUERY_PIPELINE",
+            "INDEX_PROFILE",
+            "QUERY_PROFILE",
+            "BLOB",
+            "PARSER",
+            "DATASOURCE",
+            "TASK",
+            "SCHEDULE",
+            "SEARCH_CLUSTER",
+            "EXPERIMENT",
+            "SPARK_JOB",
+            "GROUP",
+            "CUSTOM_RULE_TYPE",
+            "TYPE",
+            "RESOURCE",
+            "NULL"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "canonicalName": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "SubstitutedProperty": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "schema": {
+          "$ref": "#/definitions/Schema"
+        }
+      }
+    },
+    "Collection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "searchClusterId": {
+          "type": "string"
+        },
+        "commitWithin": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "features": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Feature"
+          }
+        },
+        "compositeIdSpec": {
+          "$ref": "#/definitions/CompositeIdSpec"
+        },
+        "solrParams": {
+          "$ref": "#/definitions/CreateCollectionCmd"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "DATA",
+            "LOGS",
+            "METRICS",
+            "SIGNALS",
+            "SIGNALS_AGGREGATION",
+            "SEARCHLOGS",
+            "SYNONYMS",
+            "RECOMMENDATIONS",
+            "HISTORY",
+            "BLOBS",
+            "MESSAGES",
+            "TAXONOMY",
+            "CRAWL_DB",
+            "JOB_HISTORY",
+            "ARCHIVING",
+            "AUTOCOMPLETE_DOCUMENTS",
+            "QUERY_REWRITE",
+            "USER_PREFS",
+            "JOB_REPORTS",
+            "NULL"
+          ]
+        },
+        "relatedCollectionId": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "FormDataContentDisposition": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modificationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "readDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "ExperimentReference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "percentOfTraffic": {
+          "type": "number",
+          "format": "double",
+          "readOnly": true
+        }
+      }
+    },
+    "Link": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "readOnly": true,
+          "$ref": "#/definitions/FusionResource"
+        },
+        "object": {
+          "readOnly": true,
+          "$ref": "#/definitions/FusionResource"
+        },
+        "linkType": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "DependsOn",
+            "Supports",
+            "IsPartOf",
+            "HasPart",
+            "RelatesTo",
+            "InContextOf",
+            "HasContext",
+            "Self"
+          ]
+        },
+        "originator": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "AnyTypeObjectObject": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    },
+    "ParameterizedHeader": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "CustomRuleTypeConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "display_type": {
+          "type": "string",
+          "readOnly": true
+        },
+        "pipeline_id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "schema": {
+          "readOnly": true,
+          "$ref": "#/definitions/ObjectType"
+        }
+      }
+    },
+    "Metadata": {
+      "type": "object",
+      "properties": {
+        "formatVersion": {
+          "type": "string"
+        },
+        "exportedBy": {
+          "type": "string"
+        },
+        "exportedDate": {
+          "type": "string"
+        },
+        "fusionVersion": {
+          "type": "string"
+        },
+        "fusionGuid": {
+          "type": "string"
+        }
+      }
+    },
+    "ImportSubstitutions": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SubstitutedProperty"
+          }
+        },
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "zipFileToken": {
+          "type": "string"
+        }
+      }
+    },
+    "FusionObjects": {
+      "type": "object",
+      "properties": {
+        "collections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Collection"
+          }
+        },
+        "indexPipelines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IndexPipelineDefinition"
+          }
+        },
+        "queryPipelines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/QueryPipelineDefinition"
+          }
+        },
+        "searchClusters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SearchCluster"
+          }
+        },
+        "features": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Feature"
+            }
+          }
+        },
+        "indexProfiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IndexProfile"
+          }
+        },
+        "queryProfiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/QueryProfile"
+          }
+        },
+        "parsers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ParserConfig"
+          }
+        },
+        "objectGroups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ObjectGroup"
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Link"
+          }
+        },
+        "tasks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Task"
+          }
+        },
+        "jobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/JobConfig"
+          }
+        },
+        "sparkJobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SparkJobConfig"
+          }
+        },
+        "blobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Blob"
+          }
+        },
+        "experiments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Experiment"
+          }
+        },
+        "appkitApps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AppkitAppExportContainer"
+          }
+        },
+        "fusionApps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FusionApp"
+          }
+        },
+        "customRules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CustomRuleTypeConfig"
+          }
+        },
+        "dataSources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DataSource"
+          }
+        }
+      }
+    },
+    "Providers": {
+      "type": "object"
+    },
+    "ParserStageConfig": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "mediaTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pathPatterns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SyntaxAndPattern"
+          }
+        },
+        "errorHandling": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "IGNORE",
+            "LOG",
+            "FAIL",
+            "MARK"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "inheritMediaTypes": {
+          "type": "boolean",
+          "default": false
+        },
+        "outputFieldPrefix": {
+          "type": "string"
+        }
+      }
+    },
+    "JobTriggerConfig": {
+      "type": "object",
+      "discriminator": "type",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "type": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "ObjectType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "required": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "additionalProperties": {
+          "type": "object",
+          "readOnly": true
+        },
+        "minProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "maxProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "definitions": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        },
+        "propertyGroups": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/PropertyGroup"
+          }
+        }
+      }
+    },
+    "MultiPart": {
+      "type": "object",
+      "properties": {
+        "contentDisposition": {
+          "$ref": "#/definitions/ContentDisposition"
+        },
+        "entity": {
+          "type": "object"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "mediaType": {
+          "$ref": "#/definitions/MediaType"
+        },
+        "messageBodyWorkers": {
+          "$ref": "#/definitions/MessageBodyWorkers"
+        },
+        "parent": {
+          "$ref": "#/definitions/MultiPart"
+        },
+        "providers": {
+          "$ref": "#/definitions/Providers"
+        },
+        "bodyParts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BodyPart"
+          }
+        },
+        "parameterizedHeaders": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ParameterizedHeader"
+            }
+          }
+        }
+      }
+    },
+    "ExperimentVariant": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "collection": {
+          "type": "string",
+          "readOnly": true
+        },
+        "queryPipeline": {
+          "type": "string",
+          "readOnly": true
+        },
+        "params": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ParamAndValue"
+          }
+        },
+        "weight": {
+          "type": "number",
+          "format": "double",
+          "readOnly": true
+        }
+      }
+    },
+    "FusionApp": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "CompositeIdSpec": {
+      "type": "object",
+      "properties": {
+        "routeKey1Field": {
+          "type": "string"
+        },
+        "routeKey1Bits": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "routeKey2Field": {
+          "type": "string"
+        },
+        "routeKey2Bits": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "FormDataMultiPart": {
+      "type": "object",
+      "properties": {
+        "contentDisposition": {
+          "$ref": "#/definitions/ContentDisposition"
+        },
+        "entity": {
+          "type": "object"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "mediaType": {
+          "$ref": "#/definitions/MediaType"
+        },
+        "messageBodyWorkers": {
+          "$ref": "#/definitions/MessageBodyWorkers"
+        },
+        "parent": {
+          "$ref": "#/definitions/MultiPart"
+        },
+        "providers": {
+          "$ref": "#/definitions/Providers"
+        },
+        "bodyParts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BodyPart"
+          }
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/FormDataBodyPart"
+            }
+          }
+        },
+        "parameterizedHeaders": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ParameterizedHeader"
+            }
+          }
+        }
+      }
+    },
+    "AnyType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    },
+    "ParamAndValue": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "readOnly": true
+        },
+        "value": {
+          "type": "string",
+          "readOnly": true
+        },
+        "policy": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "REPLACE",
+            "APPEND",
+            "REMOVE",
+            "DEFAULT"
+          ]
+        }
+      }
+    },
+    "SyntaxAndPattern": {
+      "type": "object",
+      "properties": {
+        "syntax": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "GLOB",
+            "REGEX"
+          ]
+        },
+        "pattern": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "EditingSession": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "owner": {
+          "type": "string",
+          "readOnly": true
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "ImportResult": {
+      "type": "object",
+      "properties": {
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variablesWarnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variablesErrors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variablesSubstitutions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "validationWarnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "validationErrors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "importErrors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "importActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "zipFileToken": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "SparkJobConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "IndexProfile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "indexPipeline": {
+          "type": "string",
+          "readOnly": true
+        },
+        "collection": {
+          "type": "string",
+          "readOnly": true
+        },
+        "parser": {
+          "type": "string",
+          "readOnly": true
+        },
+        "params": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ParamAndValue"
+          }
+        }
+      }
+    },
+    "InputStream": {
+      "type": "object"
+    },
+    "IntervalTrigger": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/JobTriggerConfig"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "interval": {
+              "type": "integer",
+              "format": "int32",
+              "readOnly": true
+            },
+            "timeUnit": {
+              "type": "string",
+              "readOnly": true,
+              "enum": [
+                "SECOND",
+                "MINUTE",
+                "HOUR",
+                "DAY",
+                "WEEK",
+                "MONTH"
+              ]
+            },
+            "startTime": {
+              "type": "string",
+              "format": "date-time",
+              "readOnly": true
+            }
+          }
+        }
+      ]
+    },
+    "BlobDownloadTask": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Task"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "readOnly": true
+            },
+            "blobId": {
+              "type": "string",
+              "readOnly": true
+            }
+          }
+        }
+      ]
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "CreateCollectionCmd": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "numShards": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "replicationFactor": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "collection.configName": {
+          "type": "string"
+        }
+      }
+    },
+    "SystemLogsCleanupTask": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Task"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "collection": {
+              "type": "string",
+              "readOnly": true
+            },
+            "days": {
+              "type": "integer",
+              "format": "int32",
+              "readOnly": true
+            }
+          }
+        }
+      ]
+    },
+    "ContentDisposition": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "creationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modificationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "readDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "FormDataBodyPart": {
+      "type": "object",
+      "properties": {
+        "contentDisposition": {
+          "$ref": "#/definitions/ContentDisposition"
+        },
+        "entity": {
+          "type": "object"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "mediaType": {
+          "$ref": "#/definitions/MediaType"
+        },
+        "messageBodyWorkers": {
+          "$ref": "#/definitions/MessageBodyWorkers"
+        },
+        "parent": {
+          "$ref": "#/definitions/MultiPart"
+        },
+        "providers": {
+          "$ref": "#/definitions/Providers"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "formDataContentDisposition": {
+          "$ref": "#/definitions/FormDataContentDisposition"
+        },
+        "simple": {
+          "type": "boolean",
+          "default": false
+        },
+        "parameterizedHeaders": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ParameterizedHeader"
+            }
+          }
+        }
+      }
+    },
+    "ExperimentMetric": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "jobId": {
+          "type": "string"
+        },
+        "binary": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "primary": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        }
+      }
+    },
+    "QueryPipelineDefinition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "stages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StageConfig"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ParserConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "idField": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enableMediaTypeDetection": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "maxParserDepth": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "parserStages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ParserStageConfig"
+          }
+        }
+      }
+    }
+  }
+}

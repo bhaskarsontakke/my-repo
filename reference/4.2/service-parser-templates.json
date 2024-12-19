@@ -1,0 +1,223 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service parser-templates"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "parser-templates"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/templates/parsers": {
+      "get": {
+        "operationId": "getTemplates",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/IterableParserConfig"
+            },
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/templates/parsers/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/templates/parsers/{templateId}": {
+      "get": {
+        "operationId": "getTemplate",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ParserConfig"
+            },
+            "headers": {}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "ParserStageConfig": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "mediaTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pathPatterns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SyntaxAndPattern"
+          }
+        },
+        "errorHandling": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "IGNORE",
+            "LOG",
+            "FAIL",
+            "MARK"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "inheritMediaTypes": {
+          "type": "boolean",
+          "default": false
+        },
+        "outputFieldPrefix": {
+          "type": "string"
+        }
+      }
+    },
+    "ParserConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "idField": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enableMediaTypeDetection": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "maxParserDepth": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "parserStages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ParserStageConfig"
+          }
+        }
+      }
+    },
+    "SyntaxAndPattern": {
+      "type": "object",
+      "properties": {
+        "syntax": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "GLOB",
+            "REGEX"
+          ]
+        },
+        "pattern": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    }
+  }
+}

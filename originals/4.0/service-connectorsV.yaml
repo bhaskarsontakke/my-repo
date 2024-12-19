@@ -1,0 +1,656 @@
+---
+swagger: "2.0"
+info:
+  version: "4.0.0-dev71"
+  title: "Fusion Service connectorsV4"
+basePath: "/api/apollo"
+tags:
+- name: "connectorsV4"
+schemes:
+- "http"
+paths:
+  /connectorsV4/configs:
+    get:
+      operationId: "getConnectorConfigs"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    post:
+      operationId: "addConnectorConfig"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          type: "string"
+      - name: "validate-only"
+        in: "query"
+        required: false
+        type: "boolean"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "removeConnectorConfigs"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "force"
+        in: "query"
+        required: false
+        type: "boolean"
+      - name: "remove_output"
+        in: "query"
+        required: false
+        type: "boolean"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/configs/{id}:
+    get:
+      operationId: "getConnectorConfig"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    put:
+      operationId: "updateConnectorConfig"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "removeConnectorConfig"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "force"
+        in: "query"
+        required: false
+        type: "boolean"
+      - name: "remove_output"
+        in: "query"
+        required: false
+        type: "boolean"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/configs/{id}/db:
+    get:
+      operationId: "getDb"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "dropDb"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "remove_output"
+        in: "query"
+        required: false
+        type: "boolean"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/configs/{id}/db/{table}:
+    delete:
+      operationId: "dropTable"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "table"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/configs/{id}/db/{table}/items:
+    get:
+      operationId: "getItems"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "table"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "start"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "rows"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/configs/{id}/db/{table}/items/{item}:
+    get:
+      operationId: "getItem"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "table"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "item"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "deleteItem"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "table"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "item"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/configs/{id}/getDirectoryItems:
+    get:
+      operationId: "getDirectoryItems"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "offset"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "limit"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "maxWaitTimeMs"
+        in: "query"
+        required: false
+        type: "integer"
+        default: 180000
+        format: "int32"
+      - name: "path"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/configs/{id}/output:
+    delete:
+      operationId: "deleteContent"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/history/{id}:
+    get:
+      operationId: "getHistory"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "cumulative"
+        in: "query"
+        required: false
+        type: "boolean"
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "removeHistory"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/jobs:
+    get:
+      operationId: "listJobs"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "finishAllJobs"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "collection"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "abort"
+        in: "query"
+        required: false
+        type: "boolean"
+      - name: "wait_time"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int64"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/jobs/{id}:
+    get:
+      operationId: "getJobStatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    post:
+      operationId: "transitionJobState"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "abort"
+        in: "query"
+        required: false
+        type: "boolean"
+      - name: "wait_time"
+        in: "query"
+        required: false
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/plugins:
+    get:
+      operationId: "getConnectorInfos"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/plugins/{connectorName}/source:
+    put:
+      operationId: "installOrUpdatePlugin"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "connectorName"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      operationId: "uninstallPlugin"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "connectorName"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/plugins/{type}:
+    get:
+      operationId: "getConnectorInfo"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/security_filter/{collection}:
+    get:
+      operationId: "buildSecurityFilter"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "username"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "configsIDs"
+        in: "query"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      responses:
+        default:
+          description: "successful operation"
+    post:
+      operationId: "buildSecurityFilterFromSubject"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/Subject"
+      - name: "collection"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "configsIDs"
+        in: "query"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      responses:
+        default:
+          description: "successful operation"
+  /connectorsV4/service/status:
+    get:
+      operationId: "createServiceStatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ServiceStatus"
+          headers: {}
+  /connectorsV4/status:
+    get:
+      summary: "Get the status of the service"
+      description: ""
+      operationId: "getStatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceStatus"
+  /connectorsV4/suggestions/configs:
+    get:
+      operationId: "suggestConnectorConfig"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "input"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+definitions:
+  GlobPermission:
+    type: "object"
+    properties:
+      methods:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+          enum:
+          - "GET"
+          - "POST"
+          - "PUT"
+          - "DELETE"
+          - "HEAD"
+          - "PATCH"
+          - "OPTIONS"
+      path:
+        type: "string"
+      params:
+        $ref: "#/definitions/PermissionParams"
+  SubjectRealm:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      name:
+        type: "string"
+      data:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      principal:
+        type: "string"
+  ServiceStatus:
+    type: "object"
+    properties:
+      node:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "ok"
+        - "warning"
+        - "error"
+        - "shutdown"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/StatusMessage"
+  PermissionParams:
+    type: "object"
+    properties:
+      paramNames:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+  Subject:
+    type: "object"
+    properties:
+      userId:
+        type: "string"
+      permissions:
+        type: "array"
+        items:
+          $ref: "#/definitions/GlobPermission"
+      roles:
+        type: "array"
+        items:
+          type: "string"
+      realm:
+        $ref: "#/definitions/SubjectRealm"
+      principal:
+        type: "string"
+  StatusMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      date:
+        type: "string"
+        format: "date-time"

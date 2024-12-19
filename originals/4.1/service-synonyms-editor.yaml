@@ -1,0 +1,357 @@
+---
+swagger: "2.0"
+info:
+  version: "4.1.3"
+  title: "Fusion Service synonyms-editor"
+basePath: "/api/apollo"
+tags:
+- name: "synonyms-editor"
+schemes:
+- "http"
+paths:
+  /collections/{collection}/synonyms:
+    get:
+      summary: "Return a list of synonym files along with their editing READY/NOT_READY/NOT_SAVED\
+        \ states"
+      description: ""
+      operationId: "listFiles"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The name of a collection"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/SynonymFile"
+  /collections/{collection}/synonyms/status:
+    get:
+      summary: "Get the status of the service"
+      description: ""
+      operationId: "getStatus"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceStatus"
+  /collections/{collection}/synonyms/{path}:
+    get:
+      summary: "Return editing READY/NOT_READY status for a single synonym file (or\
+        \ 404)"
+      description: ""
+      operationId: "getFile"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The name of a collection"
+        required: true
+        type: "string"
+      - name: "path"
+        in: "path"
+        description: "The path to a synonym file"
+        required: true
+        type: "string"
+        pattern: ".*"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SynonymFile"
+    put:
+      summary: "Change a synonym file's state"
+      description: ""
+      operationId: "changeState"
+      consumes:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The name of a collection"
+        required: true
+        type: "string"
+      - name: "path"
+        in: "path"
+        description: "The path to a synonym file"
+        required: true
+        type: "string"
+        pattern: ".*"
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted list of synonyms"
+        required: false
+        schema:
+          $ref: "#/definitions/SynonymFile"
+      responses:
+        default:
+          description: "successful operation"
+  /collections/{collection}/synonyms/{path}/items:
+    get:
+      summary: "Export synonyms as a CSV file"
+      description: ""
+      operationId: "exportToCsv"
+      produces:
+      - "text/csv; qs=0.9"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The name of a collection"
+        required: true
+        type: "string"
+      - name: "path"
+        in: "path"
+        description: "The path to a synonym file"
+        required: true
+        type: "string"
+        pattern: ".*"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/StreamingOutput"
+    post:
+      summary: "Add a new entry to a synonyms file"
+      description: ""
+      operationId: "addSynonym"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The name of a collection"
+        required: true
+        type: "string"
+      - name: "path"
+        in: "path"
+        description: "The path to a synonym file"
+        required: true
+        type: "string"
+        pattern: ".*"
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted synonym entries"
+        required: false
+        schema:
+          $ref: "#/definitions/SynonymEntry"
+      - name: "commit"
+        in: "query"
+        description: "If true, commit the change to Solr immediately instead of asynchronously"
+        required: false
+        type: "boolean"
+        default: true
+      - name: "fusion-user-name"
+        in: "header"
+        description: "The Fusion user for authentication"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SynonymEntry"
+  /collections/{collection}/synonyms/{path}/items/{id}:
+    put:
+      summary: "Update an entry in a synonyms file"
+      description: ""
+      operationId: "updateSynonym"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The name of a collection"
+        required: true
+        type: "string"
+      - name: "path"
+        in: "path"
+        description: "The path to a synonym file"
+        required: true
+        type: "string"
+        pattern: ".*"
+      - name: "id"
+        in: "path"
+        description: "The unique ID of the synonym entry"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted synonym entries"
+        required: false
+        schema:
+          $ref: "#/definitions/SynonymEntry"
+      - name: "commit"
+        in: "query"
+        description: "If true, commit the change to Solr immediately instead of asynchronously"
+        required: false
+        type: "boolean"
+        default: true
+      - name: "fusion-user-name"
+        in: "header"
+        description: "The Fusion user for authentication"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SynonymEntry"
+    delete:
+      summary: "Delete an entry in a synonyms file"
+      description: ""
+      operationId: "deleteSynonym"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The name of a collection"
+        required: true
+        type: "string"
+      - name: "path"
+        in: "path"
+        description: "The path to a synonym file"
+        required: true
+        type: "string"
+        pattern: ".*"
+      - name: "id"
+        in: "path"
+        description: "The unique ID of the synonym entry"
+        required: true
+        type: "string"
+      - name: "commit"
+        in: "query"
+        description: "If true, commit the change to Solr immediately instead of asynchronously"
+        required: false
+        type: "boolean"
+        default: true
+      responses:
+        default:
+          description: "successful operation"
+  /collections/{collection}/synonyms/{path}/suggestions:
+    get:
+      summary: "Get term suggestions from synonyms/categories/comments for autocomplete/autosuggest\
+        \ purposes"
+      description: ""
+      operationId: "getSuggestions"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The name of a collection"
+        required: true
+        type: "string"
+      - name: "path"
+        in: "path"
+        description: "The path to a synonym file"
+        required: true
+        type: "string"
+        pattern: ".*"
+      - name: "field"
+        in: "query"
+        description: "The field to search"
+        required: false
+        type: "string"
+      - name: "q"
+        in: "query"
+        description: "The query term for which to get suggestions"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+definitions:
+  InputStream:
+    type: "object"
+  ServiceStatus:
+    type: "object"
+    properties:
+      node:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "ok"
+        - "warning"
+        - "error"
+        - "shutdown"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/StatusMessage"
+  SynonymFile:
+    type: "object"
+    properties:
+      path:
+        type: "string"
+      state:
+        type: "string"
+        enum:
+        - "NOT_READY"
+        - "READY"
+        - "NOT_SAVED"
+  SynonymEntry:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      mapping:
+        type: "string"
+      category:
+        type: "string"
+      enabled:
+        type: "boolean"
+        default: false
+      modified:
+        type: "string"
+        format: "date-time"
+      user:
+        type: "string"
+      type:
+        type: "string"
+        enum:
+        - "EXPLICIT"
+        - "EQUIVALENT"
+  StreamingOutput:
+    type: "object"
+  SynonymItems:
+    type: "object"
+    properties:
+      count:
+        type: "integer"
+        format: "int64"
+      items:
+        type: "array"
+        items:
+          $ref: "#/definitions/SynonymEntry"
+  StatusMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      date:
+        type: "string"
+        format: "date-time"

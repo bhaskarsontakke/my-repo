@@ -1,0 +1,442 @@
+openapi: 3.1.0
+info:
+  title: Push API
+  version: '1.0'
+  contact:
+    name: Lucidworks
+    url: 'https://lucidworks.com/'
+    email: support@lucidworks.com
+  termsOfService: 'https://lucidworks.com/legal/developer-license-agreement/'
+  license:
+    name: Lucidworks
+    url: 'https://lucidworks.com/legal/developer-license-agreement/'
+  description: The Push API is used to push structured data to Springboard to make it searchable. Send data using the Save method to create or update documents. Use the Delete method to remove those documents.
+servers:
+  - url: 'http://DATASOURCE_ID.datasources.lucidworks.com'
+paths:
+  /push:
+    post:
+      summary: Save
+      operationId: post-push
+      responses:
+        '202':
+          description: Accepted if successful
+        '400':
+          $ref: '#/components/responses/response-save-error-400'
+        '413':
+          $ref: '#/components/responses/response-error-413'
+        '500':
+          $ref: '#/components/responses/response-error-500'
+        '504':
+          $ref: '#/components/responses/response-error-504'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postPush'
+            examples: {}
+        description: ''
+      description: |-
+        Creates a new document or updates a current document based on structured data. 
+
+        <!-- theme: info -->
+
+        > #### IMPORTANT
+        >
+        > Each Save request is limited to a maximum of 200 documents with a combined maximum size of 1 MB. If this is exceeded, the request is rejected and an error response is returned.
+
+        ## Processing information
+
+        The entire batch of documents is validated. 
+
+        - If there are no errors in any of the documents in the batch, the batch is processed. If an individual document contains an `externalId` that:
+          - Does not currently exist in the data source, a new document is created.
+          - Currently exists in the data source, the existing document is updated.
+
+        - If there are errors in any of the documents in the batch, the entire batch fails, and none of the batch is processed. The errors are logged and must be corrected before you resubmit the batch for processing.
+         
+        New and modified entries may not be reflected immediately in search results.
+    parameters: []
+    delete:
+      summary: Delete
+      operationId: delete-push
+      responses:
+        '202':
+          description: Accepted if successful
+        '400':
+          $ref: '#/components/responses/response-delete-error-400'
+        '413':
+          $ref: '#/components/responses/response-error-413'
+        '500':
+          $ref: '#/components/responses/response-error-500'
+        '504':
+          $ref: '#/components/responses/response-error-504'
+      description: |-
+        Deletes a batch of documents based on the `object.externalId` field associated with the document.
+
+        <!-- theme: info -->
+
+        > #### IMPORTANT
+        >
+        > Each Delete request is limited to a maximum of 200 documents with a combined maximum size of 1 MB. If this is exceeded, the request is rejected and an error response is returned.
+
+        ## Processing information
+
+        The entire batch of documents is validated. 
+
+          - If there are no errors in any of the documents in the batch, the batch is processed. If an individual document contains an `externalId` that currently exists in the data source, the existing document is deleted. If no document with the specified `externalId` exists, that `externalId` is ignored and no error is generated.
+
+          - If there are errors in any of the documents in the batch, the entire batch fails, and none of the batch is processed. The errors are logged and must be corrected before you resubmit the batch for processing.
+          
+        Deleted entries may not be reflected immediately in search results.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deletePush'
+components:
+  schemas:
+    postPush:
+      title: postPush
+      x-stoplight:
+        id: 1av77vwqocis0
+      type: array
+      items:
+        type: object
+        properties:
+          document:
+            type: object
+            properties:
+              title:
+                type: string
+                description: The name of the document.
+                maxLength: 8000
+              description:
+                type: string
+                description: The statement of the document's content.
+                maxLength: 8000
+              body:
+                type: string
+                description: The complete contents of the document.
+                maxLength: 1000000000
+              createTimestamp:
+                oneOf:
+                  - type: string
+                    format: date-time
+                    description: |
+                      The date and time the record was created in the source system. 
+
+                      The value can be received in the ISO-8601 format of `yyyy-mm-ddThh:mm:ssZ`. The value is always displayed in that format.
+
+                      <!-- theme: info -->
+
+                      > #### ISO-8601 format
+                      >
+                      > The `T` is a separator required by the ISO 8601 combined date-time format. The `Z` is also required and signifies the zero time offset from Coordinated Universal Time (UTC).Coordinated Universal Time (UTC).
+                  - type:
+                      - number
+                      - integer
+                    description: |-
+                      The date and time the record was created in the source system. 
+
+                      The value can be received in the Unix epoch time format of `seconds.nanoseconds-of-second` that is numeric, not as a string with a value of numbers. 
+                       
+                      The Unix epoch value is converted to display in the required ISO-8601 format of `yyyy-mm-ddThh:mm:ssZ`.
+
+                      <!-- theme: info -->
+
+                      > #### ISO-8601 format
+                      >
+                      > The `T` is a separator required by the ISO 8601 combined date-time format. The `Z` is also required and signifies the zero time offset from Coordinated Universal Time (UTC).
+                description: The date and time the record was created in the source system.
+              lastModifiedTimestamp:
+                oneOf:
+                  - type: string
+                    format: date-time
+                    description: |
+                      The date and time the record was last updated in the source system.
+
+                      The value can be received in the ISO-8601 format of `yyyy-mm-ddThh:mm:ssZ`. The value is always displayed in that format.
+
+                      <!-- theme: info -->
+
+                      > #### ISO-8601 format
+                      >
+                      > The `T` is a separator required by the ISO 8601 combined date-time format. The `Z` is also required and signifies the zero time offset from Coordinated Universal Time (UTC).Coordinated Universal Time (UTC).
+                  - type:
+                      - number
+                      - integer
+                    description: |-
+                      The date and time the record was last updated in the source system.
+
+                      The value can be received in the Unix epoch time format of `seconds.nanoseconds-of-second` that is numeric, not as a string with a value of numbers. 
+                       
+                      The Unix epoch value is converted to display in the required ISO-8601 format of `yyyy-mm-ddThh:mm:ssZ`.
+
+                      <!-- theme: info -->
+
+                      > #### ISO-8601 format
+                      >
+                      > The `T` is a separator required by the ISO 8601 combined date-time format. The `Z` is also required and signifies the zero time offset from Coordinated Universal Time (UTC).
+                description: The date and time the record was last updated in the source system.
+              languageCode:
+                type: string
+                description: 'The 2- or 5-digit lowercase ASCII alphanumeric code representing the name of the human language used within the document. For example, `en` or `en-us` for English.'
+                maxLength: 5
+              thumbnailImage:
+                type: string
+                description: The absolute URL to an image representative of the document.
+                example: 'https://example.com/1.png'
+                maxLength: 8000
+              url:
+                type: string
+                description: 'The absolute URL of the document, including hypertext prot'
+                example: 'https://example.com/document-name/'
+                maxLength: 8000
+              author:
+                type: string
+                description: The name of the document creator.
+                maxLength: 1000
+            required:
+              - title
+          object:
+            type: object
+            properties:
+              externalId:
+                type: string
+                description: |-
+                  The unique identifier of the document. 
+
+                  The `object.externalId` must be unique across all documents in the batch and can contain only lowercase ASCII characters, numbers, and hyphens. 
+                example: a5c8246b-0acd-497e-a020-ed6b3745976e
+                maxLength: 128
+              metadata:
+                type: object
+                description: |-
+                  Data that provides information about other data sent from the source system.
+
+                  Contains a maximum of 100 `key:value` pairs. For example, `"key1":"value1"`, `"key2":"value2"` up to `"key100":"value100"`.
+
+                  The `key` identifies a unique category of information in the document. The other requirements are:
+
+                  - A maximum of 100 `key:value` pairs are allowed.
+                  - A unique `key` is required in each pair, and cannot be repeated.
+                  - Each `key`:
+                    - Can only contain lowercase ASCII alphanumeric characters.
+                    - The first character must be a lowercase letter.
+                    - Can be up to 100 characters in length.
+                    - Must have an associated value.  
+
+                  Values:
+
+                  - Contain the data about the corresponding `key`.
+                  - Values can be up to 1,000 characters in length.
+                properties:
+                  key:
+                    type: string
+                    description: 'A unique `key:value` pair. '
+            required:
+              - externalId
+          type:
+            type: string
+            description: 'This field identifies the kind of information contained in the document. Specifically, it indicates the data model schema to which the document conforms. Currently, the only supported value is `content`.'
+            enum:
+              - content
+        required:
+          - type
+    deletePush:
+      title: Delete
+      x-stoplight:
+        id: 0hpl6lp2zqnf4
+      type: array
+      description: This is a batch operation where you can send multiple documents in a single request.
+      items:
+        type: object
+        properties:
+          externalId:
+            type: string
+            maxLength: 128
+            description: |-
+              The unique identifier of the document. 
+
+              The `object.externalId` must be unique across all documents in the batch and can contain only lowercase ASCII characters, numbers, and hyphens.
+          type:
+            type: string
+            enum:
+              - delete
+            description: 'This field identifies the operation being performed.  Currently, the only supported value is `delete`.'
+        required:
+          - externalId
+          - type
+  securitySchemes:
+    authToken:
+      type: http
+      scheme: bearer
+  responses:
+    response-save-error-400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                enum:
+                  - Request body contains invalid JSON
+                  - Request body must be a non-empty JSON array of objects
+                  - Request body contains more than 200 documents
+                  - 'Save rejected. No documents will be indexed: one or more documents are invalid.'
+                description: |-
+                  The error message:
+
+                    - Is included in every response.
+                    - Describes the errors that are not specific to particular documents.
+                    
+                  If there are multiple errors, messages are joined together in this field using `/n`.
+              documentErrors:
+                type: array
+                description: 'A list of document errors that are only included in the response if one or more documents in the batch contain errors. '
+                items:
+                  type: object
+                  properties:
+                    index:
+                      type: integer
+                      description: The zero-based index of the document in the original request. This field is always included in the response.
+                    externalId:
+                      type: string
+                      description: |-
+                        This field:
+
+                        - Contains the value of the `object.externalId` field.
+
+                        - Is only included in the error response if it can be extracted from the document.
+
+                        - Is omitted if this document is missing this field or is not valid JSON. 
+                      maxLength: 128
+                    message:
+                      type: string
+                      enum:
+                        - Document is missing required field 'FIELD_NAME'
+                        - Document contains invalid field 'FIELD_NAME'
+                        - Document contains field 'FIELD_NAME' with invalid value 'FIELD_VALUE'. The error was generated because 'VALIDATION_FAILURE_REASON'.
+                        - Document contains field 'FIELD_NAME' that cannot be repeated
+                        - Document contains field 'object.externalId' with the value 'FIELD_VALUE' that was already used in another document in this batch
+                        - Document contains `metadata` with more than 100 keys
+                      description: |-
+                        The errors that occurred within this specific document.
+
+                        If there are multiple errors for a specific document, messages are joined together in this field using `/n`.
+                  required:
+                    - index
+                    - message
+            required:
+              - message
+              - documentErrors
+          examples:
+            Standard error response:
+              value:
+                message: Request body contains invalid JSON
+                documentErrors:
+                  - index: 0
+                    externalId: string
+                    message: Document is missing required field 'FIELD_NAME'
+    response-error-500:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: This field contains the internal server error message.
+    response-error-504:
+      description: Gateway Timeout
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: This field contains the gateway timeout message.
+    response-delete-error-400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                enum:
+                  - Request body contains invalid JSON
+                  - Request body must be a non-empty JSON array of objects
+                  - Request body contains more than 200 documents
+                  - 'Delete rejected. No documents will be deleted: one or more documents are invalid.'
+                description: |-
+                  The error message:
+
+                    - Is included in every response.
+                    - Describes the errors that are not specific to particular documents.
+                    
+                  If there are multiple errors, messages are joined together in this field using `/n`.
+              documentErrors:
+                type: array
+                description: 'A list of document errors that are only included in the response if one or more documents in the batch contain errors. '
+                items:
+                  type: object
+                  properties:
+                    index:
+                      type: integer
+                      description: The zero-based index of the document in the original request. This field is always included in the response.
+                    externalId:
+                      type: string
+                      description: |-
+                        This field:
+
+                        - Contains the value of the `object.externalId` field.
+
+                        - Is only included in the error response if it can be extracted from the document.
+
+                        - Is omitted if this document is missing this field or is not valid JSON. 
+                      maxLength: 128
+                    message:
+                      type: string
+                      enum:
+                        - Document is missing required field 'FIELD_NAME'
+                        - Document contains invalid field 'FIELD_NAME'
+                        - Document contains field 'FIELD_NAME' with invalid value 'FIELD_VALUE'. The error was generated because 'VALIDATION_FAILURE_REASON'.
+                        - Document contains field 'FIELD_NAME' that cannot be repeated
+                        - Document contains field 'object.externalId' with the value 'FIELD_VALUE' that was already used in another document in this batch
+                        - Document contains `metadata` with more than 100 keys
+                      description: |-
+                        The errors that occurred within this specific document.
+
+                        If there are multiple errors for a specific document, messages are joined together in this field using `/n`.
+                  required:
+                    - index
+                    - message
+            required:
+              - message
+              - documentErrors
+          examples:
+            Standard error response:
+              value:
+                message: Request body contains invalid JSON
+                documentErrors:
+                  - index: 0
+                    externalId: string
+                    message: Document is missing required field 'FIELD_NAME'
+    response-error-413:
+      description: Request body is larger than 1 MB
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: This field contains the message indicating the request body exceeds the 1 MB limit.
+          examples: {}

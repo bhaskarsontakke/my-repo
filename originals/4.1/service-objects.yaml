@@ -1,0 +1,1328 @@
+---
+swagger: "2.0"
+info:
+  version: "4.1.3"
+  title: "Fusion Service objects"
+basePath: "/api/apollo"
+tags:
+- name: "objects"
+schemes:
+- "http"
+paths:
+  /objects/export:
+    get:
+      summary: "Export objects"
+      description: "Omit parameters to export all objects"
+      operationId: "exportJson"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json; qs=0.85"
+      parameters:
+      - name: "type"
+        in: "query"
+        description: "One or more of: collection, index-pipeline, query-pipeline,\
+          \ search-cluster, datasource, parser, group, link, task, job, spark, blob, data-model, experiment, zone, template, subscription, 
+          \ appkit or app"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      - name: "filterPolicy"
+        in: "query"
+        description: "One of: 'system' (filter system objects when exporting a particular\
+          \ type of object) or 'none' (export all objects of that type)"
+        required: false
+        type: "string"
+        default: "system"
+        enum:
+        - "SYSTEM"
+        - "NONE"
+      - name: "deep"
+        in: "query"
+        description: "'True' to include all linked objects"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ExportContainer"
+  /objects/import:
+    post:
+      summary: "Import one or more objects"
+      description: "Validation is performed before import. Import starts only if validation\
+        \ succeeds."
+      operationId: "importData"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "importPolicy"
+        in: "query"
+        description: "One of: abort, merge, overwrite"
+        required: false
+        type: "string"
+        enum:
+        - "ABORT"
+        - "MERGE"
+        - "OVERWRITE"
+      - in: "body"
+        name: "body"
+        description: "The objects to import"
+        required: false
+        schema:
+          $ref: "#/definitions/FormDataMultiPart"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ImportResult"
+  /objects/status:
+    get:
+      summary: "Get the status of the service"
+      description: ""
+      operationId: "getStatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceStatus"
+  /objects/substitutions:
+    post:
+      summary: "Returns variables declared in import file"
+      description: ""
+      operationId: "processSubstitutions"
+      consumes:
+      - "application/zip"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Import zip file"
+        required: false
+        schema:
+          $ref: "#/definitions/InputStream"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ImportSubstitutions"
+  /objects/validate:
+    post:
+      summary: "Validate objects"
+      description: ""
+      operationId: "validate"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "The objects to validate"
+        required: false
+        schema:
+          $ref: "#/definitions/FormDataMultiPart"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ImportResult"
+definitions:
+  SearchCluster:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      cloud:
+        type: "boolean"
+        default: false
+      connectString:
+        type: "string"
+      authConfig:
+        $ref: "#/definitions/AuthConfig"
+      zkClientTimeout:
+        type: "integer"
+        format: "int32"
+      zkConnectTimeout:
+        type: "integer"
+        format: "int32"
+      validateCluster:
+        type: "boolean"
+        default: false
+      bufferFlushInterval:
+        type: "integer"
+        format: "int32"
+      bufferSize:
+        type: "integer"
+        format: "int32"
+      concurrency:
+        type: "integer"
+        format: "int32"
+  BodyPart:
+    type: "object"
+    properties:
+      contentDisposition:
+        $ref: "#/definitions/ContentDisposition"
+      entity:
+        type: "object"
+      headers:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            type: "string"
+      mediaType:
+        $ref: "#/definitions/MediaType"
+      messageBodyWorkers:
+        $ref: "#/definitions/MessageBodyWorkers"
+      parent:
+        $ref: "#/definitions/MultiPart"
+      providers:
+        $ref: "#/definitions/Providers"
+      parameterizedHeaders:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            $ref: "#/definitions/ParameterizedHeader"
+  QueryProfile:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      pipelineId:
+        type: "string"
+      collectionId:
+        type: "string"
+      handler:
+        type: "string"
+      params:
+        type: "array"
+        items:
+          $ref: "#/definitions/ParamAndValue"
+      experimentReference:
+        $ref: "#/definitions/ExperimentReference"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  Task:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      type:
+        type: "string"
+      hidden:
+        type: "boolean"
+        default: false
+  Schema:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      title:
+        type: "string"
+      description:
+        type: "string"
+      hints:
+        type: "array"
+        items:
+          type: "string"
+  ExportContainer:
+    type: "object"
+    properties:
+      objects:
+        $ref: "#/definitions/FusionObjects"
+      properties:
+        type: "array"
+        items:
+          $ref: "#/definitions/SubstitutedProperty"
+      metadata:
+        $ref: "#/definitions/Metadata"
+  AuthConfig:
+    type: "object"
+    properties:
+      authType:
+        type: "string"
+        enum:
+        - "NONE"
+        - "BASIC"
+        - "KERBEROS"
+      username:
+        type: "string"
+      password:
+        type: "string"
+      keyTab:
+        type: "string"
+      principal:
+        type: "string"
+  Feature:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      collectionId:
+        type: "string"
+      params:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      enabled:
+        type: "boolean"
+        default: false
+  JobConfig:
+    type: "object"
+    properties:
+      jobResource:
+        $ref: "#/definitions/FusionResource"
+      enabled:
+        type: "boolean"
+        default: false
+      triggers:
+        type: "array"
+        items:
+          $ref: "#/definitions/JobTriggerConfig"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      default:
+        type: "boolean"
+        default: false
+  ObjectGroup:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      system:
+        type: "boolean"
+        default: false
+      hidden:
+        type: "boolean"
+        default: false
+  ServiceStatus:
+    type: "object"
+    properties:
+      node:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "ok"
+        - "warning"
+        - "error"
+        - "shutdown"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/StatusMessage"
+  IndexPipelineDefinition:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      stageConfigurations:
+        type: "array"
+        items:
+          $ref: "#/definitions/StageConfig"
+      properties:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      factory:
+        $ref: "#/definitions/PipelineDefinitionFactoryIndexPipelineDefinition"
+      unsafe:
+        type: "boolean"
+        default: false
+      hidden:
+        type: "boolean"
+        default: false
+  MediaType:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      subtype:
+        type: "string"
+      parameters:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      wildcardType:
+        type: "boolean"
+        default: false
+      wildcardSubtype:
+        type: "boolean"
+        default: false
+  AppkitApp:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      war:
+        type: "string"
+      warMd5:
+        type: "string"
+      warSize:
+        type: "integer"
+        format: "int64"
+      contextPath:
+        type: "string"
+      enabled:
+        type: "boolean"
+        default: false
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      hidden:
+        type: "boolean"
+        default: false
+  MessageBodyWorkers:
+    type: "object"
+  PipelineDefinitionFactoryQueryPipelineDefinition:
+    type: "object"
+  Blob:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      path:
+        type: "string"
+      dir:
+        type: "string"
+      filename:
+        type: "string"
+      contentType:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int64"
+      modifiedTime:
+        type: "string"
+        format: "date-time"
+      version:
+        type: "integer"
+        format: "int64"
+      md5:
+        type: "string"
+      metadata:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      hidden:
+        type: "boolean"
+        default: false
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      blobType:
+        type: "string"
+        enum:
+        - "UNSPECIFIED"
+        - "CATALOG"
+        - "JDBC_DRIVER"
+        - "CONNECTOR_PLUGIN"
+        - "SPARK_PLUGIN"
+        - "SPARK_FILE"
+        - "APPKIT_WAR"
+        - "APPKIT_RESOURCE_FILE"
+        - "ML_MODEL"
+        - "OPEN_NLP_MODEL"
+        - "JS_INDEX_FILE"
+        - "JS_QUERY_FILE"
+        - "FILE"
+        - "BANANA"
+        - "DIR"
+        - "SPARK_JAR"
+        - "NULL"
+  FieldMappingRule:
+    type: "object"
+    properties:
+      source:
+        type: "string"
+      target:
+        type: "string"
+      operation:
+        type: "string"
+        enum:
+        - "COPY"
+        - "MOVE"
+        - "DELETE"
+        - "SET"
+        - "ADD"
+        - "KEEP"
+      compiled:
+        $ref: "#/definitions/CompiledFieldMappingRule"
+  Experiment:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      description:
+        type: "string"
+      uniqueIdParam:
+        type: "string"
+      baseSignalsCollection:
+        type: "string"
+      variants:
+        type: "array"
+        items:
+          $ref: "#/definitions/ExperimentVariant"
+      metrics:
+        type: "array"
+        items:
+          $ref: "#/definitions/ExperimentMetric"
+      enabled:
+        type: "boolean"
+        default: false
+      startedDate:
+        type: "string"
+        format: "date-time"
+      runId:
+        type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  FieldMappingConfig:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      id:
+        type: "string"
+      skip:
+        type: "boolean"
+        default: false
+      label:
+        type: "string"
+      condition:
+        type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      reservedFieldsMappingAllowed:
+        type: "boolean"
+        default: false
+      mappings:
+        type: "array"
+        items:
+          $ref: "#/definitions/FieldMappingRule"
+      unmapped:
+        $ref: "#/definitions/FieldMappingRule"
+  StageConfig:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      id:
+        type: "string"
+      skip:
+        type: "boolean"
+        default: false
+      label:
+        type: "string"
+      condition:
+        type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  DataSource:
+    type: "object"
+    properties:
+      properties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      id:
+        type: "string"
+      description:
+        type: "string"
+      type:
+        type: "string"
+      connector:
+        type: "string"
+      pipeline:
+        type: "string"
+      parserId:
+        type: "string"
+      created:
+        type: "string"
+        format: "date-time"
+      modified:
+        type: "string"
+        format: "date-time"
+      collection:
+        type: "string"
+      securityTrimmingEnabled:
+        type: "boolean"
+        default: false
+      initialFieldMapping:
+        $ref: "#/definitions/FieldMappingConfig"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  AppkitAppExportContainer:
+    type: "object"
+    properties:
+      editingSessions:
+        type: "array"
+        items:
+          $ref: "#/definitions/EditingSession"
+      appkitApp:
+        $ref: "#/definitions/AppkitApp"
+  FusionResource:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+        enum:
+        - "APPKIT_APP"
+        - "APP"
+        - "COLLECTION"
+        - "INDEX_PIPELINE"
+        - "INDEX_STAGE"
+        - "QUERY_STAGE"
+        - "QUERY_PIPELINE"
+        - "INDEX_PROFILE"
+        - "QUERY_PROFILE"
+        - "BLOB"
+        - "PARSER"
+        - "DATASOURCE"
+        - "TASK"
+        - "SCHEDULE"
+        - "SEARCH_CLUSTER"
+        - "EXPERIMENT"
+        - "SPARK_JOB"
+        - "GROUP"
+        - "TYPE"
+        - "RESOURCE"
+        - "NULL"
+      id:
+        type: "string"
+      simpleName:
+        type: "string"
+      canonicalName:
+        type: "string"
+      uri:
+        type: "string"
+        format: "uri"
+  SubstitutedProperty:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      schema:
+        $ref: "#/definitions/Schema"
+  Collection:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      createdAt:
+        type: "string"
+        format: "date-time"
+      features:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/Feature"
+      solrParams:
+        $ref: "#/definitions/CreateCollectionCmd"
+      searchClusterId:
+        type: "string"
+      modifiedAt:
+        type: "string"
+        format: "date-time"
+      commitWithin:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+        enum:
+        - "DATA"
+        - "LOGS"
+        - "METRICS"
+        - "SIGNALS"
+        - "SIGNALS_AGGREGATION"
+        - "SEARCHLOGS"
+        - "SYNONYMS"
+        - "RECOMMENDATIONS"
+        - "HISTORY"
+        - "BLOBS"
+        - "MESSAGES"
+        - "TAXONOMY"
+        - "CRAWL_DB"
+        - "JOB_HISTORY"
+        - "ARCHIVING"
+        - "AUTOCOMPLETE_DOCUMENTS"
+        - "NULL"
+      relatedCollectionId:
+        type: "string"
+      metadata:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      compositeIdSpec:
+        $ref: "#/definitions/CompositeIdSpec"
+      hidden:
+        type: "boolean"
+        default: false
+  FormDataContentDisposition:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      parameters:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      fileName:
+        type: "string"
+      creationDate:
+        type: "string"
+        format: "date-time"
+      modificationDate:
+        type: "string"
+        format: "date-time"
+      readDate:
+        type: "string"
+        format: "date-time"
+      size:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+  ExperimentReference:
+    type: "object"
+    properties:
+      experimentId:
+        type: "string"
+      percentOfTrafficInExperiment:
+        type: "number"
+        format: "double"
+  Link:
+    type: "object"
+    properties:
+      subject:
+        $ref: "#/definitions/FusionResource"
+      object:
+        $ref: "#/definitions/FusionResource"
+      linkType:
+        type: "string"
+        enum:
+        - "DependsOn"
+        - "Supports"
+        - "IsPartOf"
+        - "HasPart"
+        - "RelatesTo"
+        - "InContextOf"
+        - "HasContext"
+        - "Self"
+      originator:
+        type: "string"
+      id:
+        type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  ParameterizedHeader:
+    type: "object"
+    properties:
+      value:
+        type: "string"
+      parameters:
+        type: "object"
+        additionalProperties:
+          type: "string"
+  Metadata:
+    type: "object"
+    properties:
+      formatVersion:
+        type: "string"
+      exportedBy:
+        type: "string"
+      exportedDate:
+        type: "string"
+      fusionVersion:
+        type: "string"
+      fusionGuid:
+        type: "string"
+  ImportSubstitutions:
+    type: "object"
+    properties:
+      properties:
+        type: "array"
+        items:
+          $ref: "#/definitions/SubstitutedProperty"
+      values:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      zipFileToken:
+        type: "string"
+  FusionObjects:
+    type: "object"
+    properties:
+      collections:
+        type: "array"
+        items:
+          $ref: "#/definitions/Collection"
+      indexPipelines:
+        type: "array"
+        items:
+          $ref: "#/definitions/IndexPipelineDefinition"
+      queryPipelines:
+        type: "array"
+        items:
+          $ref: "#/definitions/QueryPipelineDefinition"
+      searchClusters:
+        type: "array"
+        items:
+          $ref: "#/definitions/SearchCluster"
+      features:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            $ref: "#/definitions/Feature"
+      indexProfiles:
+        type: "array"
+        items:
+          $ref: "#/definitions/IndexProfile"
+      queryProfiles:
+        type: "array"
+        items:
+          $ref: "#/definitions/QueryProfile"
+      dataSources:
+        type: "array"
+        items:
+          $ref: "#/definitions/DataSource"
+      parsers:
+        type: "array"
+        items:
+          $ref: "#/definitions/ParserConfig"
+      fusionApps:
+        type: "array"
+        items:
+          $ref: "#/definitions/FusionApp"
+      objectGroups:
+        type: "array"
+        items:
+          $ref: "#/definitions/ObjectGroup"
+      links:
+        type: "array"
+        items:
+          $ref: "#/definitions/Link"
+      tasks:
+        type: "array"
+        items:
+          $ref: "#/definitions/Task"
+      jobs:
+        type: "array"
+        items:
+          $ref: "#/definitions/JobConfig"
+      sparkJobs:
+        type: "array"
+        items:
+          $ref: "#/definitions/SparkJobConfig"
+      blobs:
+        type: "array"
+        items:
+          $ref: "#/definitions/Blob"
+      experiments:
+        type: "array"
+        items:
+          $ref: "#/definitions/Experiment"
+      appkitApps:
+        type: "array"
+        items:
+          $ref: "#/definitions/AppkitAppExportContainer"
+  Providers:
+    type: "object"
+  ParserStageConfig:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      label:
+        type: "string"
+      enabled:
+        type: "boolean"
+        default: false
+      mediaTypes:
+        type: "array"
+        items:
+          type: "string"
+      pathPatterns:
+        type: "array"
+        items:
+          $ref: "#/definitions/SyntaxAndPattern"
+      inheritMediaTypes:
+        type: "boolean"
+        default: false
+      errorHandling:
+        type: "string"
+        enum:
+        - "IGNORE"
+        - "LOG"
+        - "FAIL"
+        - "MARK"
+      outputFieldPrefix:
+        type: "string"
+      type:
+        type: "string"
+  JobTriggerConfig:
+    type: "object"
+    properties:
+      enabled:
+        type: "boolean"
+        default: false
+      type:
+        type: "string"
+  MultiPart:
+    type: "object"
+    properties:
+      contentDisposition:
+        $ref: "#/definitions/ContentDisposition"
+      entity:
+        type: "object"
+      headers:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            type: "string"
+      mediaType:
+        $ref: "#/definitions/MediaType"
+      messageBodyWorkers:
+        $ref: "#/definitions/MessageBodyWorkers"
+      parent:
+        $ref: "#/definitions/MultiPart"
+      providers:
+        $ref: "#/definitions/Providers"
+      bodyParts:
+        type: "array"
+        items:
+          $ref: "#/definitions/BodyPart"
+      parameterizedHeaders:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            $ref: "#/definitions/ParameterizedHeader"
+  ExperimentVariant:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      pipeline:
+        type: "string"
+      params:
+        type: "array"
+        items:
+          $ref: "#/definitions/ParamAndValue"
+      collectionName:
+        type: "string"
+      traffic:
+        type: "number"
+        format: "double"
+  FusionApp:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      hidden:
+        type: "boolean"
+        default: false
+  CompositeIdSpec:
+    type: "object"
+    properties:
+      routeKey1Field:
+        type: "string"
+      routeKey1Bits:
+        type: "integer"
+        format: "int32"
+      routeKey2Field:
+        type: "string"
+      routeKey2Bits:
+        type: "integer"
+        format: "int32"
+  FormDataMultiPart:
+    type: "object"
+    properties:
+      contentDisposition:
+        $ref: "#/definitions/ContentDisposition"
+      entity:
+        type: "object"
+      headers:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            type: "string"
+      mediaType:
+        $ref: "#/definitions/MediaType"
+      messageBodyWorkers:
+        $ref: "#/definitions/MessageBodyWorkers"
+      parent:
+        $ref: "#/definitions/MultiPart"
+      providers:
+        $ref: "#/definitions/Providers"
+      bodyParts:
+        type: "array"
+        items:
+          $ref: "#/definitions/BodyPart"
+      fields:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            $ref: "#/definitions/FormDataBodyPart"
+      parameterizedHeaders:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            $ref: "#/definitions/ParameterizedHeader"
+  ParamAndValue:
+    type: "object"
+    properties:
+      key:
+        type: "string"
+      value:
+        type: "string"
+      policy:
+        type: "string"
+        enum:
+        - "REPLACE"
+        - "APPEND"
+        - "REMOVE"
+        - "DEFAULT"
+  SyntaxAndPattern:
+    type: "object"
+    properties:
+      syntax:
+        type: "string"
+        enum:
+        - "GLOB"
+        - "REGEX"
+      pattern:
+        type: "string"
+  Pattern:
+    type: "object"
+  EditingSession:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      owner:
+        type: "string"
+      createdAt:
+        type: "string"
+        format: "date-time"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      version:
+        type: "string"
+  ImportResult:
+    type: "object"
+    properties:
+      conflicts:
+        type: "array"
+        items:
+          type: "string"
+      variablesWarnings:
+        type: "array"
+        items:
+          type: "string"
+      variablesErrors:
+        type: "array"
+        items:
+          type: "string"
+      variablesSubstitutions:
+        type: "array"
+        items:
+          type: "string"
+      validationWarnings:
+        type: "array"
+        items:
+          type: "string"
+      validationErrors:
+        type: "array"
+        items:
+          type: "string"
+      importErrors:
+        type: "array"
+        items:
+          type: "string"
+      importActions:
+        type: "array"
+        items:
+          type: "string"
+      status:
+        type: "string"
+      zipFileToken:
+        type: "string"
+  CompiledFieldMappingRule:
+    type: "object"
+    properties:
+      source:
+        type: "string"
+      sourcePattern:
+        $ref: "#/definitions/Pattern"
+      target:
+        type: "string"
+      regexSource:
+        type: "boolean"
+        default: false
+      op:
+        type: "string"
+        enum:
+        - "COPY"
+        - "MOVE"
+        - "DELETE"
+        - "SET"
+        - "ADD"
+        - "KEEP"
+  SparkJobConfig:
+    type: "object"
+    properties:
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      id:
+        type: "string"
+      type:
+        type: "string"
+  IndexProfile:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      pipelineId:
+        type: "string"
+      collectionId:
+        type: "string"
+      parser:
+        type: "string"
+      params:
+        type: "array"
+        items:
+          $ref: "#/definitions/ParamAndValue"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  InputStream:
+    type: "object"
+  PipelineDefinitionFactoryIndexPipelineDefinition:
+    type: "object"
+  StatusMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      date:
+        type: "string"
+        format: "date-time"
+  CreateCollectionCmd:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      numShards:
+        type: "integer"
+        format: "int32"
+      replicationFactor:
+        type: "integer"
+        format: "int32"
+      collectionConfigName:
+        type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  ContentDisposition:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+      parameters:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      fileName:
+        type: "string"
+      creationDate:
+        type: "string"
+        format: "date-time"
+      modificationDate:
+        type: "string"
+        format: "date-time"
+      readDate:
+        type: "string"
+        format: "date-time"
+      size:
+        type: "integer"
+        format: "int64"
+  FormDataBodyPart:
+    type: "object"
+    properties:
+      contentDisposition:
+        $ref: "#/definitions/ContentDisposition"
+      entity:
+        type: "object"
+      headers:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            type: "string"
+      mediaType:
+        $ref: "#/definitions/MediaType"
+      messageBodyWorkers:
+        $ref: "#/definitions/MessageBodyWorkers"
+      parent:
+        $ref: "#/definitions/MultiPart"
+      providers:
+        $ref: "#/definitions/Providers"
+      name:
+        type: "string"
+      value:
+        type: "string"
+      formDataContentDisposition:
+        $ref: "#/definitions/FormDataContentDisposition"
+      simple:
+        type: "boolean"
+        default: false
+      parameterizedHeaders:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            $ref: "#/definitions/ParameterizedHeader"
+  ExperimentMetric:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      description:
+        type: "string"
+      primary:
+        type: "boolean"
+        default: false
+      jobId:
+        type: "string"
+      type:
+        type: "string"
+  QueryPipelineDefinition:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      stageConfigurations:
+        type: "array"
+        items:
+          $ref: "#/definitions/StageConfig"
+      properties:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      factory:
+        $ref: "#/definitions/PipelineDefinitionFactoryQueryPipelineDefinition"
+      unsafe:
+        type: "boolean"
+        default: false
+      hidden:
+        type: "boolean"
+        default: false
+  ParserConfig:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      idField:
+        type: "string"
+      enableMediaTypeDetection:
+        type: "boolean"
+        default: false
+      maxParserDepth:
+        type: "integer"
+        format: "int32"
+      parserStages:
+        type: "array"
+        items:
+          $ref: "#/definitions/ParserStageConfig"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      hidden:
+        type: "boolean"
+        default: false

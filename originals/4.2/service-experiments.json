@@ -1,0 +1,1431 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "4.2.6-rc1",
+        "title": "Fusion Service experiments"
+    },
+    "basePath": "/api/apollo",
+    "tags": [
+        {
+            "name": "experiments"
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/experiments": {
+            "get": {
+                "summary": "Get all entities",
+                "description": "",
+                "operationId": "getAllEntities",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Entity"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new entity",
+                "description": "",
+                "operationId": "createEntity",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "JSON-formatted configuration values",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/Experiment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Entity"
+                        }
+                    }
+                }
+            }
+        },
+        "/experiments/_schema": {
+            "get": {
+                "summary": "Get JSON schema for objects managed by this API",
+                "description": "",
+                "operationId": "getEntitySchema",
+                "produces": [
+                    "application/schema+json; qs=1.0",
+                    "application/json; qs=0.9"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/ObjectType"
+                        }
+                    }
+                }
+            }
+        },
+        "/experiments/status": {
+            "get": {
+                "summary": "Get the status of the service",
+                "description": "",
+                "operationId": "getStatus",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ServiceStatus"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/experiments/{id}": {
+            "get": {
+                "summary": "Get the specified entity",
+                "description": "",
+                "operationId": "getEntity",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The entity ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Entity"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update an entity",
+                "description": "",
+                "operationId": "updateEntity",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The entity ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "description": "An entity tag to match",
+                        "required": false,
+                        "type": "string",
+                        "default": "\"-1\""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "JSON-formatted configuration values",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/Experiment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Entity"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete an entity",
+                "description": "",
+                "operationId": "deleteEntity",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The entity ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "description": "An entity tag to match",
+                        "required": false,
+                        "type": "string",
+                        "default": "\"-1\""
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/experiments/{id}/groundTruth": {
+            "get": {
+                "operationId": "getGroundTruthResultsAsCsv",
+                "produces": [
+                    "text/csv; qs=0.5"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The experiment ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "queryLimit",
+                        "in": "query",
+                        "description": "Number of queries to return",
+                        "required": false,
+                        "type": "integer",
+                        "default": 100,
+                        "format": "int32"
+                    },
+                    {
+                        "name": "docLimit",
+                        "in": "query",
+                        "description": "Number of doc hits to return per query",
+                        "required": false,
+                        "type": "integer",
+                        "default": 10,
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/experiments/{id}/history": {
+            "get": {
+                "summary": "Get a list of previous configurations of this experiment",
+                "description": "",
+                "operationId": "getHistory",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The experiment ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ExperimentHistoryEntry"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/experiments/{id}/job": {
+            "post": {
+                "summary": "Start an experiment",
+                "description": "",
+                "operationId": "startJob",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The experiment ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "required": false,
+                        "type": "string",
+                        "default": "\"-1\""
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Experiment"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Stop an experiment",
+                "description": "",
+                "operationId": "stopJob",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The experiment ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "required": false,
+                        "type": "string",
+                        "default": "\"-1\""
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Experiment"
+                        }
+                    }
+                }
+            }
+        },
+        "/experiments/{id}/metrics": {
+            "get": {
+                "summary": "Get metrics associated with all runs of this experiment, current and past. ",
+                "description": "",
+                "operationId": "getMetrics",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The experiment ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ExperimentMetricResponse"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "operationId": "recompute",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The experiment ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "sync",
+                        "in": "query",
+                        "description": "When true, run the job synchronously; the request will not return until the metrics calculations jobs are complete",
+                        "required": false,
+                        "type": "boolean",
+                        "default": false
+                    },
+                    {
+                        "name": "syncWaitSeconds",
+                        "in": "query",
+                        "description": "The maximum amount of time to wait for metrics calculation jobs to complete, in seconds. Applicable only if syncis 'true'",
+                        "required": false,
+                        "type": "integer",
+                        "default": 300,
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/ExperimentRecomputeResponse"
+                        },
+                        "headers": {}
+                    }
+                }
+            }
+        },
+        "/experiments/{id}/metrics/{runId}": {
+            "get": {
+                "summary": "Get metrics associated with a particular run of this experiment. ",
+                "description": "",
+                "operationId": "getMetricsForRun",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The experiment ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "runId",
+                        "in": "path",
+                        "description": "The runId of the experiment run to return, or 'latest' for the most recent run (or the current run, if it is still running)",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/ExperimentMetricResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/experiments/{id}/variant": {
+            "get": {
+                "operationId": "getVariant",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The experiment ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "userId",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/ExperimentVariant"
+                        },
+                        "headers": {}
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Entity": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "PropertyGroup": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "properties": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "SparkJobStatus": {
+            "type": "object",
+            "properties": {
+                "state": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "unknown",
+                        "idle",
+                        "starting",
+                        "running",
+                        "finishing",
+                        "cancelling",
+                        "finished",
+                        "cancelled",
+                        "error",
+                        "skipped"
+                    ]
+                },
+                "jobId": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "jobConfig": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/SparkJobConfig"
+                },
+                "hostname": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "result": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/SparkJobResult"
+                },
+                "startTime": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "endTime": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "duration": {
+                    "type": "integer",
+                    "format": "int64",
+                    "readOnly": true
+                }
+            }
+        },
+        "JobExecutionError": {
+            "type": "object",
+            "discriminator": "type",
+            "properties": {
+                "job": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/FusionResource"
+                },
+                "jobRunId": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "httpStatusCode": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "error": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "message": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "details": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "cause": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/Throwable"
+                },
+                "stackTrace": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/StackTraceElement"
+                    }
+                },
+                "localizedMessage": {
+                    "type": "string"
+                },
+                "suppressed": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Throwable"
+                    }
+                },
+                "httpStatusMessage": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "class": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "requestId": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "StackTraceElement": {
+            "type": "object",
+            "properties": {
+                "methodName": {
+                    "type": "string"
+                },
+                "fileName": {
+                    "type": "string"
+                },
+                "lineNumber": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "className": {
+                    "type": "string"
+                },
+                "nativeMethod": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        "AuthorizationContext": {
+            "type": "object",
+            "properties": {
+                "subject": {
+                    "$ref": "#/definitions/Subject"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "DateAndValue": {
+            "type": "object",
+            "properties": {
+                "timestamp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "value": {
+                    "type": "number",
+                    "format": "double",
+                    "readOnly": true
+                }
+            }
+        },
+        "ObjectType": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "String",
+                        "Number",
+                        "Integer",
+                        "Boolean",
+                        "Object",
+                        "Array",
+                        "Null",
+                        "Ref"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "description": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "required": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "properties": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "$ref": "#/definitions/AnyType"
+                    }
+                },
+                "additionalProperties": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "minProperties": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "maxProperties": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "definitions": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "$ref": "#/definitions/AnyType"
+                    }
+                },
+                "category": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "enum": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "unsafe": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "default": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "oneOf": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/AnyTypeObjectObject"
+                    }
+                },
+                "propertyGroups": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/PropertyGroup"
+                    }
+                }
+            }
+        },
+        "GlobPermission": {
+            "type": "object",
+            "properties": {
+                "methods": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "GET",
+                            "POST",
+                            "PUT",
+                            "DELETE",
+                            "HEAD",
+                            "PATCH",
+                            "OPTIONS"
+                        ]
+                    }
+                },
+                "path": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "params": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/PermissionParams"
+                }
+            }
+        },
+        "ExperimentMetricResponse": {
+            "type": "object",
+            "properties": {
+                "experimentStartDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "experimentEndDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "dataStartDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "dataEndDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "runId": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "totalRequests": {
+                    "type": "integer",
+                    "format": "int64",
+                    "readOnly": true
+                },
+                "requestsInExperiment": {
+                    "type": "integer",
+                    "format": "int64",
+                    "readOnly": true
+                },
+                "confidence": {
+                    "type": "number",
+                    "format": "double",
+                    "readOnly": true
+                },
+                "results": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/ExperimentMetricVariantResult"
+                    }
+                }
+            }
+        },
+        "ExperimentVariant": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "name": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "collection": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "queryPipeline": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "params": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/ParamAndValue"
+                    }
+                },
+                "weight": {
+                    "type": "number",
+                    "format": "double",
+                    "readOnly": true
+                }
+            }
+        },
+        "ServiceStatus": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "starting",
+                        "ok",
+                        "warning",
+                        "error",
+                        "shutdown"
+                    ]
+                },
+                "node": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "messages": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/StatusMessage"
+                    }
+                }
+            }
+        },
+        "ExperimentMetricVariantResult": {
+            "type": "object",
+            "properties": {
+                "variantName": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "results": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/ExperimentMetricResult"
+                    }
+                },
+                "requests": {
+                    "type": "integer",
+                    "format": "int64",
+                    "readOnly": true
+                },
+                "percentRequests": {
+                    "type": "number",
+                    "format": "double",
+                    "readOnly": true
+                }
+            }
+        },
+        "ExperimentHistoryEntry": {
+            "type": "object",
+            "properties": {
+                "experiment": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/Experiment"
+                },
+                "experimentStartDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "experimentEndDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            }
+        },
+        "AnyType": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "String",
+                        "Number",
+                        "Integer",
+                        "Boolean",
+                        "Object",
+                        "Array",
+                        "Null",
+                        "Ref"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "description": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "enum": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "default": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "category": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "hints": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "unsafe": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "oneOf": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/AnyTypeObjectObject"
+                    }
+                }
+            }
+        },
+        "ParamAndValue": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "value": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "policy": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "REPLACE",
+                        "APPEND",
+                        "REMOVE",
+                        "DEFAULT"
+                    ]
+                }
+            }
+        },
+        "ExperimentRecomputeResponse": {
+            "type": "object",
+            "properties": {
+                "jobs": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/SparkJobStatus"
+                    }
+                }
+            }
+        },
+        "SparkJobConfig": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "Experiment": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "description": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "uniqueIdParameter": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "baseSignalsCollection": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "variants": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/ExperimentVariant"
+                    }
+                },
+                "automaticallyAdjustTraffic": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "startTimestamp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "runId": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "metrics": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/ExperimentMetric"
+                    }
+                }
+            }
+        },
+        "SparkJobResult": {
+            "type": "object",
+            "properties": {
+                "jobConfigId": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "jobRunId": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "docsWritten": {
+                    "type": "integer",
+                    "format": "int64",
+                    "readOnly": true
+                },
+                "exception": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/JobExecutionError"
+                }
+            }
+        },
+        "PermissionParams": {
+            "type": "object",
+            "properties": {
+                "paramNames": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "ExperimentMetricResult": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "values": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/DateAndValue"
+                    }
+                },
+                "probabilityOfBeating": {
+                    "type": "number",
+                    "format": "double",
+                    "readOnly": true
+                },
+                "p": {
+                    "type": "number",
+                    "format": "double",
+                    "readOnly": true
+                },
+                "confidence": {
+                    "type": "number",
+                    "format": "double",
+                    "readOnly": true
+                }
+            }
+        },
+        "Subject": {
+            "type": "object",
+            "properties": {
+                "userId": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "permissions": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/GlobPermission"
+                    }
+                },
+                "roles": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "realm": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/SubjectRealm"
+                },
+                "principal": {
+                    "type": "string"
+                }
+            }
+        },
+        "StatusMessage": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "message": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "FusionResource": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "APPKIT_APP",
+                        "WEBAPP_ADMIN_APP",
+                        "APP",
+                        "COLLECTION",
+                        "INDEX_PIPELINE",
+                        "INDEX_STAGE",
+                        "QUERY_STAGE",
+                        "QUERY_PIPELINE",
+                        "INDEX_PROFILE",
+                        "QUERY_PROFILE",
+                        "BLOB",
+                        "PARSER",
+                        "DATASOURCE",
+                        "TASK",
+                        "SCHEDULE",
+                        "SEARCH_CLUSTER",
+                        "EXPERIMENT",
+                        "SPARK_JOB",
+                        "GROUP",
+                        "CUSTOM_RULE_TYPE",
+                        "TYPE",
+                        "RESOURCE",
+                        "NULL"
+                    ]
+                },
+                "id": {
+                    "type": "string"
+                },
+                "canonicalName": {
+                    "type": "string"
+                },
+                "uri": {
+                    "type": "string",
+                    "format": "uri"
+                }
+            }
+        },
+        "SubjectRealm": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "name": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "principal": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "data": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "Throwable": {
+            "type": "object",
+            "properties": {
+                "cause": {
+                    "$ref": "#/definitions/Throwable"
+                },
+                "stackTrace": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/StackTraceElement"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "localizedMessage": {
+                    "type": "string"
+                },
+                "suppressed": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Throwable"
+                    }
+                }
+            }
+        },
+        "ExperimentMetric": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "description": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "jobId": {
+                    "type": "string"
+                },
+                "binary": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "primary": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                }
+            }
+        },
+        "AnyTypeObjectObject": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "String",
+                        "Number",
+                        "Integer",
+                        "Boolean",
+                        "Object",
+                        "Array",
+                        "Null",
+                        "Ref"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "description": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "enum": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "default": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "category": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "hints": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "unsafe": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "oneOf": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/AnyTypeObjectObject"
+                    }
+                }
+            }
+        }
+    }
+}

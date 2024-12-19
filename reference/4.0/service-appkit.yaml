@@ -1,0 +1,737 @@
+---
+swagger: "2.0"
+info:
+  version: "4.0.0-dev100"
+  title: "Fusion Service appkit"
+basePath: "/api/apollo"
+tags:
+- name: "appkit"
+schemes:
+- "http"
+paths:
+  /appkit:
+    get:
+      summary: "Get all entities"
+      description: ""
+      operationId: "getAllEntities"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Entity"
+    post:
+      summary: "Create a new entity"
+      description: ""
+      operationId: "createEntity"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted configuration values"
+        required: false
+        schema:
+          $ref: "#/definitions/AppkitApp"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Entity"
+  /appkit/_schema:
+    get:
+      summary: "Get JSON schema for objects managed by this API"
+      description: ""
+      operationId: "getEntitySchema"
+      produces:
+      - "application/schema+json; qs=1.0"
+      - "application/json; qs=0.9"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ObjectType"
+  /appkit/status:
+    get:
+      summary: "Get the status of the service"
+      description: ""
+      operationId: "getStatus"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceStatus"
+  /appkit/{id}:
+    get:
+      summary: "Get the specified entity"
+      description: ""
+      operationId: "getEntity"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The entity ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Entity"
+    put:
+      summary: "Update an entity"
+      description: ""
+      operationId: "updateEntity"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The entity ID"
+        required: true
+        type: "string"
+      - name: "If-Match"
+        in: "header"
+        description: "An entity tag to match"
+        required: false
+        type: "string"
+        default: "\"-1\""
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted configuration values"
+        required: false
+        schema:
+          $ref: "#/definitions/AppkitApp"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Entity"
+    delete:
+      summary: "Delete an entity"
+      description: ""
+      operationId: "deleteEntity"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The entity ID"
+        required: true
+        type: "string"
+      - name: "If-Match"
+        in: "header"
+        description: "An entity tag to match"
+        required: false
+        type: "string"
+        default: "\"-1\""
+      responses:
+        default:
+          description: "successful operation"
+  /appkit/{id}/edits:
+    get:
+      summary: "List editing sessions"
+      description: ""
+      operationId: "listSessions"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Application ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/EditingSession"
+    post:
+      summary: "Start an editing session"
+      description: ""
+      operationId: "startSession"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Application ID"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted configuration values"
+        required: false
+        schema:
+          $ref: "#/definitions/EditingSession"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/EditingSession"
+  /appkit/{id}/edits/{sessionId}:
+    get:
+      summary: "Get editing session"
+      description: ""
+      operationId: "getSession"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Application ID"
+        required: true
+        type: "string"
+      - name: "sessionId"
+        in: "path"
+        description: "Session ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/EditingSession"
+    delete:
+      summary: "Delete an editing session"
+      description: ""
+      operationId: "deleteSession"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Application ID"
+        required: true
+        type: "string"
+      - name: "sessionId"
+        in: "path"
+        description: "Session ID"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /appkit/{id}/edits/{sessionId}/action:
+    post:
+      summary: "Perform an action on an editing session"
+      description: ""
+      operationId: "action"
+      consumes:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Application ID"
+        required: true
+        type: "string"
+      - name: "sessionId"
+        in: "path"
+        description: "Session ID"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted configuration values"
+        required: false
+        schema:
+          $ref: "#/definitions/SessionAction"
+      responses:
+        default:
+          description: "successful operation"
+  /appkit/{id}/edits/{sessionId}/files:
+    get:
+      summary: "List all files within an editing session"
+      description: ""
+      operationId: "listFiles"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Application ID"
+        required: true
+        type: "string"
+      - name: "sessionId"
+        in: "path"
+        description: "Session ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Blob"
+  /appkit/{id}/edits/{sessionId}/files/{file}:
+    get:
+      summary: "Access a file within an editing session"
+      description: ""
+      operationId: "getFile"
+      produces:
+      - "application/*"
+      - "text/*"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Application ID"
+        required: true
+        type: "string"
+      - name: "sessionId"
+        in: "path"
+        description: "Session ID"
+        required: true
+        type: "string"
+      - name: "file"
+        in: "path"
+        description: "File"
+        required: true
+        type: "string"
+        pattern: ".*"
+      responses:
+        default:
+          description: "successful operation"
+    put:
+      summary: "Update a file within an editing session"
+      description: ""
+      operationId: "putFile"
+      consumes:
+      - "*/*"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Application ID"
+        required: true
+        type: "string"
+      - name: "sessionId"
+        in: "path"
+        description: "Session ID"
+        required: true
+        type: "string"
+      - name: "file"
+        in: "path"
+        description: "File"
+        required: true
+        type: "string"
+        pattern: ".*"
+      - name: "If-Match"
+        in: "header"
+        description: "If-Match value"
+        required: false
+        type: "string"
+        default: "\"-1\""
+      - in: "body"
+        name: "body"
+        description: "File contents"
+        required: false
+        schema:
+          $ref: "#/definitions/InputStream"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      summary: "Delete a file within an editing session"
+      description: ""
+      operationId: "deleteFile"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Application ID"
+        required: true
+        type: "string"
+      - name: "sessionId"
+        in: "path"
+        description: "Session ID"
+        required: true
+        type: "string"
+      - name: "file"
+        in: "path"
+        description: "File"
+        required: true
+        type: "string"
+        pattern: ".*"
+      - name: "If-Match"
+        in: "header"
+        description: "If-Match value"
+        required: false
+        type: "string"
+        default: "\"-1\""
+      responses:
+        default:
+          description: "successful operation"
+  /appkit/{id}/war:
+    get:
+      summary: "Download a war file for an app"
+      description: ""
+      operationId: "downloadWar"
+      produces:
+      - "application/zip"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Application ID"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+    put:
+      summary: "Upload a war file for an app"
+      description: ""
+      operationId: "uploadWar"
+      consumes:
+      - "*/*"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Application ID"
+        required: true
+        type: "string"
+      - name: "removeEditingSessions"
+        in: "query"
+        required: false
+        type: "boolean"
+        default: false
+      - in: "body"
+        name: "body"
+        description: "War file"
+        required: false
+        schema:
+          $ref: "#/definitions/InputStream"
+      responses:
+        default:
+          description: "successful operation"
+definitions:
+  Entity:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  Blob:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      path:
+        type: "string"
+      dir:
+        type: "string"
+      filename:
+        type: "string"
+      contentType:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int64"
+      modifiedTime:
+        type: "string"
+        format: "date-time"
+      version:
+        type: "integer"
+        format: "int64"
+      md5:
+        type: "string"
+      metadata:
+        type: "object"
+        additionalProperties:
+          type: "string"
+  EditingSession:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      owner:
+        type: "string"
+      createdAt:
+        type: "string"
+        format: "date-time"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      version:
+        type: "string"
+  PropertyGroup:
+    type: "object"
+    properties:
+      label:
+        type: "string"
+      properties:
+        type: "array"
+        items:
+          type: "string"
+  InputStream:
+    type: "object"
+  SessionAction:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+  Annotation:
+    type: "object"
+  StatusMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      date:
+        type: "string"
+        format: "date-time"
+  AppkitAppExportContainer:
+    type: "object"
+    properties:
+      editingSessions:
+        type: "array"
+        items:
+          $ref: "#/definitions/EditingSession"
+      appkitApp:
+        $ref: "#/definitions/AppkitApp"
+  ObjectType:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      category:
+        type: "string"
+      categoryPriority:
+        type: "integer"
+        format: "int32"
+      allowedValues:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "object"
+      hints:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      defaultValue:
+        type: "object"
+      accessibleProperty:
+        $ref: "#/definitions/AccessibleProperty"
+      oneOf:
+        type: "array"
+        items:
+          $ref: "#/definitions/AnyTypeObjectObject"
+      maxProperties:
+        type: "integer"
+        format: "int32"
+      minProperties:
+        type: "integer"
+        format: "int32"
+      required:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      properties:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/AnyType"
+      propertyGroups:
+        type: "array"
+        items:
+          $ref: "#/definitions/PropertyGroup"
+      definitions:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/AnyType"
+      type:
+        type: "string"
+        enum:
+        - "String"
+        - "Number"
+        - "Integer"
+        - "Boolean"
+        - "Object"
+        - "Array"
+        - "Null"
+        - "Ref"
+      additionalProperties:
+        type: "object"
+  Type:
+    type: "object"
+    properties:
+      typeName:
+        type: "string"
+  AccessibleProperty:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      required:
+        type: "boolean"
+        default: false
+      genericType:
+        $ref: "#/definitions/Type"
+      accessibleObject:
+        $ref: "#/definitions/AccessibleObject"
+  ServiceStatus:
+    type: "object"
+    properties:
+      node:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "ok"
+        - "warning"
+        - "error"
+        - "shutdown"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/StatusMessage"
+  AccessibleObject:
+    type: "object"
+    properties:
+      annotations:
+        type: "array"
+        items:
+          $ref: "#/definitions/Annotation"
+      declaredAnnotations:
+        type: "array"
+        items:
+          $ref: "#/definitions/Annotation"
+      accessible:
+        type: "boolean"
+        default: false
+  AppkitApp:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      war:
+        type: "string"
+      warMd5:
+        type: "string"
+      warSize:
+        type: "integer"
+        format: "int64"
+      contextPath:
+        type: "string"
+      enabled:
+        type: "boolean"
+        default: false
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  AnyType:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      category:
+        type: "string"
+      categoryPriority:
+        type: "integer"
+        format: "int32"
+      allowedValues:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "object"
+      hints:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      defaultValue:
+        type: "object"
+      accessibleProperty:
+        $ref: "#/definitions/AccessibleProperty"
+      oneOf:
+        type: "array"
+        items:
+          $ref: "#/definitions/AnyTypeObjectObject"
+      type:
+        type: "string"
+        enum:
+        - "String"
+        - "Number"
+        - "Integer"
+        - "Boolean"
+        - "Object"
+        - "Array"
+        - "Null"
+        - "Ref"
+  AnyTypeObjectObject:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      category:
+        type: "string"
+      categoryPriority:
+        type: "integer"
+        format: "int32"
+      allowedValues:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "object"
+      hints:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      defaultValue:
+        type: "object"
+      accessibleProperty:
+        $ref: "#/definitions/AccessibleProperty"
+      oneOf:
+        type: "array"
+        items:
+          $ref: "#/definitions/AnyTypeObjectObject"
+      type:
+        type: "string"
+        enum:
+        - "String"
+        - "Number"
+        - "Integer"
+        - "Boolean"
+        - "Object"
+        - "Array"
+        - "Null"
+        - "Ref"

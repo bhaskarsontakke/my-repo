@@ -1,0 +1,1296 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Api Documentation",
+        "version": "5.5.2",
+        "title": "Api Documentation",
+        "termsOfService": "urn:tos",
+        "contact": {},
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0"
+        }
+    },
+    "host": "docs5512apis.lucidworkstest.com",
+    "basePath": "/job-rest-server",
+    "tags": [{
+        "name": "job-config-controller",
+        "description": "Job Config Controller"
+    }, {
+        "name": "job-controller",
+        "description": "Job Controller"
+    }, {
+        "name": "recommendation-controller",
+        "description": "Recommendation Controller"
+    }, {
+        "name": "signals-controller",
+        "description": "Signals Controller"
+    }],
+    "paths": {
+        "/recommend/_changed": {
+            "post": {
+                "tags": ["recommendation-controller"],
+                "summary": "changeCallback",
+                "operationId": "changeCallbackUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "feature",
+                    "description": "feature",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/Feature"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/signals/_changed": {
+            "post": {
+                "tags": ["signals-controller"],
+                "summary": "For Lucidworks internal development",
+                "operationId": "changeCallbackUsingPOST_1",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "feature",
+                    "description": "feature",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/Feature"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/signals/create/{collection}": {
+            "post": {
+                "tags": ["signals-controller"],
+                "summary": "Create signals collections and jobs",
+                "operationId": "createSignalsCollectionsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "collection",
+                    "in": "path",
+                    "description": "Collection id",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "params",
+                    "description": "Configuration parameters",
+                    "required": false,
+                    "schema": {
+                        "type": "object"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/CollectionNames"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/signals/{collection}/i": {
+            "get": {
+                "tags": ["signals-controller"],
+                "summary": "processIncomingRequest",
+                "operationId": "processIncomingRequestUsingGET",
+                "produces": ["image/png"],
+                "parameters": [{
+                    "name": "collection",
+                    "in": "path",
+                    "description": "collection",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "headers",
+                    "in": "header",
+                    "description": "headers",
+                    "required": true,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }, {
+                    "name": "params",
+                    "in": "query",
+                    "description": "params",
+                    "required": true,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string",
+                            "format": "byte"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": true
+            }
+        },
+        "/spark/configurations": {
+            "get": {
+                "tags": ["job-config-controller"],
+                "summary": "Retrieve all job configurations",
+                "operationId": "findJobConfigsUsingGET",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Iterable«SparkJobConfig»"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            },
+            "post": {
+                "tags": ["job-config-controller"],
+                "summary": "Create a Spark job config",
+                "operationId": "createJobConfigUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "config",
+                    "description": "Job config (JSON)",
+                    "required": false,
+                    "schema": {
+                        "$ref": "#/definitions/SparkJobConfig"
+                    }
+                }, {
+                    "name": "context",
+                    "in": "query",
+                    "description": "context",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SparkJobConfig"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/spark/configurations/app/{appId}": {
+            "post": {
+                "tags": ["job-config-controller"],
+                "summary": "Create default job configurations for the app",
+                "operationId": "createJobConfigurationsUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "appId",
+                    "in": "path",
+                    "description": "Application id",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/spark/configurations/experiment": {
+            "post": {
+                "tags": ["job-config-controller"],
+                "summary": "Get list of Fusion resource by Experiment",
+                "operationId": "createJobConfigurationsByExperimentUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "experiment",
+                    "description": "experiment",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/Experiment"
+                    }
+                }, {
+                    "name": "fusionResource",
+                    "in": "query",
+                    "description": "fusionResource",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/spark/configurations/{id}": {
+            "get": {
+                "tags": ["job-config-controller"],
+                "summary": "Get config for a Spark job",
+                "operationId": "getJobConfigUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Job id",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SparkJobConfig"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            },
+            "put": {
+                "tags": ["job-config-controller"],
+                "summary": "Update Spark job config",
+                "operationId": "updateJobConfigUsingPUT",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "in": "body",
+                    "name": "config",
+                    "description": "Updated job config (JSON)",
+                    "required": false,
+                    "schema": {
+                        "$ref": "#/definitions/SparkJobConfig"
+                    }
+                }, {
+                    "name": "context",
+                    "in": "query",
+                    "description": "context",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "Job id",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SparkJobConfig"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            },
+            "delete": {
+                "tags": ["job-config-controller"],
+                "summary": "Delete job config",
+                "operationId": "deleteJobConfigUsingDELETE",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "context",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "Job id",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/spark/driver/log/{id}": {
+            "get": {
+                "tags": ["job-config-controller"],
+                "summary": "Get logs from Spark job",
+                "operationId": "getLogsFromDefaultDriverUsingGET",
+                "produces": ["text/plain"],
+                "parameters": [{
+                    "name": "Authorization",
+                    "in": "header",
+                    "description": "Authorization",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "Job id",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "rows",
+                    "in": "query",
+                    "description": "Number of rows to return from the logging",
+                    "required": false,
+                    "type": "integer",
+                    "default": 100,
+                    "format": "int32",
+                    "allowEmptyValue": false
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Resource"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/spark/jobs": {
+            "get": {
+                "tags": ["job-controller"],
+                "summary": "Retrieve status of all Spark jobs",
+                "operationId": "findJobsUsingGET_1",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/SparkJobStatus"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/spark/jobs/{id}": {
+            "get": {
+                "tags": ["job-controller"],
+                "summary": "Retrieve Spark job status",
+                "operationId": "getJobStatusUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Job id",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SparkJobStatus"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            },
+            "post": {
+                "tags": ["job-controller"],
+                "summary": "Start a Spark job",
+                "operationId": "startJobUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Job id",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SparkJobStatus"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            },
+            "delete": {
+                "tags": ["job-controller"],
+                "summary": "Stopa Spark job",
+                "operationId": "stopJobUsingDELETE",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Job id",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/spark/jobs/{id}/all": {
+            "get": {
+                "tags": ["job-controller"],
+                "summary": "findJobs",
+                "operationId": "findJobsUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "id",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/SparkJobStatus"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/spark/schema": {
+            "get": {
+                "tags": ["job-config-controller"],
+                "summary": "Get the schema for all the Spark job types",
+                "operationId": "getConfigurationTypesUsingGET",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ObjectType"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        }
+    },
+    "definitions": {
+        "AnyType": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "default": {
+                    "type": "object"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "enum": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "oneOf": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AnyType«object,object»"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["string", "number", "integer", "boolean", "object", "array", "null", "ref"]
+                }
+            },
+            "title": "AnyType"
+        },
+        "AnyType«object,object»": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "default": {
+                    "type": "object"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "enum": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "oneOf": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AnyType«object,object»"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["string", "number", "integer", "boolean", "object", "array", "null", "ref"]
+                }
+            },
+            "title": "AnyType«object,object»"
+        },
+        "CollectionNames": {
+            "type": "object",
+            "properties": {
+                "collection": {
+                    "type": "string"
+                },
+                "signalsAggrCollection": {
+                    "type": "string"
+                },
+                "signalsCollection": {
+                    "type": "string"
+                }
+            },
+            "title": "CollectionNames"
+        },
+        "Experiment": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "uniqueIdParameter": {
+                    "type": "string"
+                },
+                "baseSignalsCollection": {
+                    "type": "string"
+                },
+                "variants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ExperimentVariant"
+                    }
+                },
+                "automaticallyAdjustTraffic": {
+                    "type": "boolean"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "startTimestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "metrics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ExperimentMetric"
+                    }
+                }
+            },
+            "title": "Experiment"
+        },
+        "ExperimentMetric": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "jobId": {
+                    "type": "string"
+                },
+                "binary": {
+                    "type": "boolean"
+                },
+                "primary": {
+                    "type": "boolean"
+                }
+            },
+            "title": "ExperimentMetric"
+        },
+        "ExperimentVariant": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "collection": {
+                    "type": "string"
+                },
+                "queryPipeline": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ParamAndValue"
+                    }
+                },
+                "weight": {
+                    "type": "number",
+                    "format": "double"
+                }
+            },
+            "title": "ExperimentVariant"
+        },
+        "Feature": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "collectionId": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "object"
+                },
+                "enabled": {
+                    "type": "boolean"
+                }
+            },
+            "title": "Feature"
+        },
+        "File": {
+            "type": "object",
+            "properties": {
+                "absolute": {
+                    "type": "boolean"
+                },
+                "absoluteFile": {
+                    "$ref": "#/definitions/File"
+                },
+                "absolutePath": {
+                    "type": "string"
+                },
+                "canonicalFile": {
+                    "$ref": "#/definitions/File"
+                },
+                "canonicalPath": {
+                    "type": "string"
+                },
+                "directory": {
+                    "type": "boolean"
+                },
+                "file": {
+                    "type": "boolean"
+                },
+                "freeSpace": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "hidden": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent": {
+                    "type": "string"
+                },
+                "parentFile": {
+                    "$ref": "#/definitions/File"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "totalSpace": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "usableSpace": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            },
+            "title": "File"
+        },
+        "InputStream": {
+            "type": "object",
+            "title": "InputStream"
+        },
+        "Iterable«SparkJobConfig»": {
+            "type": "object",
+            "title": "Iterable«SparkJobConfig»"
+        },
+        "KeyValue": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "title": "KeyValue"
+        },
+        "ObjectType": {
+            "type": "object",
+            "properties": {
+                "additionalProperties": {
+                    "type": "object"
+                },
+                "category": {
+                    "type": "string"
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "default": {
+                    "type": "object"
+                },
+                "definitions": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/AnyType"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "enum": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "maxProperties": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "minProperties": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "oneOf": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AnyType«object,object»"
+                    }
+                },
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/AnyType"
+                    }
+                },
+                "propertyGroups": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PropertyGroup"
+                    }
+                },
+                "required": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["string", "number", "integer", "boolean", "object", "array", "null", "ref"]
+                }
+            },
+            "title": "ObjectType"
+        },
+        "ParamAndValue": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                },
+                "policy": {
+                    "type": "string",
+                    "enum": ["replace", "append", "remove", "default"]
+                }
+            },
+            "title": "ParamAndValue"
+        },
+        "PropertyGroup": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "PropertyGroup"
+        },
+        "Resource": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "file": {
+                    "$ref": "#/definitions/File"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "inputStream": {
+                    "$ref": "#/definitions/InputStream"
+                },
+                "open": {
+                    "type": "boolean"
+                },
+                "readable": {
+                    "type": "boolean"
+                },
+                "uri": {
+                    "$ref": "#/definitions/URI"
+                },
+                "url": {
+                    "$ref": "#/definitions/URL"
+                }
+            },
+            "title": "Resource"
+        },
+        "SparkJobConfig": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "sparkConfig": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/KeyValue"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "title": "SparkJobConfig"
+        },
+        "SparkJobResult": {
+            "type": "object",
+            "properties": {
+                "exception": {
+                    "type": "object"
+                },
+                "jobConfigId": {
+                    "type": "string"
+                },
+                "jobRunId": {
+                    "type": "string"
+                }
+            },
+            "title": "SparkJobResult"
+        },
+        "SparkJobStatus": {
+            "type": "object",
+            "properties": {
+                "duration": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "endTime": {
+                    "type": "string"
+                },
+                "hostname": {
+                    "type": "string"
+                },
+                "jobConfig": {
+                    "$ref": "#/definitions/SparkJobConfig"
+                },
+                "jobId": {
+                    "type": "string"
+                },
+                "result": {
+                    "$ref": "#/definitions/SparkJobResult"
+                },
+                "startTime": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string",
+                    "enum": ["unknown", "idle", "starting", "running", "finishing", "cancelling", "finished", "cancelled", "error", "skipped"]
+                }
+            },
+            "title": "SparkJobStatus"
+        },
+        "URI": {
+            "type": "object",
+            "properties": {
+                "absolute": {
+                    "type": "boolean"
+                },
+                "authority": {
+                    "type": "string"
+                },
+                "fragment": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "opaque": {
+                    "type": "boolean"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "rawAuthority": {
+                    "type": "string"
+                },
+                "rawFragment": {
+                    "type": "string"
+                },
+                "rawPath": {
+                    "type": "string"
+                },
+                "rawQuery": {
+                    "type": "string"
+                },
+                "rawSchemeSpecificPart": {
+                    "type": "string"
+                },
+                "rawUserInfo": {
+                    "type": "string"
+                },
+                "scheme": {
+                    "type": "string"
+                },
+                "schemeSpecificPart": {
+                    "type": "string"
+                },
+                "userInfo": {
+                    "type": "string"
+                }
+            },
+            "title": "URI"
+        },
+        "URL": {
+            "type": "object",
+            "properties": {
+                "authority": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "object"
+                },
+                "defaultPort": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "protocol": {
+                    "type": "string"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "ref": {
+                    "type": "string"
+                },
+                "userInfo": {
+                    "type": "string"
+                }
+            },
+            "title": "URL"
+        }
+    }
+}

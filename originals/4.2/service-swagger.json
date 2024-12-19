@@ -1,0 +1,158 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service swagger"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "swagger"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/swagger": {
+      "get": {
+        "summary": "Get Fusion API spec as JSON",
+        "description": "",
+        "operationId": "allJson",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/swagger/multi-json": {
+      "get": {
+        "summary": "Get Fusion per-service API specs as JSON list",
+        "description": "",
+        "operationId": "perServiceJson",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/swagger/multi-yaml": {
+      "get": {
+        "summary": "Get Fusion per-service API specs as concatenated YAML blocks",
+        "description": "",
+        "operationId": "perServiceYaml",
+        "produces": [
+          "text/yaml"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/swagger/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/swagger/yaml": {
+      "get": {
+        "summary": "Get Fusion API spec as YAML",
+        "description": "",
+        "operationId": "allYaml",
+        "produces": [
+          "text/yaml"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    }
+  }
+}

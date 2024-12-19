@@ -1,0 +1,224 @@
+openapi: 3.1.0
+info:
+  title: Signals API
+  version: '1.0'
+  termsOfService: 'https://lucidworks.com/legal/developer-license-agreement/'
+  contact:
+    name: Lucidworks
+    url: 'https://lucidworks.com/'
+    email: support@lucidworks.com
+  license:
+    name: Lucidworks
+    url: 'https://lucidworks.com/legal/developer-license-agreement/'
+  description: 'Used to track user search behavior for optimizing search relevancy.   '
+servers:
+  - url: 'https://{APPLICATION_ID}.applications.lucidworks.com'
+    description: Production
+    variables:
+      APPLICATION_ID:
+        default: APPLICATION_ID
+paths:
+  /signals:
+    parameters: []
+    post:
+      summary: Signals
+      operationId: post
+      description: |-
+        Receives details about queries submitted and associated user behavior called signals. Signals improve search relevancy over time. 
+
+        <!-- theme: info -->
+
+        > This operation accepts one object at a time. Each signal must be sent by a separate POST operation. 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - $ref: '#/components/schemas/postClickSignals'
+                - $ref: '#/components/schemas/postQuerySignals'
+            examples:
+              postClickSignals:
+                value:
+                  signalType: click
+                  documentId: string
+                  queryId: string
+                  sessionId: string
+                  utcOffset: '+04:00'
+                  timestamp: 0
+                  source: homepage
+              postQuerySignals:
+                value:
+                  signalType: query
+                  searchTerms: string
+                  documentIds:
+                    - DOC_ID1
+                  queryId: string
+                  sessionId: string
+                  utcOffset: '+04:00'
+                  timestamp: 0
+                  source: homepage
+        description: ''
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          $ref: '#/components/responses/signals-error-400'
+      security:
+        - authToken: []
+components:
+  schemas:
+    postClickSignals:
+      title: postClickSignals
+      x-stoplight:
+        id: 8a673bd0662c3
+      type: object
+      properties:
+        signalType:
+          type: string
+          enum:
+            - click
+          default: click
+          description: 'The type of signal generated when a user interacts with the application. For example, when as a user clicks a search result.'
+        documentId:
+          type: string
+          description: The unique identifier for a document indexed by a Springboard application.
+        queryId:
+          type: string
+          description: |-
+            The unique identifier for the query that:
+
+            - Is included in every response.
+            - Must be included in all subsequent feedback events, such as clicks, for analytics and machine learning (ML) optimizations to be accurate.
+        sessionId:
+          type: string
+          description: 'Unique value that identifies the user''s session. Consider passing the session ID value from your user''s browser session as the value of `sessionId`. For more information, see [the MDN developer documentation for sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage).'
+        utcOffset:
+          type: string
+          description: 'The difference between UTC and a specified time zone in a required ISO-8601 format of `±hh:mm`.'
+          pattern: '[+-][0-9]{2}:[0-9]{2}'
+          example: '+04:00'
+        timestamp:
+          type: integer
+          description: 'The date and time the signal was recorded. Format this value as Unix epoch time, in milliseconds.'
+        source:
+          type: string
+          example: homepage
+          maxLength: 200
+          description: |-
+            An optional freeform text field used to identify where the API call originates within the customer site.
+               <!-- theme: info -->
+               
+               > The value has no effect on search relevancy.
+      required:
+        - signalType
+        - documentId
+        - sessionId
+        - utcOffset
+        - timestamp
+      examples:
+        - signalType: click
+          documentId: string
+          queryId: string
+          sessionId: string
+          utcOffset: '+04:00'
+          timestamp: 0
+          source: homepage
+    postQuerySignals:
+      title: postQuerySignals
+      type: object
+      x-stoplight:
+        id: 6125edaf31002
+      examples:
+        - signalType: query
+          searchTerms: string
+          documentIds:
+            - DOC_ID1
+          queryId: string
+          sessionId: string
+          utcOffset: '+04:00'
+          timestamp: 0
+          source: homepage
+      properties:
+        signalType:
+          type: string
+          default: query
+          description: The type of signal generated when you submit a query.
+          enum:
+            - query
+        searchTerms:
+          type: string
+          description: The term or phrase you are searching in the query.
+        documentIds:
+          type: array
+          description: The unique identifiers for the documents submitted in the query.
+          items:
+            type: string
+            enum:
+              - DOC_ID1
+              - DOC_ID2
+              - DOC_ID3
+        hits:
+          type: integer
+          x-stoplight:
+            id: g6wmjcvw24zks
+          description: The total number of documents in the result set. The value is greater than or equal to the number of `documentIds` and is included in every response.
+        queryId:
+          type: string
+          description: |-
+            The unique identifier for the query that:
+
+            - Is included in every response.
+            - Must be included in all subsequent feedback events, such as clicks, for analytics and machine learning (ML) optimizations to be accurate.
+        sessionId:
+          type: string
+          description: 'Unique value that identifies the user''s session. Consider passing the session ID value from your user''s browser session as the value of `sessionId`. For more information, see [the MDN developer documentation for sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage).'
+        utcOffset:
+          type: string
+          description: 'The difference between UTC and a specified time zone in a required ISO-8601 format of `±hh:mm`.'
+          pattern: '[+-][0-9]{2}:[0-9]{2}'
+          example: '+04:00'
+        timestamp:
+          type: integer
+          description: 'The date and time the signal was recorded. Format this value as Unix epoch time, in milliseconds.'
+        source:
+          type: string
+          example: homepage
+          maxLength: 200
+          description: |-
+            An optional freeform text field used to identify where the API call originates within the customer site.
+               <!-- theme: info -->
+               
+               > The value has no effect on search relevancy.
+      required:
+        - signalType
+        - searchTerms
+        - documentIds
+        - sessionId
+        - utcOffset
+        - timestamp
+  securitySchemes:
+    authToken:
+      type: http
+      scheme: bearer
+      description: 'For details about creating an authentication token, see the Authentication page. This token expires after one hour. A new token is required at that time.'
+  responses:
+    signals-error-400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: A human-readable description of the response.
+                enum:
+                  - Request contains more than one signal
+                  - Request body contains invalid JSON
+                  - Request body is missing required field 'FIELD_NAME'
+                  - Request body contains invalid field 'FIELD_NAME'
+                  - Request body contains field 'FIELD_NAME' with invalid value 'FIELD_VALUE'
+                  - Request body contains field 'FIELD_NAME' with invalid value 'FIELD_VALUE' for application type 'APPLICATION_TYPE'
+            required:
+              - message
+  examples: {}

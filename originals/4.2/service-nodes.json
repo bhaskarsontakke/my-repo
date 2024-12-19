@@ -1,0 +1,164 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service nodes"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "nodes"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/nodes/hosts": {
+      "get": {
+        "operationId": "hosts",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/nodes/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nodes/up": {
+      "get": {
+        "operationId": "up",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            },
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/nodes/upByHost": {
+      "get": {
+        "operationId": "upByHost",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "headers": {}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1296 @@
+---
+swagger: "2.0"
+info:
+  version: "4.0.2-SNAPSHOT"
+  title: "Fusion Service spark"
+basePath: "/api/apollo"
+tags:
+- name: "spark"
+schemes:
+- "http"
+paths:
+  /spark/configurations:
+    get:
+      summary: "List existing Spark job configurations"
+      description: ""
+      operationId: "listConfigurations"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/SparkJobConfig"
+    post:
+      summary: "Create a new Spark job configuration"
+      description: ""
+      operationId: "createConfiguration"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted configuration values"
+        required: false
+        schema:
+          $ref: "#/definitions/SparkJobConfig"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SparkJobConfig"
+  /spark/configurations/{id}:
+    get:
+      summary: "Retrieve a Spark job configuration"
+      description: ""
+      operationId: "getConfiguration"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Spark configuration ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SparkJobConfig"
+    put:
+      summary: "Update an existing Spark job configuration"
+      description: ""
+      operationId: "updateConfiguration"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Spark configuration ID"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted configuration values"
+        required: false
+        schema:
+          $ref: "#/definitions/SparkJobConfig"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SparkJobConfig"
+    delete:
+      summary: "Delete an existing job configuration"
+      description: ""
+      operationId: "deleteConfiguration"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Spark configuration ID"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /spark/driver:
+    delete:
+      summary: "Stop the Spark driver process"
+      description: ""
+      operationId: "stopSparkContext"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /spark/driver/status:
+    get:
+      summary: "Get the location of all the current Spark drivers"
+      description: ""
+      operationId: "getDrivers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+            additionalProperties:
+              $ref: "#/definitions/SparkDriverRegistration"
+  /spark/info:
+    get:
+      summary: "Health check of Spark cluster"
+      description: ""
+      operationId: "getHealthStatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SparkHealthStatus"
+  /spark/jar:
+    get:
+      summary: "Get the shaded JAR for running Spark jobs"
+      description: ""
+      operationId: "getUberjar"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/octet-stream"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /spark/jobs:
+    get:
+      summary: "List all running Spark jobs"
+      description: ""
+      operationId: "listAllJobs"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type"
+        in: "query"
+        description: "Filter to list jobs of a specific type, such as custom script"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/JobList"
+    post:
+      summary: "Start a Spark job using the provided configuration. A unique ID will\
+        \ be automatically assigned and returned to the caller. Returns current status\
+        \ of that job"
+      description: ""
+      operationId: "startUndefinedJob"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "sync"
+        in: "query"
+        description: "When true, run the job synchronously; the request will not return\
+          \ until the job is complete"
+        required: false
+        type: "boolean"
+      - in: "body"
+        name: "body"
+        description: "Spark job configuration. A unique ID will be assigned to this\
+          \ configuration"
+        required: false
+        schema:
+          $ref: "#/definitions/SparkJobConfig"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SparkJobStatus"
+      deprecated: true
+    delete:
+      summary: "Stop all running Spark jobs"
+      description: ""
+      operationId: "stopAllJobs"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type"
+        in: "query"
+        description: "Filter to stop jobs of a specific type, such as aggregations"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /spark/jobs/{collection}/{id}/output:
+    delete:
+      summary: "Delete an aggregation job's output"
+      description: ""
+      operationId: "deleteJobOutput"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "Collection name"
+        required: true
+        type: "string"
+      - name: "id"
+        in: "path"
+        description: "Aggregation ID"
+        required: true
+        type: "string"
+      - name: "jobId"
+        in: "query"
+        description: "Job ID"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /spark/jobs/{id}:
+    get:
+      summary: "Retrieve status of a running Spark job"
+      description: ""
+      operationId: "getJobStatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Spark job ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SparkJobStatus"
+    post:
+      summary: "Start a Spark job using an existing job definition"
+      description: ""
+      operationId: "startJob"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Spark job ID"
+        required: true
+        type: "string"
+      - name: "sync"
+        in: "query"
+        description: "When true, run the job synchronously; the request will not return\
+          \ until the job is complete"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SparkJobStatus"
+    delete:
+      summary: "Stop a running Spark job"
+      description: ""
+      operationId: "stopJob"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Spark job ID"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /spark/jobs/{id}/{key}:
+    get:
+      summary: "Retrieve status of a running Spark job"
+      description: ""
+      operationId: "getDataFromStatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Spark job ID"
+        required: true
+        type: "string"
+      - name: "key"
+        in: "path"
+        description: "Key name"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /spark/log/api:
+    get:
+      summary: "Get last N log lines from launcher driver"
+      description: ""
+      operationId: "getLogsFromApi"
+      consumes:
+      - "application/json"
+      produces:
+      - "text/plain"
+      parameters:
+      - name: "rows"
+        in: "query"
+        description: "The number of log lines to read from file"
+        required: false
+        type: "integer"
+        default: 100
+        format: "int32"
+      - name: "jobId"
+        in: "query"
+        description: "Filter out logs by Spark job name"
+        required: false
+        type: "string"
+      - name: "jobRunId"
+        in: "query"
+        description: "Filter out logs by Spark job run ID"
+        required: false
+        type: "string"
+      - name: "pattern"
+        in: "query"
+        description: "Filter out logs using regex pattern"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/LogLine"
+  /spark/log/driver/default:
+    get:
+      summary: "Get last N log lines from default driver"
+      description: ""
+      operationId: "getLogsFromDefaultDriver"
+      consumes:
+      - "application/json"
+      produces:
+      - "text/plain"
+      parameters:
+      - name: "rows"
+        in: "query"
+        description: "The number of log lines to read from file"
+        required: false
+        type: "integer"
+        default: 100
+        format: "int32"
+      - name: "jobId"
+        in: "query"
+        description: "Filter out logs by Spark job name"
+        required: false
+        type: "string"
+      - name: "jobRunId"
+        in: "query"
+        description: "Filter out logs by Spark job run ID"
+        required: false
+        type: "string"
+      - name: "pattern"
+        in: "query"
+        description: "Filter out logs using regex pattern"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/LogLine"
+  /spark/log/driver/launcher:
+    get:
+      summary: "Get last N log lines from launcher driver"
+      description: ""
+      operationId: "getLogsFromLauncherDriver"
+      consumes:
+      - "application/json"
+      produces:
+      - "text/plain"
+      parameters:
+      - name: "rows"
+        in: "query"
+        description: "The number of log lines to read from file"
+        required: false
+        type: "integer"
+        default: 100
+        format: "int32"
+      - name: "jobId"
+        in: "query"
+        description: "Filter out logs by Spark job name"
+        required: false
+        type: "string"
+      - name: "jobRunId"
+        in: "query"
+        description: "Filter out logs by Spark job run ID"
+        required: false
+        type: "string"
+      - name: "pattern"
+        in: "query"
+        description: "Filter out logs using regex pattern"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/LogLine"
+  /spark/log/driver/scripted:
+    get:
+      summary: "Get last N log lines from scripted driver"
+      description: ""
+      operationId: "getLogsFromScriptedDriver"
+      consumes:
+      - "application/json"
+      produces:
+      - "text/plain"
+      parameters:
+      - name: "rows"
+        in: "query"
+        description: "The number of log lines to read from file"
+        required: false
+        type: "integer"
+        default: 100
+        format: "int32"
+      - name: "jobId"
+        in: "query"
+        description: "Filter out logs by Spark job name"
+        required: false
+        type: "string"
+      - name: "jobRunId"
+        in: "query"
+        description: "Filter out logs by Spark job run ID"
+        required: false
+        type: "string"
+      - name: "pattern"
+        in: "query"
+        description: "Filter out logs using regex pattern"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/LogLine"
+  /spark/log/job/{jobId}:
+    get:
+      summary: "Get all logs related to job"
+      description: ""
+      operationId: "getLogsForJob"
+      consumes:
+      - "application/json"
+      produces:
+      - "text/plain"
+      parameters:
+      - name: "jobId"
+        in: "path"
+        description: "Job config ID of the Spark job to get logs for"
+        required: true
+        type: "string"
+      - name: "jobRunId"
+        in: "query"
+        description: "Filter out logs by Spark job run ID"
+        required: false
+        type: "string"
+      - name: "rows"
+        in: "query"
+        description: "The number of log lines to read from file"
+        required: false
+        type: "integer"
+        default: 100
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/LogLine"
+  /spark/log/master:
+    get:
+      summary: "Get last N log lines from Spark Master"
+      description: ""
+      operationId: "getLogsFromSparkMaster"
+      consumes:
+      - "application/json"
+      produces:
+      - "text/plain"
+      parameters:
+      - name: "rows"
+        in: "query"
+        description: "The number of log lines to read from file"
+        required: false
+        type: "integer"
+        default: 100
+        format: "int32"
+      - name: "pattern"
+        in: "query"
+        description: "Filter out logs using regex pattern"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/LogLine"
+  /spark/log/sql:
+    get:
+      summary: "Get last N log lines from SQL log"
+      description: ""
+      operationId: "getLogsFromSql"
+      consumes:
+      - "application/json"
+      produces:
+      - "text/plain"
+      parameters:
+      - name: "rows"
+        in: "query"
+        description: "The number of log lines to read from file"
+        required: false
+        type: "integer"
+        default: 100
+        format: "int32"
+      - name: "pattern"
+        in: "query"
+        description: "Filter out logs using regex pattern"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/LogLine"
+  /spark/log/worker:
+    get:
+      summary: "Get last N log lines from Spark Master"
+      description: ""
+      operationId: "getLogsFromSparkWorker"
+      consumes:
+      - "application/json"
+      produces:
+      - "text/plain"
+      parameters:
+      - name: "rows"
+        in: "query"
+        description: "The number of log lines to read from file"
+        required: false
+        type: "integer"
+        default: 100
+        format: "int32"
+      - name: "pattern"
+        in: "query"
+        description: "Filter out logs using regex pattern"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/LogLine"
+  /spark/master:
+    get:
+      summary: "Return a string containing the Spark master URL"
+      description: ""
+      operationId: "getMaster"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+  /spark/master/config:
+    get:
+      summary: "Get a list of Spark master processes in the cluster"
+      description: ""
+      operationId: "getMasters"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/MasterConfig"
+  /spark/master/status:
+    get:
+      summary: "Get the status of all the available Spark masters"
+      description: ""
+      operationId: "getAllMasterStatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/SparkMasterStatus"
+  /spark/schema:
+    get:
+      summary: "Get the schema for all the Spark job types"
+      description: ""
+      operationId: "getConfigurationTypes"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ObjectType"
+  /spark/script:
+    post:
+      summary: "Execute an arbitrary Scala script"
+      description: "Results of computation can be returned to the caller as a part\
+        \ of the job status, by assigning the result in the script to a variable called\
+        \ `result`. The `result` is flat strings and not JSON. You can use `sqlContext.read.json(…\
+        ​)` to read this file as a `DataFrame`."
+      operationId: "startUndefinedScriptedJob"
+      consumes:
+      - "*/*"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "sync"
+        in: "query"
+        description: "When true, run the job synchronously; the request will not return\
+          \ until the job is complete"
+        required: false
+        type: "boolean"
+      - name: "rows"
+        in: "query"
+        description: "Page size for reading out of Solr"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "Content-Type"
+        in: "header"
+        description: "The media type of the entity body"
+        required: false
+        type: "string"
+        default: "application/octet-stream"
+      - in: "body"
+        name: "body"
+        description: "Scala script"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "string"
+            format: "byte"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SparkJobStatus"
+  /spark/status:
+    get:
+      summary: "Get the status of the service"
+      description: ""
+      operationId: "getStatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceStatus"
+  /spark/worker/config:
+    get:
+      summary: "Get a list of Spark worker processes in the cluster"
+      description: ""
+      operationId: "getWorkers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/WorkerConfig"
+definitions:
+  PropertyGroup:
+    type: "object"
+    properties:
+      label:
+        type: "string"
+      properties:
+        type: "array"
+        items:
+          type: "string"
+  SparkJobStatus:
+    type: "object"
+    properties:
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      state:
+        type: "string"
+        enum:
+        - "unknown"
+        - "idle"
+        - "starting"
+        - "running"
+        - "finishing"
+        - "cancelling"
+        - "finished"
+        - "cancelled"
+        - "error"
+        - "skipped"
+      jobId:
+        type: "string"
+      jobConfig:
+        $ref: "#/definitions/SparkJobConfig"
+      hostname:
+        type: "string"
+      result:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      start:
+        type: "string"
+      end:
+        type: "string"
+      duration:
+        type: "integer"
+        format: "int64"
+      terminalState:
+        type: "boolean"
+        default: false
+  SparkDriverRegistration:
+    type: "object"
+    properties:
+      hostname:
+        type: "string"
+      port:
+        type: "integer"
+        format: "int32"
+      id:
+        type: "string"
+      scripted:
+        type: "boolean"
+        default: false
+  StackTraceElement:
+    type: "object"
+    properties:
+      methodName:
+        type: "string"
+      fileName:
+        type: "string"
+      lineNumber:
+        type: "integer"
+        format: "int32"
+      className:
+        type: "string"
+      nativeMethod:
+        type: "boolean"
+        default: false
+  ObjectType:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      category:
+        type: "string"
+      categoryPriority:
+        type: "integer"
+        format: "int32"
+      allowedValues:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "object"
+      hints:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      defaultValue:
+        type: "object"
+      accessibleProperty:
+        $ref: "#/definitions/AccessibleProperty"
+      oneOf:
+        type: "array"
+        items:
+          $ref: "#/definitions/AnyTypeObjectObject"
+      maxProperties:
+        type: "integer"
+        format: "int32"
+      minProperties:
+        type: "integer"
+        format: "int32"
+      required:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      properties:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/AnyType"
+      propertyGroups:
+        type: "array"
+        items:
+          $ref: "#/definitions/PropertyGroup"
+      definitions:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/AnyType"
+      type:
+        type: "string"
+        enum:
+        - "String"
+        - "Number"
+        - "Integer"
+        - "Boolean"
+        - "Object"
+        - "Array"
+        - "Null"
+        - "Ref"
+      additionalProperties:
+        type: "object"
+  ServiceStatus:
+    type: "object"
+    properties:
+      node:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "ok"
+        - "warning"
+        - "error"
+        - "shutdown"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/StatusMessage"
+  WorkerStatus:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      host:
+        type: "string"
+      port:
+        type: "integer"
+        format: "int32"
+      webuiaddress:
+        type: "string"
+      cores:
+        type: "integer"
+        format: "int32"
+      coresused:
+        type: "integer"
+        format: "int32"
+      coresfree:
+        type: "integer"
+        format: "int32"
+      memoryused:
+        type: "integer"
+        format: "int32"
+      memoryfree:
+        type: "integer"
+        format: "int32"
+      state:
+        type: "string"
+      lastheartbeat:
+        type: "integer"
+        format: "int64"
+  WorkerConfig:
+    type: "object"
+    properties:
+      host:
+        type: "string"
+      port:
+        type: "integer"
+        format: "int32"
+      webUIPort:
+        type: "integer"
+        format: "int32"
+      cores:
+        type: "integer"
+        format: "int32"
+      shadedJarPath:
+        type: "string"
+      memoryMB:
+        type: "integer"
+        format: "int32"
+  AccessibleObject:
+    type: "object"
+    properties:
+      annotations:
+        type: "array"
+        items:
+          $ref: "#/definitions/Annotation"
+      declaredAnnotations:
+        type: "array"
+        items:
+          $ref: "#/definitions/Annotation"
+      accessible:
+        type: "boolean"
+        default: false
+  JobList:
+    type: "object"
+    properties:
+      activeJobs:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          additionalProperties:
+            type: "array"
+            items:
+              $ref: "#/definitions/SparkJobInfo"
+      finishedJobs:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          additionalProperties:
+            type: "array"
+            items:
+              $ref: "#/definitions/SparkJobInfo"
+      errors:
+        type: "array"
+        items:
+          $ref: "#/definitions/Throwable"
+  AnyType:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      category:
+        type: "string"
+      categoryPriority:
+        type: "integer"
+        format: "int32"
+      allowedValues:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "object"
+      hints:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      defaultValue:
+        type: "object"
+      accessibleProperty:
+        $ref: "#/definitions/AccessibleProperty"
+      oneOf:
+        type: "array"
+        items:
+          $ref: "#/definitions/AnyTypeObjectObject"
+      type:
+        type: "string"
+        enum:
+        - "String"
+        - "Number"
+        - "Integer"
+        - "Boolean"
+        - "Object"
+        - "Array"
+        - "Null"
+        - "Ref"
+  SparkJobInfo:
+    type: "object"
+    properties:
+      lastJobRunId:
+        type: "string"
+      duration:
+        type: "integer"
+        format: "int64"
+      state:
+        type: "string"
+        enum:
+        - "unknown"
+        - "idle"
+        - "starting"
+        - "running"
+        - "finishing"
+        - "cancelling"
+        - "finished"
+        - "cancelled"
+        - "error"
+        - "skipped"
+      startTime:
+        type: "string"
+      endTime:
+        type: "string"
+      type:
+        type: "string"
+  SparkJobConfig:
+    type: "object"
+    properties:
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      id:
+        type: "string"
+      type:
+        type: "string"
+  SparkMasterStatus:
+    type: "object"
+    properties:
+      url:
+        type: "string"
+      status:
+        type: "string"
+      workers:
+        type: "array"
+        items:
+          $ref: "#/definitions/WorkerStatus"
+      cores:
+        type: "integer"
+        format: "int32"
+      coresused:
+        type: "integer"
+        format: "int32"
+      memory:
+        type: "integer"
+        format: "int32"
+      memoryused:
+        type: "integer"
+        format: "int32"
+      activeapps:
+        type: "array"
+        items:
+          $ref: "#/definitions/ApplicationStatus"
+      completedapps:
+        type: "array"
+        items:
+          $ref: "#/definitions/ApplicationStatus"
+      activedrivers:
+        type: "array"
+        items:
+          type: "object"
+          additionalProperties:
+            type: "object"
+  LogLine:
+    type: "object"
+    properties:
+      line:
+        type: "string"
+      date:
+        type: "integer"
+        format: "int64"
+  Annotation:
+    type: "object"
+  StatusMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      date:
+        type: "string"
+        format: "date-time"
+  ClusterInfo:
+    type: "object"
+  Type:
+    type: "object"
+    properties:
+      typeName:
+        type: "string"
+  AccessibleProperty:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      required:
+        type: "boolean"
+        default: false
+      genericType:
+        $ref: "#/definitions/Type"
+      accessibleObject:
+        $ref: "#/definitions/AccessibleObject"
+  ApplicationStatus:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      starttime:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      user:
+        type: "string"
+      memoryperslave:
+        type: "integer"
+        format: "int32"
+      submitdate:
+        type: "string"
+      state:
+        type: "string"
+      duration:
+        type: "integer"
+        format: "int64"
+  Throwable:
+    type: "object"
+    properties:
+      cause:
+        $ref: "#/definitions/Throwable"
+      stackTrace:
+        type: "array"
+        items:
+          $ref: "#/definitions/StackTraceElement"
+      message:
+        type: "string"
+      localizedMessage:
+        type: "string"
+      suppressed:
+        type: "array"
+        items:
+          $ref: "#/definitions/Throwable"
+  MasterConfig:
+    type: "object"
+    properties:
+      host:
+        type: "string"
+      port:
+        type: "integer"
+        format: "int32"
+      webUIPort:
+        type: "integer"
+        format: "int32"
+      webUrl:
+        type: "string"
+  SparkHealthStatus:
+    type: "object"
+    properties:
+      mode:
+        type: "string"
+        enum:
+        - "LOCAL"
+        - "STANDALONE"
+        - "NONE"
+      masterUrl:
+        type: "string"
+      clusterInfo:
+        $ref: "#/definitions/ClusterInfo"
+      activeJobs:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            $ref: "#/definitions/SparkJobInfo"
+      completedJobs:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            $ref: "#/definitions/SparkJobInfo"
+      config:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  AnyTypeObjectObject:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      category:
+        type: "string"
+      categoryPriority:
+        type: "integer"
+        format: "int32"
+      allowedValues:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "object"
+      hints:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      defaultValue:
+        type: "object"
+      accessibleProperty:
+        $ref: "#/definitions/AccessibleProperty"
+      oneOf:
+        type: "array"
+        items:
+          $ref: "#/definitions/AnyTypeObjectObject"
+      type:
+        type: "string"
+        enum:
+        - "String"
+        - "Number"
+        - "Integer"
+        - "Boolean"
+        - "Object"
+        - "Array"
+        - "Null"
+        - "Ref"

@@ -1,0 +1,470 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service features"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "features"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/features": {
+      "get": {
+        "summary": "Return a list of features",
+        "description": "",
+        "operationId": "listFeatures",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FeatureSpec"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/features/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/features/{feature}": {
+      "get": {
+        "summary": "Return details about a feature",
+        "description": "",
+        "operationId": "getFeature",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "feature",
+            "in": "path",
+            "description": "The name of a feature",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/FeatureSpec"
+            }
+          }
+        }
+      }
+    },
+    "/features/{feature}/_schema": {
+      "get": {
+        "summary": "Get a feature's configuration schema",
+        "description": "",
+        "operationId": "getFeatureSchema",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "feature",
+            "in": "path",
+            "description": "The name of a feature",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ObjectType"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "FeatureSpec": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "defaults": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "callback": {
+          "$ref": "#/definitions/CallParams"
+        }
+      }
+    },
+    "ObjectType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "required": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "additionalProperties": {
+          "type": "object",
+          "readOnly": true
+        },
+        "minProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "maxProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "definitions": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        },
+        "propertyGroups": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/PropertyGroup"
+          }
+        }
+      }
+    },
+    "CallParams": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE"
+          ]
+        },
+        "queryParams": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "entity": {
+          "type": "object"
+        }
+      }
+    },
+    "PropertyGroup": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "readOnly": true
+        },
+        "properties": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "AnyType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    },
+    "AnyTypeObjectObject": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    }
+  }
+}

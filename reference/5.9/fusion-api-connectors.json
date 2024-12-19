@@ -1,0 +1,2469 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "A Lucidworks Fusion microservice for Connectors management.",
+        "version": "5.9.0",
+        "title": "Fusion Connectors Service API",
+        "termsOfService": "https://lucidworks.com/legal/developer-license-agreement/",
+        "contact": {
+            "name": "Lucidworks",
+            "url": "www.lucidworks.com",
+            "email": "support@lucidworks.com"
+        },
+        "license": {
+            "name": "License of API",
+            "url": "https://lucidworks.com/legal/developer-license-agreement/"
+        }
+    },
+    "host": "FUSION_HOST.com",
+    "basePath": "/api/connectors",
+    "tags": [{
+        "name": "configs-controller",
+        "description": "The V2 Datasource Configuration API allows to manage V2 (SDK) datasource configurations. These are the configurations that define settings for crawling a specific repository, database, API or other content source."
+    }, {
+        "name": "content-controller",
+        "description": "The Content Sampling API is an internalAPI that allows to do a sample a datasource by running a short crawl and retrieving a limited number of resultsboth Classic and V2 (SDK) datasource configurations. These are the configurations that define settings for "
+    }, {
+        "name": "data-sources-controller",
+        "description": "The Datasource Configuration API allows to manage both Classic and V2 (SDK) datasource configurations. These are the configurations that define settings for crawling a specific repository, database, API or other content source."
+    }, {
+        "name": "jobs-controller",
+        "description": "The Datasource Jobs API provides control over datasource crawl jobs. It allows to list, check status, start and stop datasource crawl jobs."
+    }, {
+        "name": "partial-config-controller",
+        "description": "The Configuration Suggestion API allows to get suggestion on which connector plugin can be used for crawling provided content source."
+    }, {
+        "name": "plugins-by-category-controller",
+        "description": "Plugins By Category Controller"
+    }, {
+        "name": "plugins-controller",
+        "description": "The Connector Plugins API allows to manage (list, install, update and uninstall) connector plugins."
+    }, {
+        "name": "repository-plugins-controller",
+        "description": "The Connector Repository Plugins API allows to list connector plugins from the plugin repository."
+    }, {
+        "name": "schema-controller",
+        "description": "The Connectors Schema API allows to retrieve available configuration properties for a specific connector plugin type."
+    }, {
+        "name": "security-filter-controller",
+        "description": "The Connectors Security Filters API provides security filter queries generated for a specific collection, user and connector type. These filter queries are used by the query pipeline to filter out documents returned to specific users and group of users depending on their permissions."
+    }],
+    "schemes": ["https"],
+    "paths": {
+        "/configs": {
+            "get": {
+                "tags": ["configs-controller"],
+                "summary": "List the connector V2 configurations",
+                "description": "Lists the V2 configurations linked to a collection. If no collection is provided, then all available configurations are listed",
+                "operationId": "getConnectorConfigsUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "collection",
+                    "in": "query",
+                    "description": "The collection name",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ConnectorConfig",
+                                "originalRef": "ConnectorConfig"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "post": {
+                "tags": ["configs-controller"],
+                "summary": "Create a connector V2 configuration",
+                "operationId": "addConnectorConfigUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "requestBody",
+                    "description": "The configuration to be created",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }, {
+                    "name": "validateOnly",
+                    "in": "query",
+                    "description": "Indicates if the configuration should be created(persisted) or just validated",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/ConnectorConfig",
+                            "originalRef": "ConnectorConfig"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["configs-controller"],
+                "summary": "Remove connector V2 configurations",
+                "description": "Remove all V2 configurations linked to the given collection. A list of the removed configuration IDs is returned",
+                "operationId": "removeConnectorConfigsUsingDELETE",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "collection",
+                    "in": "query",
+                    "description": "The collection name, linked configurations will be removed",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "force",
+                    "in": "query",
+                    "description": "Indicates if the configuration should be removed even if a job is currently running",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "removeOutput",
+                    "in": "query",
+                    "description": "Indicates if the documents indexed should be also removed",
+                    "required": false,
+                    "type": "boolean"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/configs/{id}": {
+            "get": {
+                "tags": ["configs-controller"],
+                "summary": "Get specific connector V2 configuration",
+                "operationId": "getConnectorConfigUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "The V2 configuration ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ConnectorConfig",
+                            "originalRef": "ConnectorConfig"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "put": {
+                "tags": ["configs-controller"],
+                "summary": "Update a connector V2 configuration",
+                "operationId": "updateConnectorConfigUsingPUT",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The configuration ID",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "requestBody",
+                    "description": "The new configuration",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ConnectorConfig",
+                            "originalRef": "ConnectorConfig"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["configs-controller"],
+                "summary": "Remove specific connector V2 configuration",
+                "operationId": "removeConnectorConfigUsingDELETE",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "force",
+                    "in": "query",
+                    "description": "Indicates if the configuration should be removed even if a job is currently running",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The configuration ID",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "removeOutput",
+                    "in": "query",
+                    "description": "Indicates if the documents indexed should be also removed",
+                    "required": false,
+                    "type": "boolean"
+                }],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/content/{id}/pipeline": {
+            "get": {
+                "tags": ["content-controller"],
+                "summary": "Run a connector job and return the results",
+                "operationId": "getPipelineResultsUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "excludeBinaryFields",
+                    "in": "query",
+                    "description": "Indicates if fields with a byte array as value should be excluded or not",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The datasource/configuration ID",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "limit",
+                    "in": "query",
+                    "description": "The maximum number of results to return",
+                    "required": false,
+                    "type": "integer",
+                    "default": 5,
+                    "format": "int32"
+                }, {
+                    "name": "maxFieldLength",
+                    "in": "query",
+                    "description": "The maximum length of fields returned in the response",
+                    "required": false,
+                    "type": "integer",
+                    "default": 1024,
+                    "format": "int32"
+                }, {
+                    "name": "parserId",
+                    "in": "query",
+                    "description": "The Parser ID to be used in the sampling process",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "pipelineId",
+                    "in": "query",
+                    "description": "The Pipeline ID to be used in the sampling process",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "refresh",
+                    "in": "query",
+                    "description": "Indicates if the sampling cache should be cleared",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "wait",
+                    "in": "query",
+                    "description": "An specific amount of time to run the sample, in seconds",
+                    "required": false,
+                    "type": "integer",
+                    "default": 30,
+                    "format": "int32"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/IndexPipelineDebugResponse",
+                            "originalRef": "IndexPipelineDebugResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/datasources": {
+            "get": {
+                "tags": ["data-sources-controller"],
+                "summary": "Return a list of data source configurations",
+                "description": "Lists the data source configurations linked to a collection. If no collection is provided, then all available configurations are listed",
+                "operationId": "getDataSourcesUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "collection",
+                    "in": "query",
+                    "description": "The collection name",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "post": {
+                "tags": ["data-sources-controller"],
+                "summary": "Create a new connector data source configuration",
+                "operationId": "addDataSourceUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "requestBody",
+                    "description": "The data source configuration",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }, {
+                    "name": "validate",
+                    "in": "query",
+                    "description": "Indicates if the configuration should be created(persisted) or just validated",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["data-sources-controller"],
+                "summary": "Remove data source configurations",
+                "description": "Remove all data source configurations linked to the given collection. A list of the removed data source configuration IDs is returned",
+                "operationId": "removeDataSourcesUsingDELETE",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "collection",
+                    "in": "query",
+                    "description": "The collection name, linked configurations will be removed",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "force",
+                    "in": "query",
+                    "description": "Indicates if the configuration should be removed even if a job is currently running",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "remove_output",
+                    "in": "query",
+                    "description": "Indicates if the documents indexed should be also removed",
+                    "required": false,
+                    "type": "boolean"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/datasources/{id}": {
+            "get": {
+                "tags": ["data-sources-controller"],
+                "summary": "Return a data source configuration",
+                "operationId": "getDataSourceUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The data source configuration ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "put": {
+                "tags": ["data-sources-controller"],
+                "summary": "Update a data source connector configuration",
+                "operationId": "updateDataSourceUsingPUT",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The configuration ID",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "requestBody",
+                    "description": "The new configuration",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }, {
+                    "name": "validate",
+                    "in": "query",
+                    "description": "Indicates if the configuration should be validated",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["data-sources-controller"],
+                "summary": "Remove specific data source configuration",
+                "operationId": "removeDataSourceUsingDELETE",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "force",
+                    "in": "query",
+                    "description": "Indicates if the configuration should be removed even if a job is currently running",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The configuration ID",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "remove_output",
+                    "in": "query",
+                    "description": "Indicates if the documents indexed should be also removed",
+                    "required": false,
+                    "type": "boolean"
+                }],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/datasources/{id}/db": {
+            "delete": {
+                "tags": ["data-sources-controller"],
+                "summary": "Clear crawlDB of the given data source configuration",
+                "operationId": "dropDbUsingDELETE",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The data source configuration ID",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "remove_output",
+                    "in": "query",
+                    "description": "Indicates if the documents indexed should be removed",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/datasources/{id}/output": {
+            "delete": {
+                "tags": ["data-sources-controller"],
+                "summary": "Deletes documents indexed by the given data source configuration",
+                "operationId": "deleteOutputDataUsingDELETE",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "The context of resource. It usually is the app inside which the resource is created",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The data source configuration ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/datasources/{id}/sample": {
+            "get": {
+                "tags": ["data-sources-controller"],
+                "summary": "Run a connector sample job  and return the results. Classic datasource configurations only",
+                "operationId": "datasourceDocsSampleUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "excludeBinaryFields",
+                    "in": "query",
+                    "description": "Indicates if fields with a byte array as value should be excluded or not",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The data source configuration ID",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "limit",
+                    "in": "query",
+                    "description": "The maximum number of results to return",
+                    "required": false,
+                    "type": "integer",
+                    "format": "int32"
+                }, {
+                    "name": "maxFieldLength",
+                    "in": "query",
+                    "description": "The maximum length of fields returned in the response",
+                    "required": false,
+                    "type": "integer",
+                    "default": 1024,
+                    "format": "int32"
+                }, {
+                    "name": "refresh",
+                    "in": "query",
+                    "description": "Indicates if the sampling cache should be cleared",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "wait",
+                    "in": "query",
+                    "description": "An specific amount of time to run the sample, in seconds",
+                    "required": false,
+                    "type": "integer",
+                    "format": "int32"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/PipelineDocument",
+                                "originalRef": "PipelineDocument"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/datasources/{id}/sample/pipeline-debug": {
+            "get": {
+                "tags": ["data-sources-controller"],
+                "summary": "Run a connector sample job and return the results with extra information from the pipeline",
+                "operationId": "datasourceDocsSamplePipelineDebugUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "excludeBinaryFields",
+                    "in": "query",
+                    "description": "Indicates if fields with a byte array as value should be excluded or not",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The datasource/configuration ID",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "limit",
+                    "in": "query",
+                    "description": "The maximum number of results to return",
+                    "required": false,
+                    "type": "integer",
+                    "default": 5,
+                    "format": "int32"
+                }, {
+                    "name": "maxFieldLength",
+                    "in": "query",
+                    "description": "The maximum length of fields returned in the response",
+                    "required": false,
+                    "type": "integer",
+                    "default": 1024,
+                    "format": "int32"
+                }, {
+                    "name": "parserId",
+                    "in": "query",
+                    "description": "The Parser ID to be used in the sampling process",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "pipelineId",
+                    "in": "query",
+                    "description": "The Pipeline ID to be used in the sampling process",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "pipelineParams",
+                    "in": "query",
+                    "description": "pipelineParams",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "refresh",
+                    "in": "query",
+                    "description": "Indicates if the sampling cache should be cleared",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }, {
+                    "name": "wait",
+                    "in": "query",
+                    "description": "An specific amount of time to run the sample, in seconds",
+                    "required": false,
+                    "type": "integer",
+                    "default": 30,
+                    "format": "int32"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/IndexPipelineDebugResponse",
+                            "originalRef": "IndexPipelineDebugResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/jobs": {
+            "get": {
+                "tags": ["jobs-controller"],
+                "summary": "List running connector jobs",
+                "description": "Return the status of all running jobs of the given connector type",
+                "operationId": "listJobsUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "connector",
+                    "in": "query",
+                    "description": "The connector type. If specified, running jobs of that type will be listed",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/JobStatus",
+                                "originalRef": "JobStatus"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["jobs-controller"],
+                "summary": "Stop or abort all jobs for a particular connector type and collection",
+                "operationId": "finishAllJobsUsingDELETE",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "abort",
+                    "in": "query",
+                    "description": "Indicates if job should be aborted",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "collection",
+                    "in": "query",
+                    "description": "The collection name. Linked jobs to that collection will be stopped",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "connector",
+                    "in": "query",
+                    "description": "The connector type. All jobs from that type will be stopped",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "wait_time",
+                    "in": "query",
+                    "description": "The amount of time(in milliseconds) to wait for each job to be stopped",
+                    "required": false,
+                    "type": "integer",
+                    "default": 100,
+                    "format": "int64"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/JobStatus",
+                                "originalRef": "JobStatus"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/jobs/{id}": {
+            "get": {
+                "tags": ["jobs-controller"],
+                "summary": "Get the connector job status",
+                "operationId": "getJobStatusUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "The connector job id",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/JobStatus",
+                            "originalRef": "JobStatus"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "post": {
+                "tags": ["jobs-controller"],
+                "summary": "Update the connector job state",
+                "operationId": "transitionJobStateUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "abort",
+                    "in": "query",
+                    "description": "Indicates if the job should be aborted",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The job id to be updated",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "state",
+                    "description": "The state to transition to",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/JobState",
+                        "originalRef": "JobState"
+                    }
+                }, {
+                    "name": "wait_time",
+                    "in": "query",
+                    "description": "The amount of time(in milliseconds) to wait for the update",
+                    "required": false,
+                    "type": "integer",
+                    "default": 60000,
+                    "format": "int64"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/JobStatus",
+                            "originalRef": "JobStatus"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/jobs/{id}/db": {
+            "get": {
+                "tags": ["jobs-controller"],
+                "summary": "Return crawlDB metrics",
+                "description": "Method not implemented, do not use",
+                "operationId": "getDbUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "The job ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["jobs-controller"],
+                "summary": "Clear crawlDB collection",
+                "operationId": "dropDbUsingDELETE_1",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "The connector configuration id to be cleared",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "remove_output",
+                    "in": "query",
+                    "description": "Indicates if the content collection should be cleared as well",
+                    "required": false,
+                    "type": "boolean"
+                }],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/jobs/{id}/output": {
+            "delete": {
+                "tags": ["jobs-controller"],
+                "summary": "Delete indexed documents",
+                "description": "documents indexed by the given configuration ID will be deleted from content collection",
+                "operationId": "deleteContentUsingDELETE",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "The connector configuration id",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/partial-config": {
+            "get": {
+                "tags": ["partial-config-controller"],
+                "summary": "List possible connectors that can handle given input value",
+                "operationId": "suggestConnectorConfigUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "input",
+                    "in": "query",
+                    "description": "The input value. It could be an URL, a file path, an FTP URL, etc.",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ConnectorConfigSuggestion",
+                                "originalRef": "ConnectorConfigSuggestion"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/plugins": {
+            "get": {
+                "tags": ["plugins-controller"],
+                "summary": "List installed plugins",
+                "operationId": "pluginStatusesUsingGET",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "post": {
+                "tags": ["plugins-controller"],
+                "summary": "Install a plugin from the plugins repository",
+                "operationId": "installOrUpdatePluginFromRepositoryUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "query",
+                    "description": "The plugin id to be installed",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "version",
+                    "in": "query",
+                    "description": "The specific plugin version to be installed. Leave empty to use the most recent plugin version",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PluginInstallResponse",
+                            "originalRef": "PluginInstallResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "put": {
+                "tags": ["plugins-controller"],
+                "summary": "Install plugin",
+                "operationId": "installOrUpdatePluginUsingPUT",
+                "consumes": ["application/octet-stream", "application/x-zip-compressed", "application/zip"],
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PluginInstallResponse",
+                            "originalRef": "PluginInstallResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/plugins/{connector}/types": {
+            "get": {
+                "tags": ["schema-controller"],
+                "summary": "List the plugin sub-types",
+                "operationId": "listPluginTypesUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "connector",
+                    "in": "path",
+                    "description": "The plugin type",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/plugins/{connector}/types/{type}": {
+            "get": {
+                "tags": ["schema-controller"],
+                "summary": "Return the plugin schema definition",
+                "operationId": "getPluginTypeSchemaUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "connector",
+                    "in": "path",
+                    "description": "The plugin type",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "type",
+                    "in": "path",
+                    "description": "The plugin sub-type",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/plugins/{pluginId}": {
+            "delete": {
+                "tags": ["plugins-controller"],
+                "summary": "Uninstall plugin",
+                "operationId": "uninstallPluginUsingDELETE",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "pluginId",
+                    "in": "path",
+                    "description": "The plugin id to be uninstalled",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PluginInstallResponse",
+                            "originalRef": "PluginInstallResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/plugins/{type}": {
+            "get": {
+                "tags": ["schema-controller"],
+                "summary": "Return the plugin schema definition. V2 plugins only",
+                "operationId": "getConnectorInfoUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "type",
+                    "in": "path",
+                    "description": "The plugin type",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ConnectorPluginInfo",
+                            "originalRef": "ConnectorPluginInfo"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/pluginsByCategory": {
+            "get": {
+                "tags": ["plugins-by-category-controller"],
+                "summary": "getConnectorTypesByCategory",
+                "operationId": "getConnectorTypesByCategoryUsingGET",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "additionalProperties": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": true
+            }
+        },
+        "/repository": {
+            "get": {
+                "tags": ["repository-plugins-controller"],
+                "summary": "List plugins from repository",
+                "operationId": "listPluginsUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "name",
+                    "in": "query",
+                    "description": "The plugin name or partial name. Plugins containing this value will be included in the response",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/PluginArtifact",
+                                "originalRef": "PluginArtifact"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/schema/{connector}/types": {
+            "get": {
+                "tags": ["schema-controller"],
+                "summary": "List the plugin sub-types",
+                "operationId": "listPluginTypesUsingGET_1",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "connector",
+                    "in": "path",
+                    "description": "The plugin type",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/schema/{connector}/types/{type}": {
+            "get": {
+                "tags": ["schema-controller"],
+                "summary": "Return the plugin schema definition",
+                "operationId": "getPluginTypeSchemaUsingGET_1",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "connector",
+                    "in": "path",
+                    "description": "The plugin type",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "type",
+                    "in": "path",
+                    "description": "The plugin sub-type",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/schema/{type}": {
+            "get": {
+                "tags": ["schema-controller"],
+                "summary": "Return the plugin schema definition. V2 plugins only",
+                "operationId": "getConnectorInfoUsingGET_1",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "type",
+                    "in": "path",
+                    "description": "The plugin type",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ConnectorPluginInfo",
+                            "originalRef": "ConnectorPluginInfo"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/security-filter": {
+            "post": {
+                "tags": ["security-filter-controller"],
+                "summary": "Build security filter",
+                "operationId": "getSecurityFilterUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "collectionIds",
+                    "in": "query",
+                    "description": "A list of collection names. Security filters will be built for the configurations linked to these collections",
+                    "required": true,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }, {
+                    "name": "datasources",
+                    "in": "query",
+                    "description": "A sub set of configuration IDs to build filters for. Leave empty to include all configurations",
+                    "required": false,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }, {
+                    "in": "body",
+                    "name": "subject",
+                    "description": "The subject to build the filter for",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/Subject",
+                        "originalRef": "Subject"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SecurityFilter",
+                            "originalRef": "SecurityFilter"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/security-filter/{collection}": {
+            "get": {
+                "tags": ["security-filter-controller"],
+                "summary": "Build security filter",
+                "operationId": "getSecurityFilterUsingGET",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "collection",
+                    "in": "path",
+                    "description": "The collection name. Security filters will be built for the configurations linked to this collection",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "datasources",
+                    "in": "query",
+                    "description": "A sub set of configuration IDs to build filters for. Leave empty to include all configurations",
+                    "required": false,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }, {
+                    "name": "username",
+                    "in": "query",
+                    "description": "The username to built the filter for",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SecurityFilter",
+                            "originalRef": "SecurityFilter"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/security_filter": {
+            "post": {
+                "tags": ["security-filter-controller"],
+                "summary": "Build security filter",
+                "operationId": "getSecurityFilterUsingPOST_1",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "collectionIds",
+                    "in": "query",
+                    "description": "A list of collection names. Security filters will be built for the configurations linked to these collections",
+                    "required": true,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }, {
+                    "name": "datasources",
+                    "in": "query",
+                    "description": "A sub set of configuration IDs to build filters for. Leave empty to include all configurations",
+                    "required": false,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }, {
+                    "in": "body",
+                    "name": "subject",
+                    "description": "The subject to build the filter for",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/Subject",
+                        "originalRef": "Subject"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SecurityFilter",
+                            "originalRef": "SecurityFilter"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/security_filter/{collection}": {
+            "get": {
+                "tags": ["security-filter-controller"],
+                "summary": "Build security filter",
+                "operationId": "getSecurityFilterUsingGET_1",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "collection",
+                    "in": "path",
+                    "description": "The collection name. Security filters will be built for the configurations linked to this collection",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "datasources",
+                    "in": "query",
+                    "description": "A sub set of configuration IDs to build filters for. Leave empty to include all configurations",
+                    "required": false,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }, {
+                    "name": "username",
+                    "in": "query",
+                    "description": "The username to built the filter for",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SecurityFilter",
+                            "originalRef": "SecurityFilter"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/suggestions/datasources": {
+            "get": {
+                "tags": ["partial-config-controller"],
+                "summary": "List possible connectors that can handle given input value",
+                "operationId": "suggestConnectorConfigUsingGET_1",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "input",
+                    "in": "query",
+                    "description": "The input value. It could be an URL, a file path, an FTP URL, etc.",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ConnectorConfigSuggestion",
+                                "originalRef": "ConnectorConfigSuggestion"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Fusion Native Realm": {
+            "type": "basic"
+        }
+    },
+    "definitions": {
+        "Annotation": {
+            "type": "object",
+            "properties": {
+                "end": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "featureCount": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "features": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "label": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "title": "Annotation"
+        },
+        "AnyType": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "type": "object"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "enum": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "oneOf": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AnyType«object,object»",
+                        "originalRef": "AnyType«object,object»"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["array", "boolean", "null", "number", "object", "ref", "string"]
+                }
+            },
+            "title": "AnyType"
+        },
+        "AnyType«object,object»": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "type": "object"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "enum": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "oneOf": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AnyType«object,object»",
+                        "originalRef": "AnyType«object,object»"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["array", "boolean", "null", "number", "object", "ref", "string"]
+                }
+            },
+            "title": "AnyType«object,object»"
+        },
+        "Command": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "Command"
+        },
+        "ConnectorConfig": {
+            "type": "object",
+            "title": "ConnectorConfig"
+        },
+        "ConnectorConfigSuggestion": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "type": "object"
+                },
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ValidationError",
+                        "originalRef": "ValidationError"
+                    }
+                },
+                "installed": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "valid": {
+                    "type": "boolean"
+                }
+            },
+            "title": "ConnectorConfigSuggestion"
+        },
+        "ConnectorPluginInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "pluginVersion": {
+                    "type": "string"
+                },
+                "schema": {
+                    "$ref": "#/definitions/RootSchemaType",
+                    "originalRef": "RootSchemaType"
+                },
+                "sdkVersion": {
+                    "type": "string"
+                }
+            },
+            "title": "ConnectorPluginInfo"
+        },
+        "ContextAndDoc": {
+            "type": "object",
+            "properties": {
+                "context": {
+                    "type": "object"
+                },
+                "doc": {
+                    "$ref": "#/definitions/PipelineDocument",
+                    "originalRef": "PipelineDocument"
+                },
+                "error": {
+                    "type": "string"
+                }
+            },
+            "title": "ContextAndDoc"
+        },
+        "FusionResource": {
+            "type": "object",
+            "properties": {
+                "canonicalName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["APP", "APPKIT_APP", "BLOB", "COLLECTION", "CUSTOM_RULE_TYPE", "DATASOURCE", "DATA_MODEL", "EXPERIMENT", "GROUP", "INDEX_PIPELINE", "INDEX_PROFILE", "NULL", "PARSER", "QUERY_PIPELINE", "QUERY_PROFILE", "RESOURCE", "SCHEDULE", "SEARCH_CLUSTER", "SPARK_JOB", "SUBSCRIPTION", "TASK", "TEMPLATE", "TEMPLATE_SETTINGS", "TYPE", "ZONE"]
+                },
+                "uri": {
+                    "type": "string",
+                    "format": "uri"
+                }
+            },
+            "title": "FusionResource"
+        },
+        "GlobPermission": {
+            "type": "object",
+            "properties": {
+                "methods": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "enum": ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+                    }
+                },
+                "params": {
+                    "$ref": "#/definitions/PermissionParams",
+                    "originalRef": "PermissionParams"
+                },
+                "path": {
+                    "type": "string"
+                }
+            },
+            "title": "GlobPermission"
+        },
+        "IndexPipelineDebugResponse": {
+            "type": "object",
+            "properties": {
+                "output": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/ContextAndDoc",
+                            "originalRef": "ContextAndDoc"
+                        }
+                    }
+                },
+                "outputEncounteredCount": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "stages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/StageConfig",
+                        "originalRef": "StageConfig"
+                    }
+                }
+            },
+            "title": "IndexPipelineDebugResponse"
+        },
+        "JobState": {
+            "type": "object",
+            "properties": {
+                "state": {
+                    "type": "string",
+                    "enum": ["START", "STOP"]
+                }
+            },
+            "title": "JobState"
+        },
+        "JobStatus": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "object"
+                },
+                "extra": {
+                    "type": "object"
+                },
+                "resource": {
+                    "$ref": "#/definitions/FusionResource",
+                    "originalRef": "FusionResource"
+                },
+                "runId": {
+                    "type": "string"
+                },
+                "startTime": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "state": {
+                    "type": "string",
+                    "enum": ["ABORTED", "FAILED", "PAUSED", "READY", "RUNNING", "SUCCESS"]
+                },
+                "time": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            },
+            "title": "JobStatus"
+        },
+        "PermissionParams": {
+            "type": "object",
+            "title": "PermissionParams"
+        },
+        "PipelineDocument": {
+            "type": "object",
+            "properties": {
+                "commands": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Command",
+                        "originalRef": "Command"
+                    }
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PipelineField",
+                        "originalRef": "PipelineField"
+                    }
+                },
+                "hints": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "PipelineDocument"
+        },
+        "PipelineField": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Annotation",
+                        "originalRef": "Annotation"
+                    }
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "object"
+                }
+            },
+            "title": "PipelineField"
+        },
+        "PluginArtifact": {
+            "type": "object",
+            "properties": {
+                "displayName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "sdkVersion": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            },
+            "title": "PluginArtifact"
+        },
+        "PluginInstallActionStatus": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": ["INSTALL", "UNINSTALL", "UNKNOWN", "UPDATE"]
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": ["FAIL", "NOOP", "SUCCESS"]
+                }
+            },
+            "title": "PluginInstallActionStatus"
+        },
+        "PluginInstallResponse": {
+            "type": "object",
+            "properties": {
+                "pluginId": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/PluginInstallActionStatus",
+                    "originalRef": "PluginInstallActionStatus"
+                }
+            },
+            "title": "PluginInstallResponse"
+        },
+        "RootSchemaType": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "default": {
+                    "type": "object"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "enum": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "interfaces": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "oneOf": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AnyType«object,object»",
+                        "originalRef": "AnyType«object,object»"
+                    }
+                },
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/AnyType",
+                        "originalRef": "AnyType"
+                    }
+                },
+                "required": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["array", "boolean", "null", "number", "object", "ref", "string"]
+                }
+            },
+            "title": "RootSchemaType"
+        },
+        "SecurityFilter": {
+            "type": "object",
+            "properties": {
+                "filter": {
+                    "type": "string"
+                },
+                "nestedClauses": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "SecurityFilter"
+        },
+        "StageConfig": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "title": "StageConfig"
+        },
+        "Subject": {
+            "type": "object",
+            "properties": {
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/GlobPermission",
+                        "originalRef": "GlobPermission"
+                    }
+                },
+                "realm": {
+                    "$ref": "#/definitions/SubjectRealm",
+                    "originalRef": "SubjectRealm"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "userId": {
+                    "type": "string"
+                }
+            },
+            "title": "Subject"
+        },
+        "SubjectRealm": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "principal": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "title": "SubjectRealm"
+        },
+        "ValidationError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "field": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "object"
+                }
+            },
+            "title": "ValidationError"
+        }
+    }
+}

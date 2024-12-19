@@ -1,0 +1,264 @@
+---
+swagger: "2.0"
+info:
+  version: "4.0.2-SNAPSHOT"
+  title: "Fusion Service blobs"
+basePath: "/api/apollo"
+tags:
+- name: "blobs"
+schemes:
+- "http"
+paths:
+  /blobs:
+    get:
+      summary: "List blobs"
+      description: ""
+      operationId: "listBlobManifests"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "dir"
+        in: "query"
+        description: "Directory to be queries"
+        required: false
+        type: "string"
+      - name: "recurse"
+        in: "query"
+        description: "Recurse when querying directory"
+        required: false
+        type: "boolean"
+        default: false
+      - name: "showdirs"
+        in: "query"
+        description: "Show directories when querying directory"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Blob"
+  /blobs/convert:
+    put:
+      summary: "migrate blob manifests from 3.x to 4.x format"
+      description: ""
+      operationId: "migrateBlobManifests"
+      produces:
+      - "application/*"
+      - "text/*"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+      deprecated: true
+  /blobs/status:
+    get:
+      summary: "Get the status of the service"
+      description: ""
+      operationId: "getStatus"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceStatus"
+  /blobs/{id}:
+    get:
+      summary: "Retrieve a blob"
+      description: ""
+      operationId: "getBlob"
+      produces:
+      - "*/*"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The blob ID"
+        required: true
+        type: "string"
+        pattern: ".*"
+      responses:
+        default:
+          description: "successful operation"
+    head:
+      summary: "Retrieve a blob's metadata only"
+      description: ""
+      operationId: "getBlobMetadata"
+      produces:
+      - "*/*"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The blob ID"
+        required: true
+        type: "string"
+        pattern: ".*"
+      responses:
+        default:
+          description: "successful operation"
+    put:
+      summary: "Upload a blob and define its ID"
+      description: ""
+      operationId: "putBlob"
+      consumes:
+      - "*/*"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The blob ID"
+        required: true
+        type: "string"
+        pattern: ".*"
+      - name: "If-Match"
+        in: "header"
+        description: "An entity tag to match against the specified blob"
+        required: false
+        type: "string"
+        default: "\"0\""
+      - name: "Content-Type"
+        in: "header"
+        description: "The media type of the entity body"
+        required: false
+        type: "string"
+        default: "application/octet-stream"
+      - name: "fusion-blob-type"
+        in: "header"
+        description: "The blob sub-type of the entity"
+        required: false
+        type: "string"
+      - name: "commit"
+        in: "query"
+        description: "Whether to commit to Solr Blob store or not"
+        required: false
+        type: "boolean"
+        default: true
+      - name: "update"
+        in: "query"
+        description: "update the data, metadata, or both (default)"
+        required: false
+        type: "string"
+        default: "both"
+      - in: "body"
+        name: "body"
+        description: "The blob to store"
+        required: false
+        schema:
+          $ref: "#/definitions/InputStream"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      summary: "Remove a blob from the blob store"
+      description: ""
+      operationId: "deleteFile"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The blob ID"
+        required: true
+        type: "string"
+        pattern: ".*"
+      - name: "If-Match"
+        in: "header"
+        description: "An entity tag to match against the specified blob"
+        required: false
+        type: "string"
+        default: "\"0\""
+      - name: "commit"
+        in: "query"
+        description: "Whether to commit to Solr Blob store or not"
+        required: false
+        type: "boolean"
+        default: true
+      responses:
+        default:
+          description: "successful operation"
+definitions:
+  Blob:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      path:
+        type: "string"
+      dir:
+        type: "string"
+      filename:
+        type: "string"
+      contentType:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int64"
+      modifiedTime:
+        type: "string"
+        format: "date-time"
+      version:
+        type: "integer"
+        format: "int64"
+      md5:
+        type: "string"
+      metadata:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  InputStream:
+    type: "object"
+  ServiceStatus:
+    type: "object"
+    properties:
+      node:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "ok"
+        - "warning"
+        - "error"
+        - "shutdown"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/StatusMessage"
+  LinkManager:
+    type: "object"
+    properties:
+      links:
+        $ref: "#/definitions/StreamLink"
+  StreamLink:
+    type: "object"
+    properties:
+      parallel:
+        type: "boolean"
+        default: false
+  OptionalBlob:
+    type: "object"
+    properties:
+      present:
+        type: "boolean"
+        default: false
+  StatusMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      date:
+        type: "string"
+        format: "date-time"

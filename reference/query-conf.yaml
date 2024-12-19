@@ -1,0 +1,1570 @@
+openapi: 3.1.0
+info:
+  title: Query APIs
+  version: '1.0'
+  description: 'Used for various query operations, including getting search and searchahead results.'
+  contact:
+    name: Lucidworks
+    email: support@lucidworks.com
+    url: 'https://lucidworks.com/'
+  license:
+    name: Lucidworks
+    url: 'https://lucidworks.com/legal/developer-license-agreement/'
+  termsOfService: 'https://lucidworks.com/legal/developer-license-agreement/'
+servers:
+  - url: 'https://{APPLICATION_ID}.applications.lucidworks.com/query'
+    description: Production
+    variables:
+      APPLICATION_ID:
+        default: APPLICATION_ID
+tags:
+  - name: Search
+  - name: Searchahead
+  - name: Detail
+  - name: Browse
+paths:
+  /search:
+    post:
+      summary: Search
+      operationId: post-query-search
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseSearch'
+        '400':
+          $ref: '#/components/responses/response-error-400'
+        '500':
+          $ref: '#/components/responses/response-error-500'
+      description: Finds relevant matches to complete terms within an indexed data collection. Results match all of the words in the query. For partial matches use the `searchahead` endpoint.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postSearch'
+            examples:
+              example-1:
+                value:
+                  query: string
+                  utcOffset: '+04:00'
+                  sessionId: string
+                  page: 0
+                  limit: 20
+                  sort:
+                    - sortField: relevancy
+                      sortOrder: asc
+                  facets:
+                    - file.extension
+                  fieldList:
+                    - document.url
+                  highlight: false
+                  filters:
+                    - field: file.extension
+                      values:
+                        - string
+                  analyticsData: true
+        description: |-
+          HTTP request guidelines:
+
+          * The maximum HTTP request body size is 1 MiB. 
+
+          * If no response is received in 10 seconds, the request times out and returns a 504 timeout error.
+      security:
+        - authToken: []
+  /searchahead:
+    post:
+      summary: Searchahead
+      operationId: post-query-search-ahead
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseSearchahead'
+        '400':
+          $ref: '#/components/responses/searchAhead-error-400'
+        '500':
+          $ref: '#/components/responses/response-error-500'
+      description: Searches a collection of data for relevant partial-term matches to user-specified search terms. Results match one unbroken string of characters without spaces. Does not combine with facets.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postSearchahead'
+            examples: {}
+        description: |-
+          HTTP request guidelines:
+
+          * The maximum HTTP request body size is 1 MiB. 
+
+          * If no response is received in 10 seconds, the request times out and returns a 504 timeout error.
+      security:
+        - authToken: []
+  /detail:
+    post:
+      summary: Detail
+      operationId: post-query-detail
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseDetail'
+        '400':
+          $ref: '#/components/responses/response-error-400'
+        '500':
+          $ref: '#/components/responses/response-error-500'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postDetail'
+            examples: {}
+        description: |-
+          HTTP request guidelines:
+
+          * The maximum HTTP request body size is 1 MiB. 
+
+          * If no response is received in 10 seconds, the request times out and returns a 504 timeout error.
+      description: Returns metadata associated with a specified record ID.
+      security:
+        - authToken: []
+  /metatags:
+    post:
+      summary: Metatags
+      operationId: post-query-metatags
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseMetatags'
+        '400':
+          $ref: '#/components/responses/response-error-400'
+        '500':
+          $ref: '#/components/responses/response-error-500'
+      description: 'Returns a list of `page.metatags.FIELD_NAME` fields currently indexed in the application''s collection, where at least 1 document contains data in that field.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postMetatags'
+            examples: {}
+        description: |-
+          HTTP request guidelines:
+
+          * The maximum HTTP request body size is 1 MiB. 
+
+          * If no response is received in 10 seconds, the request times out and returns a 504 timeout error.
+      security:
+        - authToken: []
+  /browse:
+    post:
+      summary: Browse
+      operationId: post-query-browse
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseBrowse'
+        '400':
+          $ref: '#/components/responses/response-error-400'
+        '500':
+          $ref: '#/components/responses/response-error-500'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postBrowse'
+            examples: {}
+        description: |-
+          HTTP request guidelines:
+
+          * The maximum HTTP request body size is 1 MiB. 
+
+          * If no response is received in 10 seconds, the request times out and returns a 504 timeout error.
+      description: Returns all documents for the application you're searching.
+      security:
+        - authToken: []
+      x-internal: false
+  /relatedContent:
+    post:
+      summary: Related Content
+      operationId: post-query-related-content
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responseRelatedContent'
+        '400':
+          $ref: '#/components/responses/response-error-400'
+        '500':
+          $ref: '#/components/responses/response-error-500'
+      description: |-
+        Finds and returns documents that are semantically similar. The request requires either: 
+
+        * The `document.title` with the optional field of `document.description`, or 
+
+        * The `id` obtained from the search result of the web page 
+
+
+        CAUTION: You cannot use both the `document.title` and the `id` in the same request.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/postRelatedContentTitle'
+                - $ref: '#/components/schemas/postRelatedContentDocId'
+                  x-stoplight:
+                    id: fdjpyamapjp3f
+            examples:
+              postRelatedContentTitle:
+                value:
+                  probe:
+                    title: string
+                    description: string
+                  utcOffset: '+04:00'
+                  fieldList:
+                    - document.url
+                  sessionId: string
+                  source: homepage
+                  limit: 5
+                  analyticsData: true
+              postRelatedContentDocId:
+                value:
+                  probe:
+                    documentId: string
+                  utcOffset: '+04:00'
+                  fieldList:
+                    - document.url
+                  sessionId: string
+                  source: homepage
+                  limit: 5
+                  analyticsData: true
+        description: |-
+          HTTP request guidelines:
+
+          * The maximum HTTP request body size is 1 MiB. 
+
+          * If no response is received in 10 seconds, the request times out and returns a 504 timeout error.
+      security:
+        - authToken: []
+    parameters: []
+components:
+  schemas:
+    postSearch:
+      description: ''
+      type: object
+      examples: []
+      title: postSearch
+      properties:
+        query:
+          type: string
+          description: |-
+            The raw search query term. The query compares the `query` string value with the following fields for a match:
+
+            - `document.title`
+            - `document.description`
+            - `document.body`
+
+            <!-- theme: info -->
+
+            > See the descriptions in `fieldList` for details on each field.
+          maxLength: 200
+        utcOffset:
+          type: string
+          description: 'The difference between UTC and a specified time zone in a required ISO-8601 format of `±hh:mm`.'
+          pattern: '[+-][0-9]{2}:[0-9]{2}'
+          example: '+04:00'
+        sessionId:
+          type: string
+          description: 'Unique value that identifies the user''s session. Consider passing the session ID value from your user''s browser session as the value of `sessionId`. For more information, see [the MDN developer documentation for sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage).'
+        page:
+          type: integer
+          description: |-
+            The page number of results to return. Use with `limit` to specify section of query matches to return. Useful for pagination. Using `"limit": 20`, `"page": 0` contains results 1-20 while `"page": 1` contains results 21-40.
+            If the page number value is greater than the actual number of pages of results, an empty docs array is returned.
+          default: 0
+          minimum: 0
+          maximum: 99999999
+        limit:
+          type: integer
+          description: The maximum number of matches to return in the response.
+          default: 20
+          minimum: 1
+          maximum: 100
+        sort:
+          type: array
+          description: 'The order in which results are displayed. If a field name is entered more than once in the request, a `400` error is returned.'
+          items:
+            type: object
+            properties:
+              sortField:
+                type: string
+                description: |-
+                  The value to sort the response by.
+
+                  - `relevancy`: Calculation for how relevant a match is for this specific query.
+                  - `document.sourceCreateTimestamp`: The date and time the record was created. 
+                  - `document.sourceLastModifiedTimestamp`: The date and time the most recent changes occurred. 
+                enum:
+                  - relevancy
+                  - document.sourceCreateTimestamp
+                  - document.sourceLastModifiedTimestamp
+                default: relevancy
+              sortOrder:
+                type: string
+                description: |-
+                  The order in which results are displayed.
+
+                  - `asc`: Ascending order. 
+                  - `desc`: Descending order. Not available for sorting by `relevancy`. If this is selected for `relevancy`, errors are generated.
+                default: asc
+                enum:
+                  - asc
+                  - desc
+            required:
+              - sortField
+              - sortOrder
+        facets:
+          type: array
+          description: |-
+            The array of strings that specify fields to return facet values.
+
+            A facet is enabled if it contains a non-empty value.
+          items:
+            type: string
+            enum:
+              - file.extension
+              - document.languageCode
+              - datasourceLabels
+              - type
+              - page.metatags.FIELD_NAME
+        fieldList:
+          $ref: '#/components/schemas/fieldList'
+        highlight:
+          type: boolean
+          description: |-
+            If true, the feature is enabled and highlighting is applied to fields in the `fieldList` parameter.
+
+            The matching text is wrapped in `<em></em>` tags.
+          default: false
+        filters:
+          type: array
+          uniqueItems: true
+          description: 'The filters specified determine which documents are included in the response. Documents must match all filter values to be included because multiple filters are processed using an AND operator. If a filter value is entered more than once in the request, a `400` error is returned.'
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: 'The field name on which to filter. If the same field is entered more than once, a `400` error is returned.'
+                enum:
+                  - file.extension
+                  - document.languageCode
+                  - datasourceLabels
+                  - type
+                  - page.metatags.FIELD_NAME
+              values:
+                type: array
+                uniqueItems: false
+                description: Multiple entries are processed using an OR operator.
+                items:
+                  type: string
+        source:
+          type: string
+          example: homepage
+          maxLength: 200
+          description: |-
+            An optional freeform text field used to identify where the API call originates within the customer site.
+
+              <!-- theme: info -->
+              
+              > The value has no effect on search relevancy.
+        analyticsData:
+          type: boolean
+          default: true
+          description: |-
+            If true, the request is included in analytical data. Set `analyticsData` to false to exclude the query from the application metrics and other analytical data. Set to false for all non-production requests, including tests.
+
+            This field does not affect the query or results.
+      required:
+        - query
+        - utcOffset
+        - sessionId
+    postSearchahead:
+      description: ''
+      type: object
+      examples: []
+      title: postSearchahead
+      properties:
+        query:
+          type: string
+          description: |-
+            The raw search query term. The query compares the `query` string value with the following fields for a match:
+
+            - `document.title`
+            - `document.description`
+            - `document.body`
+
+            <!-- theme: info -->
+
+            > See the descriptions in `fieldList` for details on each field.
+          minLength: 3
+          maxLength: 200
+        utcOffset:
+          type: string
+          description: 'The difference between UTC and a specified time zone in a required ISO-8601 format of `±hh:mm`.'
+          pattern: '[+-][0-9]{2}:[0-9]{2}'
+          example: '+04:00'
+        sessionId:
+          type: string
+          description: 'Unique value that identifies the user''s session. Consider passing the session ID value from your user''s browser session as the value of `sessionId`. For more information, see [the MDN developer documentation for sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage).'
+        page:
+          type: integer
+          description: |-
+            The page number of results to return. Use with `limit` to specify section of query matches to return. Useful for pagination. Using `"limit": 20`, `"page": 0` contains results 1-20 while `"page": 1` contains results 21-40.
+            If the page number value is greater than the actual number of pages of results, an empty docs array is returned.
+          default: 0
+          minimum: 0
+          maximum: 99999999
+        limit:
+          type: integer
+          description: The maximum number of matches to return in the response.
+          default: 20
+          minimum: 1
+          maximum: 100
+        sort:
+          type: array
+          description: 'The order in which results are displayed. If a field name is entered more than once in the request, a `400` error is returned.'
+          items:
+            type: object
+            properties:
+              sortField:
+                type: string
+                description: |-
+                  The value to sort the response by.
+
+                  - `relevancy`: Calculation for how relevant a match is for this specific query. 
+                  - `document.sourceCreateTimestamp`: The date and time the record was created. 
+                  - `document.sourceLastModifiedTimestamp`: The date and time the most recent changes occurred. 
+                enum:
+                  - relevancy
+                  - document.sourceCreateTimestamp
+                  - document.sourceLastModifiedTimestamp
+                default: relevancy
+              sortOrder:
+                type: string
+                description: |-
+                  The order in which results are displayed.
+
+                  - `asc`: Ascending order. 
+                  - `desc`: Descending order. Not available for sorting by `relevancy`. If this is selected for `relevancy`, errors are generated.
+                default: asc
+                enum:
+                  - asc
+                  - desc
+            required:
+              - sortField
+              - sortOrder
+        fieldList:
+          $ref: '#/components/schemas/fieldList'
+        highlight:
+          type: boolean
+          description: |-
+            If true, the feature is enabled and highlighting is applied to fields in the `fieldList` parameter.
+
+            The matching text is wrapped in `<em></em>` tags.
+          default: false
+        filters:
+          type: array
+          uniqueItems: true
+          description: 'The filters specified determine which documents are included in the response. Documents must match all filter values to be included because multiple filters are processed using an AND operator. If a filter value is entered more than once in the request, a `400` error is returned.'
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: 'The field name on which to filter. If the same field is entered more than once, a `400` error is returned.'
+                enum:
+                  - file.extension
+                  - document.languageCode
+                  - datasourceLabels
+                  - type
+                  - page.metatags.FIELD_NAME
+              values:
+                type: array
+                uniqueItems: false
+                description: Multiple entries are processed using an OR operator.
+                items:
+                  type: string
+        source:
+          type: string
+          example: homepage
+          maxLength: 200
+          description: |-
+            An optional freeform text field used to identify where the API call originates within the customer site.
+              <!-- theme: info -->
+              
+              > The value has no effect on search relevancy.
+        analyticsData:
+          type: boolean
+          default: true
+          description: |-
+            If true, the request is included in analytical data. Set `analyticsData` to false to exclude the query from the application metrics and other analytical data. Set to false for all non-production requests, including tests.
+
+            This field does not affect the query or results.
+      required:
+        - query
+        - utcOffset
+        - sessionId
+    postDetail:
+      description: ''
+      type: object
+      examples: []
+      title: postDetail
+      properties:
+        id:
+          type: string
+          description: The ID of the record to return.
+        utcOffset:
+          type: string
+          description: 'The difference between UTC and a specified time zone in a required ISO-8601 format of `±hh:mm`.'
+          pattern: '[+-][0-9]{2}:[0-9]{2}'
+          example: '+04:00'
+        sessionId:
+          type: string
+          description: 'Unique value that identifies the user''s session. Consider passing the session ID value from your user''s browser session as the value of `sessionId`. For more information, see [the MDN developer documentation for sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage).'
+        fieldList:
+          $ref: '#/components/schemas/fieldListDetail'
+        source:
+          type: string
+          example: homepage
+          maxLength: 200
+          description: |-
+            An optional freeform text field used to identify where the API call originates within the customer site.
+
+              <!-- theme: info -->
+              
+              > The value has no effect on search relevancy.
+        analyticsData:
+          type: boolean
+          default: true
+          description: |-
+            If true, the request is included in analytical data. Set `analyticsData` to false to exclude the query from the application metrics and other analytical data. Set to false for all non-production requests, including tests.
+
+            This field does not affect the query or results.
+      required:
+        - id
+        - utcOffset
+        - sessionId
+    postBrowse:
+      description: ''
+      type: object
+      examples: []
+      title: postBrowse
+      properties:
+        utcOffset:
+          type: string
+          description: 'The difference between UTC and a specified time zone in a required ISO-8601 format of `±hh:mm`.'
+          example: '+04:00'
+          pattern: '[+-][0-9]{2}:[0-9]{2}'
+        sessionId:
+          type: string
+          description: 'Unique value that identifies the user''s session. Consider passing the session ID value from your user''s browser session as the value of `sessionId`. For more information, see [the MDN developer documentation for sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage).'
+        page:
+          type: integer
+          description: |-
+            The page number of results to return. Use with `limit` to specify section of query matches to return. Useful for pagination. Using `"limit": 20`, `"page": 0` contains results 1-20 while `"page": 1` contains results 21-40.
+            If the page number value is greater than the actual number of pages of results, an empty docs array is returned.
+          default: 0
+          minimum: 0
+          maximum: 99999999
+        limit:
+          type: integer
+          description: The maximum number of matches to return in the response.
+          default: 20
+          minimum: 1
+          maximum: 100
+        sort:
+          type: array
+          description: 'The order in which results are displayed. If a field name is entered more than once in the request, a `400` error is returned.'
+          items:
+            type: object
+            properties:
+              sortField:
+                type: string
+                description: |
+                  The value to sort the response by.
+
+                  - `relevancy`: Calculation for how relevant a match is for this specific query.
+                  - `document.sourceCreateTimestamp`: The date and time the record was created.
+                  - `document.sourceLastModifiedTimestamp`: The date and time the most recent changes occurred.
+                enum:
+                  - relevancy
+                  - document.sourceCreateTimestamp
+                  - document.sourceLastModifiedTimestamp
+              sortOrder:
+                type: string
+                enum:
+                  - asc
+                  - desc
+                description: |-
+                  The order in which results are displayed. 
+
+                  - `asc`: Ascending order. 
+                  - `desc`: Descending order. Not available for sorting by `relevancy`. If this is selected for `relevancy`, errors are generated.
+        facets:
+          type: array
+          description: |-
+            The array of strings that specify fields to return facet values.
+
+            A facet is enabled if it contains a non-empty value.
+          items:
+            type: string
+            enum:
+              - file.extension
+              - document.languageCode
+              - datasourceLabels
+              - type
+              - page.metatags.FIELD_NAME
+        fieldList:
+          $ref: '#/components/schemas/fieldListBrowse'
+        filters:
+          type: array
+          uniqueItems: true
+          description: 'The filters specified determine which documents are included in the response. Documents must match all filter values to be included because multiple filters are processed using an AND operator. If a filter value is entered more than once in the request, a `400` error is returned.'
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: 'The field name on which to filter. If the same field is entered more than once, a `400` error is returned.'
+                enum:
+                  - file.extension
+                  - document.languageCode
+                  - datasourceLabels
+                  - type
+                  - page.metatags.FIELD_NAME
+              values:
+                type: array
+                uniqueItems: false
+                description: Multiple entries are processed using an OR operator.
+                items:
+                  type: string
+        source:
+          type: string
+          example: homepage
+          description: |-
+            An optional freeform text field used to identify where the API call originates within the customer site.
+
+              <!-- theme: info -->
+              
+              > The value has no effect on search relevancy.
+          maxLength: 200
+        analyticsData:
+          type: boolean
+          default: true
+          description: |-
+            If true, the request is included in analytical data. Set `analyticsData` to false to exclude the query from the application metrics and other analytical data. Set to false for all non-production requests, including tests.
+
+            This field does not affect the query or results.
+      required:
+        - utcOffset
+        - sessionId
+    postMetatags:
+      description: ''
+      type: object
+      examples:
+        - analyticsData: true
+      title: postMetatags
+      properties:
+        source:
+          type: string
+          description: |-
+            An optional freeform text field used to identify where the API call originates within the customer site.
+
+              <!-- theme: info -->
+              
+              > The value has no effect on search relevancy.
+          maxLength: 200
+          example: homepage
+        analyticsData:
+          type: boolean
+          default: true
+          description: |-
+            If true, the request is included in analytical data. Set `analyticsData` to false to exclude the query from the application metrics and other analytical data. Set to false for all non-production requests, including tests.
+
+            This field does not affect the query or results.
+      required:
+        - analyticsData
+    postRelatedContentDocId:
+      type: object
+      x-stoplight:
+        id: trk3cuh2ao9td
+      examples:
+        - probe:
+            documentId: string
+          utcOffset: '+04:00'
+          fieldList:
+            - document.url
+          sessionId: string
+          source: homepage
+          limit: 5
+          analyticsData: true
+      title: postRelatedContentDocId
+      properties:
+        probe:
+          type: object
+          additionalProperties: false
+          properties:
+            documentId:
+              type: string
+              x-stoplight:
+                id: 001w9gd9lh70g
+              description: 'The ID of the document. Documents that are semantically similar to the existing `id` are returned. If `probe.documentId` matches the `id` of a result, it is not returned in the results.'
+        utcOffset:
+          type: string
+          description: 'The difference between UTC and a specified time zone in a required ISO-8601 format of `±hh:mm`.'
+          example: '+04:00'
+        fieldList:
+          $ref: '#/components/schemas/fieldListRelatedContent'
+        sessionId:
+          type: string
+          description: 'Unique value that identifies the user''s session. Consider passing the session ID value from your user''s browser session as the value of `sessionId`. For more information, see [the MDN developer documentation for sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage).'
+        source:
+          type: string
+          description: |-
+            An optional freeform text field used to identify where the API call originates within the customer site.
+
+              <!-- theme: info -->
+              
+              > The value has no effect on search relevancy.
+          maxLength: 200
+          example: homepage
+        limit:
+          type: integer
+          description: The maximum number of matches to return in the response.
+          default: 5
+          maximum: 20
+        analyticsData:
+          type: boolean
+          default: true
+          description: |-
+            If true, the request is included in analytical data. Set `analyticsData` to false to exclude the query from the application metrics and other analytical data. Set to false for all non-production requests, including tests.
+
+            This field does not affect the query or results.
+      required:
+        - utcOffset
+        - sessionId
+    postRelatedContentTitle:
+      type: object
+      x-stoplight:
+        id: tth5ot0k967vv
+      examples:
+        - probe:
+            title: string
+            description: string
+          utcOffset: '+04:00'
+          fieldList:
+            - document.url
+          sessionId: string
+          source: homepage
+          limit: 5
+          analyticsData: true
+      title: postRelatedContentTitle
+      properties:
+        probe:
+          type: object
+          additionalProperties: false
+          properties:
+            title:
+              type: string
+              x-stoplight:
+                id: 001w9gd9lh70g
+              description: 'The name of the document. Documents that are semantically similar (not case-sensitive) to the existing `document.title` are returned. If `probe.title` matches the `document.title` of a result, it is not returned in the results.'
+            description:
+              type: string
+              x-stoplight:
+                id: vlis9ern87dp7
+              description: Statement of the document's content.
+        utcOffset:
+          type: string
+          description: 'The difference between UTC and a specified time zone in a required ISO-8601 format of `±hh:mm`.'
+          example: '+04:00'
+        fieldList:
+          $ref: '#/components/schemas/fieldListRelatedContent'
+        sessionId:
+          type: string
+          description: 'Unique value that identifies the user''s session. Consider passing the session ID value from your user''s browser session as the value of `sessionId`. For more information, see [the MDN developer documentation for sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage).'
+        source:
+          type: string
+          description: |-
+            An optional freeform text field used to identify where the API call originates within the customer site.
+
+              <!-- theme: info -->
+              
+              > The value has no effect on search relevancy.
+          maxLength: 200
+          example: homepage
+        limit:
+          type: integer
+          description: The maximum number of matches to return in the response.
+          default: 5
+          maximum: 20
+        analyticsData:
+          type: boolean
+          default: true
+          description: |-
+            If true, the request is included in analytical data. Set `analyticsData` to false to exclude the query from the application metrics and other analytical data. Set to false for all non-production requests, including tests.
+
+            This field does not affect the query or results.
+      required:
+        - utcOffset
+        - sessionId
+    responseSearch:
+      type: object
+      examples: []
+      title: responseSearch
+      properties:
+        queryId:
+          type: string
+          description: |-
+            The unique identifier for the query that:
+
+            - Is included in every response.
+            - Must be included in all subsequent feedback events, such as clicks, for analytics and machine learning (ML) optimizations to be accurate.
+        hits:
+          type: integer
+          description: The total number of documents in the result set. The value is included in every response. The maximum returned value is 1000.
+          minimum: 0
+          maximum: 1000
+        facets:
+          type: object
+          description: 'The count of documents with values for the fields entered as request `facets`. Each facet returns a maximum of the top 100 facet matches. If a field name is entered more than once in the request, a `400` error is returned.'
+          properties:
+            field:
+              description: The dictionary of JSON objects where each object corresponds to a field passed in the `facets` parameter.
+              allOf:
+                - properties:
+                    field.extension:
+                      $ref: '#/components/schemas/facetFieldObject'
+                - properties:
+                    document.languageCode:
+                      $ref: '#/components/schemas/facetFieldObject'
+                - properties:
+                    datasourceLabels:
+                      $ref: '#/components/schemas/facetFieldObject'
+                - properties:
+                    type:
+                      $ref: '#/components/schemas/facetFieldObject'
+                - properties:
+                    page.metatags.FIELD_NAME:
+                      $ref: '#/components/schemas/facetFieldObject'
+              type: object
+        docs:
+          type: array
+          uniqueItems: true
+          description: The array of JSON objects that contain metadata about each search result.
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The data type for a document.
+              id:
+                type: string
+                description: The unique identifier for the record within the indexed collection.
+              rank:
+                type: integer
+                description: |-
+                  Positive integer that specifies the result position within the overall query result set, with `1` being the top result.
+
+                  <!-- theme: info -->
+
+                  > #### Rank behavior
+                  >
+                  > The rank only has relative value to other results from _this_ query, not across queries or use cases.
+                minimum: 1
+              datasourceLabels:
+                type: array
+                description: The labels created in Springboard for the data source.
+                items:
+                  type: string
+              fields:
+                type: object
+                description: |-
+                  Fields from each record that match the list of fields passed in `fieldList`, in addition to the required fields.
+
+                  <!-- theme: info -->
+
+                  > See the descriptions in `fieldList` for details on each field.
+                required:
+                  - document.title
+                  - document.url
+                properties:
+                  document.title:
+                    type: string
+                  document.url:
+                    type: string
+            required:
+              - type
+              - id
+              - rank
+              - datasourceLabels
+              - fields
+      required:
+        - queryId
+        - hits
+        - docs
+    responseSearchahead:
+      description: ''
+      type: object
+      examples: []
+      title: responseSearchahead
+      properties:
+        queryId:
+          type: string
+          description: |-
+            The unique identifier for the query that:
+
+            - Is included in every response.
+            - Must be included in all subsequent feedback events, such as clicks, for analytics and machine learning (ML) optimizations to be accurate.
+        hits:
+          type: integer
+          description: The total number of documents in the result set. The value is included in every response. The maximum returned value is 1000.
+          minimum: 0
+          maximum: 1000
+        docs:
+          type: array
+          uniqueItems: true
+          description: The array of JSON objects that contain metadata about each search result.
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The data type for a document.
+              id:
+                type: string
+                description: The unique identifier for the record within the indexed collection.
+              rank:
+                type: integer
+                description: |-
+                  Positive integer that specifies the result position within the overall query result set, with `1` being the top result.
+
+                  <!-- theme: info -->
+
+                  > #### Rank behavior
+                  >
+                  > The rank only has relative value to other results from _this_ query, not across queries or use cases.
+                minimum: 1
+              datasourceLabels:
+                type: array
+                description: The labels created in Springboard for the data source.
+                items:
+                  type: string
+              fields:
+                type: object
+                description: |-
+                  Fields from each record that match the list of fields passed in `fieldList`, in addition to the required fields.
+
+                  <!-- theme: info -->
+
+                  > See the descriptions in `fieldList` for details on each field.
+                required:
+                  - document.title
+                  - document.url
+                properties:
+                  document.title:
+                    type: string
+                  document.url:
+                    type: string
+            required:
+              - type
+              - id
+              - rank
+              - datasourceLabels
+              - fields
+      required:
+        - queryId
+        - hits
+        - docs
+    responseDetail:
+      description: ''
+      type: object
+      title: responseDetail
+      properties:
+        queryId:
+          type: string
+          description: |-
+            The unique identifier for the query that:
+
+            - Is included in every response.
+            - Must be included in all subsequent feedback events, such as clicks, for analytics and machine learning (ML) optimizations to be accurate.
+        type:
+          type: string
+          description: The data type for a document.
+          enum:
+            - case
+            - article
+            - page
+            - file
+        id:
+          type: string
+          description: The unique identifier for a document indexed by a Springboard application.
+        datasourceLabels:
+          type: array
+          description: The labels created in Springboard for the data source.
+          items:
+            type: string
+        fields:
+          anyOf:
+            - properties:
+                document.title:
+                  type: string
+                document.body:
+                  type: string
+                document.url:
+                  type: string
+                document.sourceCreateTimestamp:
+                  type: string
+                  format: date-time
+                document.sourceLastModifiedTimestamp:
+                  type: string
+                  format: date-time
+                document.languageCode:
+                  type: string
+              required:
+                - document.title
+                - document.body
+                - document.url
+                - document.sourceCreateTimestamp
+                - document.sourceLastModifiedTimestamp
+                - document.languageCode
+          description: |-
+            Fields from each record that match the list of fields passed in `fieldList`, in addition to the required fields.
+
+            <!-- theme: info -->
+
+            > See the descriptions in `fieldList` for details on each field.
+          type: object
+      required:
+        - queryId
+        - type
+        - id
+        - datasourceLabels
+        - fields
+      examples:
+        - queryId: string
+          type: case
+          id: string
+          datasourceLabels:
+            - string
+          fields:
+            document.title: string
+            document.body: string
+            document.url: string
+            document.sourceCreateTimestamp: '2019-08-24T14:15:22Z'
+            document.sourceLastModifiedTimestamp: '2019-08-24T14:15:22Z'
+            document.languageCode: string
+    responseBrowse:
+      description: ''
+      type: object
+      title: responseBrowse
+      properties:
+        queryId:
+          type: string
+          description: |-
+            The unique identifier for the query that:
+
+            - Is included in every response.
+            - Must be included in all subsequent feedback events, such as clicks, for analytics and machine learning (ML) optimizations to be accurate.
+        hits:
+          type: integer
+          description: The total number of documents in the result set. The value is included in every response. The maximum returned value is 1000.
+          minimum: 0
+          maximum: 1000
+        docs:
+          type: array
+          uniqueItems: true
+          description: The array of JSON objects that contain metadata about each search result.
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The data type for a document.
+                enum:
+                  - case
+                  - article
+                  - page
+                  - file
+              id:
+                type: string
+                description: The unique identifier for a document indexed by a Springboard application.
+              rank:
+                type: integer
+                description: |-
+                  Positive integer that specifies the result position within the overall query result set, with `1` being the top result.
+
+                  <!-- theme: info -->
+
+                  > #### Rank behavior
+                  >
+                  > The rank only has relative value to other results from _this_ query, not across queries or use cases.
+                minimum: 1
+              datasourceLabels:
+                type: array
+                description: The labels created in Springboard for the data source.
+                items:
+                  type: string
+              fields:
+                description: |-
+                  Fields from each record that match the list of fields passed in `fieldList`, in addition to the required fields.
+
+                  <!-- theme: info -->
+
+                  > See the descriptions in `fieldList` for details on each field.
+                anyOf:
+                  - properties:
+                      document.title:
+                        type: string
+                      document.url:
+                        type: string
+                    required:
+                      - document.title
+                      - document.url
+                type: object
+            required:
+              - type
+              - id
+              - rank
+              - datasourceLabels
+              - fields
+        facets:
+          type: object
+          description: 'The count of documents with values for the fields entered as request `facets`. Each facet returns a maximum of the top 100 facet matches. If a field name is entered more than once in the request, a `400` error is returned.'
+          properties:
+            field:
+              allOf:
+                - properties:
+                    file.extension:
+                      $ref: '#/components/schemas/facetFieldObject'
+                - properties:
+                    document.languageCode:
+                      $ref: '#/components/schemas/facetFieldObject'
+                - properties:
+                    datasourceLabels:
+                      $ref: '#/components/schemas/facetFieldObject'
+                - properties:
+                    type:
+                      $ref: '#/components/schemas/facetFieldObject'
+                - properties:
+                    page.metatags.FIELD_NAME:
+                      $ref: '#/components/schemas/facetFieldObject'
+              description: The dictionary of JSON objects where each object corresponds to a field passed in the `facets` parameter.
+              type: object
+      required:
+        - queryId
+        - hits
+        - docs
+    responseMetatags:
+      description: ''
+      type: object
+      properties:
+        queryId:
+          type: string
+          description: |-
+            The unique identifier for the query that:
+
+            - Is included in every response.
+            - Must be included in all subsequent feedback events, such as clicks, for analytics and machine learning (ML) optimizations to be accurate.
+        fields:
+          description: The valid indexed `page.metatags` fields for the specified record.
+          type: array
+          items:
+            type: string
+      required:
+        - queryId
+        - fields
+      title: responseMetatags
+    responseRelatedContent:
+      type: object
+      examples:
+        - queryId: string
+          hits: 0
+          docs:
+            - type: string
+              id: string
+              rank: 1
+              datasourceLabels:
+                - string
+              fields:
+                document.title: string
+                document.description: string
+                document.url: string
+                document.sourceLastModifiedTimestamp: '`yyyy-mm-ddThh:mm:ssZ`'
+      title: responseRelatedContent
+      properties:
+        queryId:
+          type: string
+          description: |-
+            The unique identifier for the query that:
+
+            - Is included in every response.
+            - Must be included in all subsequent feedback events, such as clicks, for analytics and machine learning (ML) optimizations to be accurate.
+        hits:
+          type: integer
+          description: The total number of documents in the result set. The value is included in every response. The maximum returned value is 20.
+          minimum: 0
+          maximum: 20
+        docs:
+          type: array
+          uniqueItems: true
+          description: The array of JSON objects that contain metadata about each search result.
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The data type for a document.
+              id:
+                type: string
+                description: The unique identifier for the record within the indexed collection.
+              rank:
+                type: integer
+                description: |-
+                  Positive integer that specifies the result position within the overall query result set, with `1` being the top result.
+
+                  <!-- theme: info -->
+
+                  > #### Rank behavior
+                  >
+                  > The rank only has relative value to other results from _this_ query, not across queries or use cases.
+                minimum: 1
+              datasourceLabels:
+                type: array
+                description: The labels created in Springboard for the data source.
+                items:
+                  type: string
+              fields:
+                description: |-
+                  Fields from each record that match the list of fields passed in `fieldList`, in addition to the required fields.
+
+                  <!-- theme: info -->
+
+                  > See the descriptions in `fieldList` for details on each field.
+                anyOf:
+                  - properties:
+                      document.title:
+                        type: string
+                      document.description:
+                        type: string
+                      document.url:
+                        type: string
+                      document.sourceLastModifiedTimestamp:
+                        type: string
+                        format: date-time
+                      page.metatags.FIELD_NAME:
+                        type: string
+                type: object
+            required:
+              - type
+              - id
+              - rank
+              - datasourceLabels
+      required:
+        - queryId
+        - hits
+        - docs
+    facetFieldObject:
+      title: facetFieldObject
+      type: object
+      properties:
+        missing:
+          type: integer
+          description: The count of query results that do not have a value set for the `field`.
+        counts:
+          type: array
+          description: The array of objects that contain the facet value names and associated query result number.
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The facet value available on at least one of the query results returned.
+              count:
+                type: integer
+                description: The number of query results that include the associated `counts.name` value.
+            required:
+              - name
+              - count
+      required:
+        - missing
+        - counts
+    fieldList:
+      type: array
+      description: |-
+        The fields to return in a response. By default, all fields are returned. If a field name is entered more than once in the request, a 400 error is returned.
+
+        <!-- theme: info -->
+
+        > #### ISO-8601 format
+        >
+        > The format for the `document.sourceCreateTimestamp` and `document.sourceLastModifiedTimestamp` response values is: `yyyy-mm-ddThh:mm:ssZ`. The `T` is a separator required by the ISO 8601 combined date-time format. The `Z` is also required and signifies the zero time offset from Coordinated Universal Time (UTC). The raw API response provides two digits for the seconds portion of the field.
+
+        - `document.url`: The absolute URL of the document, including hypertext protocol. For example, `https://company-name.com/document-name/`. Maps to `link rel="canonical"` metadata tag.
+        - `document.title`: The name of the document. Maps to `title` and `og:title` metadata tags.
+
+          <!-- theme: info -->
+
+          > #### Process to populate the response if `document.title` is empty
+          >
+          > If `document.title` does not contain a value, the response displays the first non-null value from the fields in the following order: `file.name`, `document.url`, and `object.id`. For example, if `document.title` and `file.name` contain null values, the response is populated with the value in the `document.url` field.
+
+        - `document.description`: Statement of the document's content. Maps to the `description` metadata tag.
+        - `document.sourceCreateTimestamp`: The date and time the record was created, displayed in the required ISO-8601 format of `yyyy-mm-ddThh:mm:ssZ`.
+        - `document.sourceLastModifiedTimestamp`: The date and time the most recent changes occurred, displayed in the required ISO-8601 format of `yyyy-mm-ddThh:mm:ssZ`.
+        - `document.author`: The name of the document creator.
+        - `document.languageCode`: The code representing the name of the human language used within the document. An example is en for English. Maps to `language` metadata tag. If no language tag is set, then language is determined through text analysis.
+        - `document.thumbnailImage`: The absolute URL to an image representative of the document, for example `<meta property="og:image" content="\https://example.com/1.png">`.
+        - `page.metatags.FIELD_NAME`: The name of the field associated with the page metatag. Replace `FIELD_NAME` with a valid field name. Call the `/metatags` endpoint to get a list of valid field names in this application.
+
+          <!-- theme: info -->
+          > This API only validates the `page.metatags` value by ensuring that field name starts with `page.metatags`. You must ensure the `FIELD_NAME` value is valid.
+      title: fieldList
+      examples:
+        - - document.url
+      items:
+        type: string
+        enum:
+          - document.url
+          - document.title
+          - document.description
+          - document.sourceCreateTimestamp
+          - document.sourceLastModifiedTimestamp
+          - document.author
+          - document.languageCode
+          - document.thumbnailImage
+          - page.metatags.FIELD_NAME
+    fieldListDetail:
+      title: fieldListDetail
+      type: array
+      description: |-
+        The fields to return in a response. By default, all fields are returned. If a field name is entered more than once in the request, a 400 error is returned.
+
+        <!-- theme: info -->
+
+        > #### ISO-8601 format
+        >
+        > The format for the `document.sourceCreateTimestamp` and `document.sourceLastModifiedTimestamp` response values is: `yyyy-mm-ddThh:mm:ssZ`. The `T` is a separator required by the ISO 8601 combined date-time format. The `Z` is also required and signifies the zero time offset from Coordinated Universal Time (UTC). The raw API response provides two digits for the seconds portion of the field.
+
+        - `document.url`: The absolute URL of the document, including hypertext protocol. For example, `https://company-name.com/document-name/`. Maps to `link rel="canonical"` metadata tag.
+        - `document.title`: The name of the document. Maps to `title` and `og:title` metadata tags.
+
+          <!-- theme: info -->
+
+          > #### Process to populate the response if `document.title` is empty
+          >
+          > If `document.title` does not contain a value, the response displays the first non-null value from the fields in the following order: `file.name`, `document.url`, and `object.id`. For example, if `document.title` and `file.name` contain null values, the response is populated with the value in the `document.url` field.
+
+        - `document.description`: Statement of the document's content. Maps to the `description` metadata tag.
+        - `document.body`: The content found within the document. Maps to <body> HTML tag. 
+        - `document.sourceCreateTimestamp`: The date and time the record was created, displayed in the required ISO-8601 format of `yyyy-mm-ddThh:mm:ssZ`.
+        - `document.sourceLastModifiedTimestamp`: The date and time the most recent changes occurred, displayed in the required ISO-8601 format of `yyyy-mm-ddThh:mm:ssZ`.
+        - `document.author`: The name of the document creator.
+        - `document.languageCode`: The code representing the name of the human language used within the document. An example is en for English. Maps to `language` metadata tag. If no language tag is set, then language is determined through text analysis.
+        - `document.thumbnailImage`: The absolute URL to an image representative of the document, for example `<meta property="og:image" content="\https://example.com/1.png">`.
+        - `page.metatags.FIELD_NAME`: The name of the field associated with the page metatag. Replace `FIELD_NAME` with a valid field name. Call the `/metatags` endpoint to get a list of valid field names in this application.
+
+          <!-- theme: info -->
+          > This API only validates the `page.metatags` value by ensuring that field name starts with `page.metatags`. You must ensure the `FIELD_NAME` value is valid.
+          
+        - `file.name`: The full name of the file, including extension.
+        - `file.extension`: The identifier for the type of document. If a file extension exists in the URL, results display that value in the response. If the field cannot be parsed from the URL, the HTTP header `Content-Type` MIME type is used to determine `file.extension` based on mapped values. If `file.extension` cannot be determined with either of these methods, the value is empty and it is not displayed in the response.
+
+          <!-- theme: info -->
+          > Older Microsoft Office MIME types are ambiguous, so the `file.extension` assigned during ingestion may differ from the original value. For example, original templates with `.dot` extensions use the `application/msword` MIME type and are ingested into Springboard with the `.doc` value. For more information, see [File extension processing](https://doc.lucidworks.com/springboard/connected-search/j6u88y/field-mapping#file-extension-processing^).
+      items:
+        type: string
+        enum:
+          - document.url
+          - document.title
+          - document.description
+          - document.body
+          - document.sourceCreateTimestamp
+          - document.sourceLastModifiedTimestamp
+          - document.author
+          - document.languageCode
+          - document.thumbnailImage
+          - page.metatags.FIELD_NAME
+          - file.name
+          - file.extension
+      examples:
+        - - document.url
+    fieldListBrowse:
+      title: fieldListBrowse
+      type: array
+      description: |-
+        The fields to return in a response. By default, all fields are returned. If a field name is entered more than once in the request, a 400 error is returned.
+
+        <!-- theme: info -->
+
+        > #### ISO-8601 format
+        >
+        > The format for the `document.sourceCreateTimestamp` and `document.sourceLastModifiedTimestamp` response values is: `yyyy-mm-ddThh:mm:ssZ`. The `T` is a separator required by the ISO 8601 combined date-time format. The `Z` is also required and signifies the zero time offset from Coordinated Universal Time (UTC). The raw API response provides two digits for the seconds portion of the field.
+
+        - `document.url`: The absolute URL of the document, including hypertext protocol. For example, `https://company-name.com/document-name/`. Maps to `link rel="canonical"` metadata tag.
+        - `document.title`: The name of the document. Maps to `title` and `og:title` metadata tags.
+
+          <!-- theme: info -->
+
+          > #### Process to populate the response if `document.title` is empty
+          >
+          > If `document.title` does not contain a value, the response displays the first non-null value from the fields in the following order: `file.name`, `document.url`, and `object.id`. For example, if `document.title` and `file.name` contain null values, the response is populated with the value in the `document.url` field.
+
+        - `document.description`: Statement of the document's content. Maps to the `description` metadata tag.
+        - `document.sourceCreateTimestamp`: The date and time the record was created, displayed in the required ISO-8601 format of `yyyy-mm-ddThh:mm:ssZ`.
+        - `document.sourceLastModifiedTimestamp`: The date and time the most recent changes occurred, displayed in the required ISO-8601 format of `yyyy-mm-ddThh:mm:ssZ`.
+        - `document.author`: The name of the document creator.
+        - `document.languageCode`: The code representing the name of the human language used within the document. An example is en for English. Maps to `language` metadata tag. If no language tag is set, then language is determined through text analysis.
+        - `document.thumbnailImage`: The absolute URL to an image representative of the document, for example `<meta property="og:image" content="\https://example.com/1.png">`.
+        - `page.metatags.FIELD_NAME`: The name of the field associated with the page metatag. Replace `FIELD_NAME` with a valid field name. Call the `/metatags` endpoint to get a list of valid field names in this application.
+
+          <!-- theme: info -->
+          > This API only validates the `page.metatags` value by ensuring that field name starts with `page.metatags`. You must ensure the `FIELD_NAME` value is valid.
+          
+        - `file.name`: The full name of the file, including extension. 
+        - `file.extension`: The identifier for the type of document. If a file extension exists in the URL, results display that value in the response. If the field cannot be parsed from the URL, the HTTP header `Content-Type` MIME type is used to determine `file.extension` based on mapped values. If `file.extension` cannot be determined with either of these methods, the value is empty and it is not displayed in the response.
+
+          <!-- theme: info -->
+          > Older Microsoft Office MIME types are ambiguous, so the `file.extension` assigned during ingestion may differ from the original value. For example, original templates with `.dot` extensions use the `application/msword` MIME type and are ingested into Springboard with the `.doc` value. For more information, see [File extension processing](https://doc.lucidworks.com/springboard/connected-search/j6u88y/field-mapping#file-extension-processing^).
+      items:
+        type: string
+        enum:
+          - document.url
+          - document.title
+          - document.description
+          - document.sourceCreateTimestamp
+          - document.sourceLastModifiedTimestamp
+          - document.author
+          - document.languageCode
+          - document.thumbnailImage
+          - page.metatags.FIELD_NAME
+          - file.name
+          - file.extension
+    fieldListRelatedContent:
+      type: array
+      description: |-
+        The fields to return in a response. By default, all fields are returned. If a field name is entered more than once in the request, a 400 error is returned.
+
+        <!-- theme: info -->
+
+        > #### ISO-8601 format
+        >
+        > The format for the `document.sourceLastModifiedTimestamp` response value is: `yyyy-mm-ddThh:mm:ssZ`. The `T` is a separator required by the ISO 8601 combined date-time format. The `Z` is also required and signifies the zero time offset from Coordinated Universal Time (UTC). The raw API response provides two digits for the seconds portion of the field.
+
+        - `document.title`: The name of the document. Maps to `title` and `og:title` metadata tags.
+        - `document.description`: Statement of the document's content. Maps to the `description` metadata tag.
+        - `document.url`: The absolute URL of the document, including hypertext protocol. For example, `https://company-name.com/document-name/`. Maps to `link rel="canonical"` metadata tag.
+        - `document.sourceLastModifiedTimestamp`: The date and time the most recent changes occurred, displayed in the required ISO-8601 format of `yyyy-mm-ddThh:mm:ssZ`.
+        - `page.metatags.FIELD_NAME`: The name of the field associated with the page metatag. Replace `FIELD_NAME` with a valid field name. Call the `/metatags` endpoint to get a list of valid field names in this application.
+
+          <!-- theme: info -->
+          > This API only validates the `page.metatags` value by ensuring that field name starts with `page.metatags`. You must ensure the `FIELD_NAME` value is valid.
+      title: fieldListRelatedContent
+      examples:
+        - - document.url
+      items:
+        type: string
+        enum:
+          - document.url
+          - document.title
+          - document.description
+          - document.sourceLastModifiedTimestamp
+          - page.metatags.FIELD_NAME
+  securitySchemes:
+    authToken:
+      type: http
+      scheme: bearer
+      description: 'For details about creating an authentication token, see the Authentication page. This token expires after one hour. A new token is required at that time.'
+  responses:
+    response-error-400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            description: ''
+            type: object
+            properties:
+              queryId:
+                type: string
+                description: |-
+                  The unique identifier for the query that:
+
+                  - Is included in every response.
+                  - Must be included in all subsequent feedback events, such as clicks, for analytics and machine learning (ML) optimizations to be accurate.
+              message:
+                type: string
+                description: 'A human-readable description of the response. '
+                enum:
+                  - Request body contains invalid JSON
+                  - Request body is missing required field 'FIELD_NAME'
+                  - Request body contains invalid field 'FIELD_NAME'
+                  - Request body contains field 'FIELD_NAME' with invalid value 'FIELD_VALUE'
+                  - Request body contains field 'FIELD_NAME' with value 'FIELD_VALUE' that cannot be repeated
+                  - Request body contains field 'FIELD_NAME' that cannot exceed 200 characters in length
+            required:
+              - queryId
+              - message
+          examples: {}
+    response-error-500:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            description: ''
+            type: object
+    searchAhead-error-400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            description: ''
+            type: object
+            properties:
+              queryId:
+                type: string
+                description: |-
+                  The unique identifier for the query that:
+
+                  - Is included in every response.
+                  - Must be included in all subsequent feedback events, such as clicks, for analytics and machine learning (ML) optimizations to be accurate.
+              message:
+                type: string
+                description: 'A human-readable description of the response. '
+                enum:
+                  - Request body contains field 'FIELD_NAME' with invalid value 'FIELD_VALUE'.
+                  - Request body contains field 'FIELD_NAME' with value 'FIELD_VALUE' that cannot be repeated.
+                  - Request body contains invalid field 'FIELD_NAME'.
+                  - Request body contains invalid JSON.
+                  - Request body is missing required field 'FIELD_NAME'.
+                  - Term is too short. Valid terms must be at least 3 characters in length.
+                  - Invalid value 'FIELD_VALUE' in field 'query'. Query is too short. Must be at least 3 characters in length.
+                  - Request body contains field 'FIELD_NAME' that cannot exceed 200 characters in length
+            required:
+              - queryId
+              - message
+  requestBodies: {}
+  examples: {}

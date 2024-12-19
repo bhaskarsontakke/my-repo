@@ -1,0 +1,742 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "4.2.6-rc1",
+        "title": "Fusion Service collections"
+    },
+    "basePath": "/api/apollo",
+    "tags": [
+        {
+            "name": "collections"
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/collections": {
+            "get": {
+                "summary": "Return properties for all existing collections",
+                "description": "",
+                "operationId": "getCollections",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Collection"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "createCollection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/Collection"
+                        }
+                    },
+                    {
+                        "name": "pipelines",
+                        "in": "query",
+                        "description": "A boolean to indicate if pipelines should also be created. This has been deprecated in favor of 'relatedObjects'",
+                        "required": false,
+                        "type": "boolean",
+                        "default": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Collection"
+                        },
+                        "headers": {}
+                    }
+                }
+            }
+        },
+        "/collections/status": {
+            "get": {
+                "summary": "Get the status of the service",
+                "description": "",
+                "operationId": "getStatus",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ServiceStatus"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/collections/{collection}": {
+            "get": {
+                "summary": "Return the properties for a specific collection",
+                "description": "",
+                "operationId": "getCollection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "description": "The name of a collection",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Collection"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Create a new data collection or update an existing one",
+                "description": "",
+                "operationId": "overwriteCollection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "description": "The name of a collection",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "description": "An entity tag to match against the specified blob",
+                        "required": false,
+                        "type": "string",
+                        "default": "\"-1\""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "JSON-formatted configuration values",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/Collection"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Collection"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a collection",
+                "description": "",
+                "operationId": "deleteCollection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "description": "The name of a collection",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "solr",
+                        "in": "query",
+                        "description": "'True' to delete the collection from Solr while it is deleted from Fusion",
+                        "required": false,
+                        "type": "boolean",
+                        "default": false
+                    },
+                    {
+                        "name": "purge",
+                        "in": "query",
+                        "description": "'True' to also delete associated signals and searchLogs collections",
+                        "required": false,
+                        "type": "boolean",
+                        "default": false
+                    },
+                    {
+                        "name": "pipelines",
+                        "in": "query",
+                        "description": "'True' to also delete associated pipelines",
+                        "required": false,
+                        "type": "boolean",
+                        "default": false
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "description": "An entity tag to match against the specified collection",
+                        "required": false,
+                        "type": "string",
+                        "default": "\"-1\""
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/collections/{collection}/features": {
+            "get": {
+                "summary": "Return all features for a specified collection",
+                "description": "",
+                "operationId": "listFeatures",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "description": "The name of a collection",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Feature"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/collections/{collection}/features/{feature}": {
+            "get": {
+                "summary": "Return all properties for a specified feature in a collection",
+                "description": "",
+                "operationId": "getFeature",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "description": "The name of a collection",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "feature",
+                        "in": "path",
+                        "description": "The name of a feature",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Feature"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update a feature's properties",
+                "description": "",
+                "operationId": "overwriteFeature",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "description": "The name of a collection",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "feature",
+                        "in": "path",
+                        "description": "The name of a feature",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "callback",
+                        "in": "query",
+                        "description": "Additional commands to execute",
+                        "required": false,
+                        "type": "boolean",
+                        "default": true
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "description": "An entity tag to match against the specified feature",
+                        "required": false,
+                        "type": "string",
+                        "default": "\"-1\""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "JSON-formatted configuration values",
+                        "required": false,
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Remove a feature from a collection",
+                "description": "",
+                "operationId": "resetFeature",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "description": "The name of a collection",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "feature",
+                        "in": "path",
+                        "description": "The name of a feature",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "callback",
+                        "in": "query",
+                        "description": "Additional commands to execute",
+                        "required": false,
+                        "type": "boolean",
+                        "default": true
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "description": "An entity tag to match against the specified feature",
+                        "required": false,
+                        "type": "string",
+                        "default": "\"-1\""
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/collections/{collection}/stats": {
+            "get": {
+                "summary": "Return statistics about a collection",
+                "description": "Stats include the number of documents in the index, how many requests have been made of the collection, the average request time, and the index size in bytes",
+                "operationId": "getCollectionMetrics",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "description": "The name of a collection",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/CollectionMetrics"
+                        }
+                    }
+                }
+            }
+        },
+        "/collections/{collection}/status": {
+            "get": {
+                "summary": "Return the status of a collection",
+                "description": "Status includes the state of each shard and each shard’s replica. Each shard will be listed, and within that each replica, including the core name, its status as leader, the base URL, and the node name",
+                "operationId": "getCollectionStatus",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "description": "The name of a collection",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/CollectionInfo"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "CreateCollectionCmd": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "numShards": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "replicationFactor": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "collection.configName": {
+                    "type": "string"
+                }
+            }
+        },
+        "ReplicaInfo": {
+            "type": "object",
+            "properties": {
+                "state": {
+                    "type": "string"
+                },
+                "core": {
+                    "type": "string"
+                },
+                "leader": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "base_url": {
+                    "type": "string"
+                },
+                "node_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "CollectionInfo": {
+            "type": "object",
+            "properties": {
+                "maxShardsPerNode": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "replicationFactor": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "configName": {
+                    "type": "string"
+                },
+                "shards": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/ShardInfo"
+                    }
+                },
+                "policy": {
+                    "type": "string"
+                }
+            }
+        },
+        "ServiceStatus": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "starting",
+                        "ok",
+                        "warning",
+                        "error",
+                        "shutdown"
+                    ]
+                },
+                "node": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "messages": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/StatusMessage"
+                    }
+                }
+            }
+        },
+        "CompositeIdSpec": {
+            "type": "object",
+            "properties": {
+                "routeKey1Field": {
+                    "type": "string"
+                },
+                "routeKey1Bits": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "routeKey2Field": {
+                    "type": "string"
+                },
+                "routeKey2Bits": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            }
+        },
+        "Collection": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "searchClusterId": {
+                    "type": "string"
+                },
+                "commitWithin": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "features": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Feature"
+                    }
+                },
+                "compositeIdSpec": {
+                    "$ref": "#/definitions/CompositeIdSpec"
+                },
+                "solrParams": {
+                    "$ref": "#/definitions/CreateCollectionCmd"
+                },
+                "modifiedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "DATA",
+                        "LOGS",
+                        "METRICS",
+                        "SIGNALS",
+                        "SIGNALS_AGGREGATION",
+                        "SEARCHLOGS",
+                        "SYNONYMS",
+                        "RECOMMENDATIONS",
+                        "HISTORY",
+                        "BLOBS",
+                        "MESSAGES",
+                        "TAXONOMY",
+                        "CRAWL_DB",
+                        "JOB_HISTORY",
+                        "ARCHIVING",
+                        "AUTOCOMPLETE_DOCUMENTS",
+                        "QUERY_REWRITE",
+                        "USER_PREFS",
+                        "JOB_REPORTS",
+                        "NULL"
+                    ]
+                },
+                "relatedCollectionId": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "CollectionMetrics": {
+            "type": "object",
+            "properties": {
+                "collectionId": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "documentCount": {
+                    "type": "integer",
+                    "format": "int64",
+                    "readOnly": true
+                },
+                "requestCount": {
+                    "type": "integer",
+                    "format": "int64",
+                    "readOnly": true
+                },
+                "avgTimePerRequestMs": {
+                    "type": "number",
+                    "format": "double",
+                    "readOnly": true
+                },
+                "sizeInBytes": {
+                    "type": "integer",
+                    "format": "int64",
+                    "readOnly": true
+                },
+                "lastModified": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            }
+        },
+        "Feature": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "collectionId": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        "ShardInfo": {
+            "type": "object",
+            "properties": {
+                "range": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "replicas": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/ReplicaInfo"
+                    }
+                }
+            }
+        },
+        "StatusMessage": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "message": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        }
+    }
+}

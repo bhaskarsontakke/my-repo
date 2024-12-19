@@ -1,0 +1,765 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service query-stages"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "query-stages"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/query-stages/instances": {
+      "get": {
+        "summary": "Get all stage instances",
+        "description": "",
+        "operationId": "listStageInstances",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "The stage type",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StageConfig"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new stage instance",
+        "description": "",
+        "operationId": "createStage",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/StageConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/StageConfig"
+            }
+          }
+        }
+      }
+    },
+    "/query-stages/instances/{id}": {
+      "get": {
+        "summary": "Get a specific stage instance",
+        "description": "",
+        "operationId": "getStageInstance",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The stage ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/StageConfig"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a specific stage instance",
+        "description": "",
+        "operationId": "createOrUpdateStageInstance",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The stage ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "An entity tag to match against the specified stage instance",
+            "required": false,
+            "type": "string",
+            "default": "\"-1\""
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "JSON-formatted configuration values",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/StageConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/StageConfig"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a specific stage instance",
+        "description": "",
+        "operationId": "deleteStageInstance",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The stage ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "An entity tag to match against the specified stage instance",
+            "required": false,
+            "type": "string",
+            "default": "\"-1\""
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/query-stages/instances/{id}/test": {
+      "get": {
+        "summary": "Perform a test query",
+        "description": "",
+        "operationId": "testStageInstance",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Stage ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collection",
+            "in": "query",
+            "description": "Collection ID",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/QueryRequestAndResponse"
+            }
+          }
+        }
+      }
+    },
+    "/query-stages/schema": {
+      "get": {
+        "summary": "Get the properties for all available stage types",
+        "description": "",
+        "operationId": "listStageSchemas",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/ObjectType"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/query-stages/schema/{type}": {
+      "get": {
+        "summary": "Get the properties for a stage type",
+        "description": "",
+        "operationId": "getStageSchema",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "description": "The stage type",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ObjectType"
+            }
+          }
+        }
+      }
+    },
+    "/query-stages/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/query-stages/test": {
+      "post": {
+        "summary": "Define a stage and perform a test query",
+        "description": "",
+        "operationId": "testStage",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "collection",
+            "in": "query",
+            "description": "Collection ID",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "JSON-formatted stage configuration values",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/StageConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/QueryRequestAndResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Response": {
+      "type": "object",
+      "properties": {
+        "headers": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ObjectType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "required": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "additionalProperties": {
+          "type": "object",
+          "readOnly": true
+        },
+        "minProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "maxProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "definitions": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        },
+        "propertyGroups": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/PropertyGroup"
+          }
+        }
+      }
+    },
+    "PropertyGroup": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "readOnly": true
+        },
+        "properties": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "QueryRequestAndResponse": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "$ref": "#/definitions/Request"
+        },
+        "response": {
+          "$ref": "#/definitions/Response"
+        },
+        "totalTime": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "startTime": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "fieldNames": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "Request": {
+      "type": "object",
+      "properties": {
+        "initialParams": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "headers": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "params": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "httpMethod": {
+          "type": "string",
+          "readOnly": true
+        },
+        "entityBytes": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string",
+            "format": "byte"
+          }
+        },
+        "entityMediaType": {
+          "readOnly": true,
+          "$ref": "#/definitions/MediaType"
+        }
+      }
+    },
+    "MediaType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "subtype": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "wildcardType": {
+          "type": "boolean",
+          "default": false
+        },
+        "wildcardSubtype": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "AnyType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    },
+    "StageConfig": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true
+        },
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "skip": {
+          "type": "boolean",
+          "default": false
+        },
+        "label": {
+          "type": "string"
+        },
+        "condition": {
+          "type": "string"
+        }
+      }
+    },
+    "AnyTypeObjectObject": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    }
+  }
+}

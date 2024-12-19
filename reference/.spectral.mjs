@@ -1,0 +1,2 @@
+import ruleset from "https://stoplight.io/api/v1/projects/cHJqOjEyNzQyNA/spectral.js?branch_slug=SBDOCS-803-update-signals-api-query-signals&token=fb3fd119-2d2e-4a53-a7bd-9ec471156555";
+export default { extends: ruleset };

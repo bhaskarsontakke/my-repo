@@ -1,0 +1,86 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "4.2.6-rc1",
+        "title": "Fusion Service history-id"
+    },
+    "basePath": "/api/connectors",
+    "tags": [
+        {
+            "name": "connectors"
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/connectors/history/{id}": {
+            "get": {
+                "summary": "Return the history of that datasource",
+                "description": "",
+                "operationId": "getHistory",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "cumulative",
+                        "in": "query",
+                        "description": "Whether to return return a cumulative summary of the datasource runs or not",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The datasource name",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete the history of that datasource",
+                "description": "",
+                "operationId": "removeHistory",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The datasource name",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        }
+    }
+}

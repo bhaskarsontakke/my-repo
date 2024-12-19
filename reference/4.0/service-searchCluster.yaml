@@ -1,0 +1,596 @@
+---
+swagger: "2.0"
+info:
+  version: "4.0.2-SNAPSHOT"
+  title: "Fusion Service searchCluster"
+basePath: "/api/apollo"
+tags:
+- name: "searchCluster"
+schemes:
+- "http"
+paths:
+  /searchCluster:
+    get:
+      summary: "Return the definitions for all defined clusters"
+      description: ""
+      operationId: "listSearchClusters"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              type: "object"
+    post:
+      summary: "Create a new cluster definition"
+      description: ""
+      operationId: "createSearchCluster"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted cluster configuration values"
+        required: false
+        schema:
+          $ref: "#/definitions/SearchCluster"
+      - name: "validate"
+        in: "query"
+        description: "Before creating the cluster definition, verify that Fusion can\
+          \ connect to this new search cluster correctly"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SearchCluster"
+  /searchCluster/_schema:
+    get:
+      summary: "Return the JSON schema for all configuration values"
+      description: ""
+      operationId: "getSchema"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ObjectType"
+  /searchCluster/status:
+    get:
+      summary: "Get the status of the service"
+      description: ""
+      operationId: "getStatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceStatus"
+  /searchCluster/{id}:
+    get:
+      summary: "Return the definition for the specified cluster"
+      description: ""
+      operationId: "getSearchCluster"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The cluster ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SearchCluster"
+    put:
+      summary: "Update a cluster definition"
+      description: ""
+      operationId: "createOrUpdateSearchCluster"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The cluster ID"
+        required: true
+        type: "string"
+      - name: "If-Match"
+        in: "header"
+        description: "An entity tag to match against the specified blob"
+        required: false
+        type: "string"
+        default: "\"-1\""
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted cluster configuration values"
+        required: false
+        schema:
+          $ref: "#/definitions/SearchCluster"
+      - name: "validate"
+        in: "query"
+        description: "Validate the updated cluster definition before saving it"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SearchCluster"
+    delete:
+      summary: "Delete a cluster definition"
+      description: ""
+      operationId: "deleteSearchCluster"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The cluster ID"
+        required: true
+        type: "string"
+      - name: "If-Match"
+        in: "header"
+        description: "An entity tag to match against the specified blob"
+        required: false
+        type: "string"
+        default: "\"-1\""
+      responses:
+        default:
+          description: "successful operation"
+  /searchCluster/{id}/nodes:
+    get:
+      summary: "Get the status of each node of the cluster"
+      description: ""
+      operationId: "getClusterState"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The cluster ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            uniqueItems: true
+            items:
+              $ref: "#/definitions/Node"
+  /searchCluster/{id}/systemInfo:
+    get:
+      summary: "Return details about a search cluster"
+      description: "Details include the JVM version, the OS, free space available,\
+        \ and so on"
+      operationId: "getSystemInfo"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The cluster ID"
+        required: true
+        type: "string"
+      - name: "nodeName"
+        in: "query"
+        description: "Return information only for the named node"
+        required: false
+        type: "string"
+      - name: "all"
+        in: "query"
+        description: "When true, system information for every node of the cluster\
+          \ is returned"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+            additionalProperties:
+              $ref: "#/definitions/SystemInfo"
+definitions:
+  SearchCluster:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      cloud:
+        type: "boolean"
+        default: false
+      connectString:
+        type: "string"
+      authConfig:
+        $ref: "#/definitions/AuthConfig"
+      zkClientTimeout:
+        type: "integer"
+        format: "int32"
+      zkConnectTimeout:
+        type: "integer"
+        format: "int32"
+      validateCluster:
+        type: "boolean"
+        default: false
+      bufferFlushInterval:
+        type: "integer"
+        format: "int32"
+      bufferSize:
+        type: "integer"
+        format: "int32"
+      concurrency:
+        type: "integer"
+        format: "int32"
+  JVMInfo:
+    type: "object"
+    properties:
+      version:
+        type: "string"
+      name:
+        type: "string"
+      processors:
+        type: "integer"
+        format: "int32"
+      memoryInfo:
+        $ref: "#/definitions/JVMMemoryInfo"
+  SystemInfo:
+    type: "object"
+    properties:
+      mode:
+        type: "string"
+        enum:
+        - "std"
+        - "solrcloud"
+      baseUrl:
+        type: "string"
+      version:
+        $ref: "#/definitions/Version"
+      jvminfo:
+        $ref: "#/definitions/JVMInfo"
+      hostInfo:
+        $ref: "#/definitions/HostInfo"
+  PropertyGroup:
+    type: "object"
+    properties:
+      label:
+        type: "string"
+      properties:
+        type: "array"
+        items:
+          type: "string"
+  JVMMemoryInfo:
+    type: "object"
+    properties:
+      raw:
+        $ref: "#/definitions/JVMRawMemoryInfo"
+  Node:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      baseUrl:
+        type: "string"
+      state:
+        type: "string"
+  AuthConfig:
+    type: "object"
+    properties:
+      authType:
+        type: "string"
+        enum:
+        - "NONE"
+        - "BASIC"
+        - "KERBEROS"
+      username:
+        type: "string"
+      password:
+        type: "string"
+      keyTab:
+        type: "string"
+      principal:
+        type: "string"
+  Annotation:
+    type: "object"
+  StatusMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      date:
+        type: "string"
+        format: "date-time"
+  ObjectType:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      category:
+        type: "string"
+      categoryPriority:
+        type: "integer"
+        format: "int32"
+      allowedValues:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "object"
+      hints:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      defaultValue:
+        type: "object"
+      accessibleProperty:
+        $ref: "#/definitions/AccessibleProperty"
+      oneOf:
+        type: "array"
+        items:
+          $ref: "#/definitions/AnyTypeObjectObject"
+      maxProperties:
+        type: "integer"
+        format: "int32"
+      minProperties:
+        type: "integer"
+        format: "int32"
+      required:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      properties:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/AnyType"
+      propertyGroups:
+        type: "array"
+        items:
+          $ref: "#/definitions/PropertyGroup"
+      definitions:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/AnyType"
+      type:
+        type: "string"
+        enum:
+        - "String"
+        - "Number"
+        - "Integer"
+        - "Boolean"
+        - "Object"
+        - "Array"
+        - "Null"
+        - "Ref"
+      additionalProperties:
+        type: "object"
+  Type:
+    type: "object"
+    properties:
+      typeName:
+        type: "string"
+  AccessibleProperty:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      required:
+        type: "boolean"
+        default: false
+      genericType:
+        $ref: "#/definitions/Type"
+      accessibleObject:
+        $ref: "#/definitions/AccessibleObject"
+  Version:
+    type: "object"
+    properties:
+      solrSpecVersion:
+        type: "string"
+      luceneSpecVersion:
+        type: "string"
+  ServiceStatus:
+    type: "object"
+    properties:
+      node:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "ok"
+        - "warning"
+        - "error"
+        - "shutdown"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/StatusMessage"
+  AccessibleObject:
+    type: "object"
+    properties:
+      annotations:
+        type: "array"
+        items:
+          $ref: "#/definitions/Annotation"
+      declaredAnnotations:
+        type: "array"
+        items:
+          $ref: "#/definitions/Annotation"
+      accessible:
+        type: "boolean"
+        default: false
+  HostInfo:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      version:
+        type: "string"
+      arch:
+        type: "string"
+      systemLoadAverage:
+        type: "number"
+        format: "double"
+      committedVirtualMemorySize:
+        type: "integer"
+        format: "int64"
+      freePhysicalMemorySize:
+        type: "integer"
+        format: "int64"
+      freeSwapSpaceSize:
+        type: "integer"
+        format: "int64"
+      processCpuTime:
+        type: "integer"
+        format: "int64"
+      totalPhysicalMemorySize:
+        type: "integer"
+        format: "int64"
+      totalSwapSpaceSize:
+        type: "integer"
+        format: "int64"
+      openFileDescriptorCount:
+        type: "integer"
+        format: "int64"
+      maxFileDescriptorCount:
+        type: "integer"
+        format: "int64"
+      uname:
+        type: "string"
+      uptime:
+        type: "string"
+  JVMRawMemoryInfo:
+    type: "object"
+    properties:
+      free:
+        type: "integer"
+        format: "int64"
+      total:
+        type: "integer"
+        format: "int64"
+      max:
+        type: "integer"
+        format: "int64"
+      used:
+        type: "integer"
+        format: "int64"
+      usedPct:
+        type: "number"
+        format: "double"
+  AnyType:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      category:
+        type: "string"
+      categoryPriority:
+        type: "integer"
+        format: "int32"
+      allowedValues:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "object"
+      hints:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      defaultValue:
+        type: "object"
+      accessibleProperty:
+        $ref: "#/definitions/AccessibleProperty"
+      oneOf:
+        type: "array"
+        items:
+          $ref: "#/definitions/AnyTypeObjectObject"
+      type:
+        type: "string"
+        enum:
+        - "String"
+        - "Number"
+        - "Integer"
+        - "Boolean"
+        - "Object"
+        - "Array"
+        - "Null"
+        - "Ref"
+  AnyTypeObjectObject:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      category:
+        type: "string"
+      categoryPriority:
+        type: "integer"
+        format: "int32"
+      allowedValues:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "object"
+      hints:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+      defaultValue:
+        type: "object"
+      accessibleProperty:
+        $ref: "#/definitions/AccessibleProperty"
+      oneOf:
+        type: "array"
+        items:
+          $ref: "#/definitions/AnyTypeObjectObject"
+      type:
+        type: "string"
+        enum:
+        - "String"
+        - "Number"
+        - "Integer"
+        - "Boolean"
+        - "Object"
+        - "Array"
+        - "Null"
+        - "Ref"

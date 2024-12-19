@@ -1,0 +1,251 @@
+---
+swagger: "2.0"
+info:
+  version: "4.0.2-SNAPSHOT"
+  title: "Fusion Service solrconfig"
+basePath: "/api/apollo"
+tags:
+- name: "solrconfig"
+schemes:
+- "http"
+paths:
+  /collections/{collection}/solr-config:
+    get:
+      summary: "Retrieve a list of all configuration files from ZooKeeper"
+      description: ""
+      operationId: "listConfigNodes"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The collection that contains the configuration files"
+        required: true
+        type: "string"
+      - name: "recursive"
+        in: "query"
+        description: "'True' to return children of nested ZooKeeper nodes"
+        required: false
+        type: "boolean"
+        default: false
+      - name: "expand"
+        in: "query"
+        description: "If true, the binary content of a file is returned base64-encoded.\
+          \ Otherwise, only the metadata about each node is returned. To see the content\
+          \ of the file in plain text, you can add 'Accept: text/plain' to the request\
+          \ header. Alternately, you can get the raw bytes by adding 'Accept: application/octet-stream'\
+          \ to the header."
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/SolrZkConfigNode"
+  /collections/{collection}/solr-config/status:
+    get:
+      summary: "Get the status of the service"
+      description: ""
+      operationId: "getStatus"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceStatus"
+  /collections/{collection}/solr-config/{path}:
+    get:
+      summary: "Retrieve information on a single file or a directory"
+      description: ""
+      operationId: "getConfigNodeAsBytes"
+      produces:
+      - "application/octet-stream"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The collection that contains the configuration files"
+        required: true
+        type: "string"
+      - name: "path"
+        in: "path"
+        description: "The path to a specific file or nested child nodes. If the file\
+          \ is not nested, the filename can be entered without any path information"
+        required: true
+        type: "string"
+        pattern: ".*"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+    post:
+      summary: "Add a configuration file"
+      description: ""
+      operationId: "postFile"
+      consumes:
+      - "*/*"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The collection that contains the configuration files"
+        required: true
+        type: "string"
+      - name: "path"
+        in: "path"
+        description: "The path to a specific file or nested child nodes. If the file\
+          \ is not nested, the filename can be entered without any path information"
+        required: true
+        type: "string"
+        pattern: ".*"
+      - name: "reload"
+        in: "query"
+        description: "'True' to reload the collection and make the changes available\
+          \ to Solr immediately."
+        required: false
+        type: "boolean"
+        default: false
+      - name: "validate"
+        in: "query"
+        description: "Validate the configuration file before saving it"
+        required: false
+        type: "boolean"
+        default: true
+      - name: "If-Match"
+        in: "header"
+        description: "An entity tag to match against the specified blob"
+        required: false
+        type: "string"
+        default: "\"0\""
+      - in: "body"
+        name: "body"
+        description: "The content of the file to be saved"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "string"
+            format: "byte"
+      responses:
+        default:
+          description: "successful operation"
+    put:
+      summary: "Replace a configuration file"
+      description: ""
+      operationId: "putFile"
+      consumes:
+      - "*/*"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The collection that contains the configuration files"
+        required: true
+        type: "string"
+      - name: "path"
+        in: "path"
+        description: "The path to a specific file or nested child nodes. If the file\
+          \ is not nested, the filename can be entered without any path information"
+        required: true
+        type: "string"
+        pattern: ".*"
+      - name: "reload"
+        in: "query"
+        description: "'True' to reload the collection and make the changes available\
+          \ to Solr immediately."
+        required: false
+        type: "boolean"
+        default: false
+      - name: "validate"
+        in: "query"
+        description: "Before updating the Solr configuration, reload the Solr collection\
+          \ and verify that it doesn't fail"
+        required: false
+        type: "boolean"
+        default: true
+      - name: "If-Match"
+        in: "header"
+        description: "An entity tag to match against the specified blob"
+        required: false
+        type: "string"
+        default: "\"-1\""
+      - in: "body"
+        name: "body"
+        description: "The content of the file to be saved"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "string"
+            format: "byte"
+      responses:
+        default:
+          description: "successful operation"
+definitions:
+  SolrZkConfigNode:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      parent:
+        type: "string"
+      href:
+        type: "string"
+        format: "uri"
+      version:
+        type: "integer"
+        format: "int32"
+      isDir:
+        type: "boolean"
+        default: false
+      children:
+        type: "array"
+        items:
+          $ref: "#/definitions/SolrZkConfigNode"
+      value:
+        type: "array"
+        items:
+          type: "string"
+          format: "byte"
+      type:
+        type: "string"
+        enum:
+        - "STOPWORDS"
+        - "SYNONYMS"
+  ServiceStatus:
+    type: "object"
+    properties:
+      node:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "ok"
+        - "warning"
+        - "error"
+        - "shutdown"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/StatusMessage"
+  StatusMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      date:
+        type: "string"
+        format: "date-time"

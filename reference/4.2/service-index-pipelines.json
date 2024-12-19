@@ -1,0 +1,1153 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "4.2.6-rc1",
+        "title": "Fusion Service index-pipelines"
+    },
+    "basePath": "/api/apollo",
+    "tags": [
+        {
+            "name": "index-pipelines"
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/index-pipelines": {
+            "get": {
+                "summary": "List all pipeline definitions",
+                "description": "",
+                "operationId": "listPipelines",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new pipeline",
+                "description": "The pipeline name is omitted from the path; it must be included in the definition in the request body",
+                "operationId": "createPipeline",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/IndexPipelineDefinition"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/PipelineDefinitionObject"
+                        }
+                    }
+                }
+            }
+        },
+        "/index-pipelines/status": {
+            "get": {
+                "summary": "Get the status of the service",
+                "description": "",
+                "operationId": "getStatus",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ServiceStatus"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}": {
+            "get": {
+                "summary": "Get the definition for a specific pipeline",
+                "description": "",
+                "operationId": "getPipeline",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/PipelineDefinitionObject"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Modify an existing pipeline",
+                "description": "This allows you to remove, re-order, or configure the pipeline's stages. To add an index pipeline, you must use the POST method.",
+                "operationId": "createOrUpdatePipeline",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "description": "An entity tag to match against the specified blob",
+                        "required": false,
+                        "type": "string",
+                        "default": "\"-1\""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/IndexPipelineDefinition"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/PipelineDefinitionObject"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete the specified pipeline",
+                "description": "",
+                "operationId": "deletePipeline",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of a specific pipeline",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "If-Match",
+                        "in": "header",
+                        "description": "An entity tag to match against the specified blob",
+                        "required": false,
+                        "type": "string",
+                        "default": "\"-1\""
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/collections/{collection}/debug": {
+            "post": {
+                "summary": "Debug a pipeline",
+                "description": "The documents to be debugged are sent in the request body. The output shows the state of the document after each indexing stage. A debug request will index documents to the system, but you can prevent it from doing so by setting the query parameter 'simulate' to false.",
+                "operationId": "debugPipelineDocument",
+                "consumes": [
+                    "application/vnd.lucidworks-document",
+                    "application/vnd.solr-document"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The name of a specific pipeline",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "description": "The name of a specific collection",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "simulate",
+                        "in": "query",
+                        "description": "If true, documents won’t be sent to Solr for indexing; the solr-index stage is skipped",
+                        "required": false,
+                        "type": "boolean",
+                        "default": false
+                    },
+                    {
+                        "name": "echo",
+                        "in": "query",
+                        "description": "If true, return the list of indexed documents; if false, no output is returned",
+                        "required": false,
+                        "type": "boolean",
+                        "default": true
+                    },
+                    {
+                        "name": "echoMaxCount",
+                        "in": "query",
+                        "description": "The maximum number of documents to list in the output",
+                        "required": false,
+                        "type": "integer",
+                        "default": 100,
+                        "format": "int32"
+                    },
+                    {
+                        "name": "bufferDocsForSolr",
+                        "in": "query",
+                        "description": "If true, documents will be buffered before sending to Solr; this is an asynchronous mode and may give faster performance when indexing a large number of documents",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "throwOnError",
+                        "in": "query",
+                        "required": false,
+                        "type": "boolean",
+                        "default": true
+                    },
+                    {
+                        "name": "eventsCollection",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "eventsPipeline",
+                        "in": "query",
+                        "description": "A string containing the name of the index pipeline that processes the link events; required for event processing",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "eventTypes",
+                        "in": "query",
+                        "description": "A comma-separated list of eventTypes to be processed by the specified index pipeline; the only supported event type is 'links'",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/IterablePipelineDocument"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/IndexPipelineDebugResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/collections/{collection}/index": {
+            "post": {
+                "summary": "index pipeline documents and do not generate any statistical processing data",
+                "description": "",
+                "operationId": "indexPipelineDocumentNoStats",
+                "consumes": [
+                    "application/vnd.lucidworks-document",
+                    "application/vnd.solr-document"
+                ],
+                "produces": [
+                    "application/vnd.lucidworks-document; qs=0.95",
+                    "application/vnd.solr-document; qs=0.9"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "simulate",
+                        "in": "query",
+                        "required": false,
+                        "type": "boolean",
+                        "default": false
+                    },
+                    {
+                        "name": "echo",
+                        "in": "query",
+                        "required": false,
+                        "type": "boolean",
+                        "default": false
+                    },
+                    {
+                        "name": "echoMaxCount",
+                        "in": "query",
+                        "required": false,
+                        "type": "integer",
+                        "default": -1,
+                        "format": "int32"
+                    },
+                    {
+                        "name": "bufferDocsForSolr",
+                        "in": "query",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "throwOnError",
+                        "in": "query",
+                        "required": false,
+                        "type": "boolean",
+                        "default": true
+                    },
+                    {
+                        "name": "eventsCollection",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "eventsPipeline",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "eventTypes",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/IterablePipelineDocument"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/IterablePipelineDocument"
+                        }
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/collections/{collection}/indexMultiple": {
+            "post": {
+                "summary": "Submit a set of documents to an index pipeline",
+                "description": "",
+                "operationId": "indexMultiple",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json; qs=1.0"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/IndexPipelineInputDoc"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/IndexPipelineStatResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/collections/{collection}/reindex": {
+            "post": {
+                "summary": "Reindex raw document",
+                "description": "",
+                "operationId": "reIndex",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "collection",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "bufferDocsForSolr",
+                        "in": "query",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "throwOnError",
+                        "in": "query",
+                        "required": false,
+                        "type": "boolean",
+                        "default": true
+                    },
+                    {
+                        "name": "parserId",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "skipParsing",
+                        "in": "query",
+                        "required": false,
+                        "type": "boolean",
+                        "default": false
+                    },
+                    {
+                        "name": "autoDetectFormat",
+                        "in": "query",
+                        "required": false,
+                        "type": "boolean",
+                        "default": true
+                    },
+                    {
+                        "name": "Content-Type",
+                        "in": "header",
+                        "required": false,
+                        "type": "string",
+                        "default": "application/octet-stream"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/InputStream"
+                        }
+                    },
+                    {
+                        "name": "contentSourceName",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "unknown"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/IndexPipelineStatResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/metrics": {
+            "get": {
+                "summary": "For internal use by the system",
+                "description": "",
+                "operationId": "getPipelineMetrics",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The name of a specific pipeline",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "pretty",
+                        "in": "query",
+                        "description": "Format the output for easier reading",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "rateUnit",
+                        "in": "query",
+                        "description": "The time unit for rate values (`seconds`, `minutes`, and so on)",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "durationUnit",
+                        "in": "query",
+                        "description": "The time unit for duration values (`seconds`, `minutes`, and so on)",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "showSamples",
+                        "in": "query",
+                        "description": "Show the data values used in calculations",
+                        "required": false,
+                        "type": "boolean"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/MetricResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/refresh": {
+            "put": {
+                "summary": "Reload the specified pipeline",
+                "description": "When changes are made to a pipeline, the pipeline needs to be refreshed (reloaded). A Fusion restart refreshes all pipelines",
+                "operationId": "refreshPipeline",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of a specific pipeline",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "For internal use by the system",
+                "description": "",
+                "operationId": "stopPipeline",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of a specific pipeline",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Histogram": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "snapshot": {
+                    "$ref": "#/definitions/Snapshot"
+                }
+            }
+        },
+        "Meter": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "oneMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "fiveMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "fifteenMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "meanRate": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "InputStream": {
+            "type": "object"
+        },
+        "MetricRegistry": {
+            "type": "object",
+            "properties": {
+                "metrics": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Metric"
+                    }
+                },
+                "meters": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Meter"
+                    }
+                },
+                "names": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "counters": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Counter"
+                    }
+                },
+                "timers": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Timer"
+                    }
+                },
+                "histograms": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Histogram"
+                    }
+                },
+                "gauges": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Gauge"
+                    }
+                }
+            }
+        },
+        "IndexPipelineInputDoc": {
+            "type": "object",
+            "properties": {
+                "rawDocId": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "doc": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/PipelineDocument"
+                },
+                "docID": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "Annotation": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "end": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "features": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "label": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "featureCount": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            }
+        },
+        "StageConfig": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "id": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "skip": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "label": {
+                    "type": "string"
+                },
+                "condition": {
+                    "type": "string"
+                }
+            }
+        },
+        "PipelineDocument": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/PipelineField"
+                    }
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "commands": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Command"
+                    }
+                },
+                "hints": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "Gauge": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "object"
+                }
+            }
+        },
+        "StatusMessage": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "message": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "Snapshot": {
+            "type": "object",
+            "properties": {
+                "max": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "mean": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "stdDev": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "median": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "get75thPercentile": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "get95thPercentile": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "get98thPercentile": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "get99thPercentile": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "get999thPercentile": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "min": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "IndexPipelineStatResponse": {
+            "type": "object",
+            "properties": {
+                "docs": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/PipelineDocument"
+                    }
+                },
+                "stats": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "Counter": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "PipelineDefinitionObject": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "stages": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/StageConfig"
+                    }
+                },
+                "properties": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "MetricResponse": {
+            "type": "object",
+            "properties": {
+                "metricRegistry": {
+                    "$ref": "#/definitions/MetricRegistry"
+                },
+                "metricsList": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Metric"
+                    }
+                },
+                "pretty": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "rateUnit": {
+                    "type": "string",
+                    "enum": [
+                        "NANOSECONDS",
+                        "MICROSECONDS",
+                        "MILLISECONDS",
+                        "SECONDS",
+                        "MINUTES",
+                        "HOURS",
+                        "DAYS"
+                    ]
+                },
+                "durationUnit": {
+                    "type": "string",
+                    "enum": [
+                        "NANOSECONDS",
+                        "MICROSECONDS",
+                        "MILLISECONDS",
+                        "SECONDS",
+                        "MINUTES",
+                        "HOURS",
+                        "DAYS"
+                    ]
+                },
+                "showSamples": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        "Timer": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "oneMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "fiveMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "fifteenMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "meanRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "snapshot": {
+                    "$ref": "#/definitions/Snapshot"
+                }
+            }
+        },
+        "ContextAndDoc": {
+            "type": "object",
+            "properties": {
+                "context": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                },
+                "error": {
+                    "type": "string"
+                },
+                "doc": {
+                    "$ref": "#/definitions/PipelineDocument"
+                }
+            }
+        },
+        "Command": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "params": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "ServiceStatus": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "starting",
+                        "ok",
+                        "warning",
+                        "error",
+                        "shutdown"
+                    ]
+                },
+                "node": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "messages": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/StatusMessage"
+                    }
+                }
+            }
+        },
+        "IndexPipelineDefinition": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "stages": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/StageConfig"
+                    }
+                },
+                "properties": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "Metric": {
+            "type": "object"
+        },
+        "PipelineField": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "object"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "annotations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Annotation"
+                    }
+                }
+            }
+        },
+        "IndexPipelineDebugResponse": {
+            "type": "object",
+            "properties": {
+                "stages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/StageConfig"
+                    }
+                },
+                "output": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/ContextAndDoc"
+                        }
+                    }
+                },
+                "outputEncounteredCount": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        }
+    }
+}

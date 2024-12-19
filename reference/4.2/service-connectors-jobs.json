@@ -1,0 +1,209 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service connectors-jobs"
+  },
+  "basePath": "/api/connectors",
+  "tags": [
+    {
+      "name": "connectors"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/connectors/jobs": {
+      "get": {
+        "operationId": "listJobs",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "connector",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "finishAllJobs",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "connector",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collection",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "abort",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "wait_time",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/connectors/jobs/{id}": {
+      "get": {
+        "summary": "Return the status of a job",
+        "description": "",
+        "operationId": "getJobStatus",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The datasource name",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create and start a job",
+        "description": "",
+        "operationId": "startJob",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The datasource name",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Stop a job",
+        "description": "",
+        "operationId": "stopJob",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The datasource name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "abort",
+            "in": "query",
+            "description": "Whether to stop the job or not",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "wait_time",
+            "in": "query",
+            "description": "The time to wait before aborting a job",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "/connectors/jobs/{id}/pipeline": {
+      "get": {
+        "operationId": "getPipelineStats",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object"
+              }
+            },
+            "headers": {}
+          }
+        }
+      }
+    }
+  }
+}

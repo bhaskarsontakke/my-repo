@@ -1,0 +1,1169 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service webapps"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "webapps"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/webapps": {
+      "get": {
+        "summary": "Get all webapps",
+        "description": null,
+        "operationId": "getAllEntities",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AppkitApp"
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "summary": "Import Application metadata including all editing sessions",
+        "description": "",
+        "operationId": "importApp",
+        "consumes": [
+          "application/vnd.lucidworks-appkit-export+json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Application metadata",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/AppkitAppExportContainer"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/webapps/_schema": {
+      "get": {
+        "summary": "Get JSON schema for webapps",
+        "description": null,
+        "operationId": "getEntitySchema",
+        "produces": [
+          "application/schema+json; qs=1.0",
+          "application/json; qs=0.9"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ObjectType"
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/webapps/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webapps/{id}": {
+      "get": {
+        "summary": "Export Application metadata including all editing sessions",
+        "description": "",
+        "operationId": "exportApp",
+        "produces": [
+          "application/vnd.lucidworks-appkit-export+json; qs=0.9"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/AppkitAppExportContainer"
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "put": {
+        "summary": "Update a webapp",
+        "description": null,
+        "operationId": "updateEntity",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The entity ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "An entity tag to match",
+            "required": false,
+            "type": "string",
+            "default": "\"-1\""
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "JSON-formatted configuration values",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/AppkitApp"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/AppkitApp"
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "delete": {
+        "summary": "Delete a webapp",
+        "description": null,
+        "operationId": "deleteEntity",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The entity ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "An entity tag to match",
+            "required": false,
+            "type": "string",
+            "default": "\"-1\""
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/webapps/{id}/edits": {
+      "get": {
+        "summary": "Get a list of editing sessions for specified webapp",
+        "description": null,
+        "operationId": "listSessions",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EditingSession"
+              }
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "summary": "Get a list of editing sessions for given webapp",
+        "description": null,
+        "operationId": "startSession",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "JSON-formatted configuration values",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/EditingSession"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/EditingSession"
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/webapps/{id}/edits/{sessionId}": {
+      "get": {
+        "summary": "Get specified editing session",
+        "description": null,
+        "operationId": "getSession",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sessionId",
+            "in": "path",
+            "description": "Session ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/EditingSession"
+            }
+          }
+        },
+        "deprecated": true
+      },
+      "delete": {
+        "summary": "Delete specified editing session",
+        "description": null,
+        "operationId": "deleteSession",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sessionId",
+            "in": "path",
+            "description": "Session ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/webapps/{id}/edits/{sessionId}/action": {
+      "post": {
+        "summary": "Perform action on specified editing session",
+        "description": null,
+        "operationId": "action",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sessionId",
+            "in": "path",
+            "description": "Session ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "JSON-formatted configuration values",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/SessionAction"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/webapps/{id}/edits/{sessionId}/files": {
+      "get": {
+        "summary": "List all files in the specified editing session",
+        "description": null,
+        "operationId": "listFiles",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sessionId",
+            "in": "path",
+            "description": "Session ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Blob"
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/webapps/{id}/edits/{sessionId}/files/{file}": {
+      "get": {
+        "summary": "Get file from specified editing session",
+        "description": null,
+        "operationId": "getFile",
+        "produces": [
+          "application/*",
+          "text/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sessionId",
+            "in": "path",
+            "description": "Session ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "file",
+            "in": "path",
+            "description": "File",
+            "required": true,
+            "type": "string",
+            "pattern": ".*"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "deprecated": true
+      },
+      "put": {
+        "summary": "Update file in specified editing session",
+        "description": null,
+        "operationId": "putFile",
+        "consumes": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sessionId",
+            "in": "path",
+            "description": "Session ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "file",
+            "in": "path",
+            "description": "File",
+            "required": true,
+            "type": "string",
+            "pattern": ".*"
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "If-Match value",
+            "required": false,
+            "type": "string",
+            "default": "\"0\""
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "File contents",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/InputStream"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "deprecated": true
+      },
+      "delete": {
+        "summary": "Delete file in specified editing session",
+        "description": null,
+        "operationId": "deleteFile",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sessionId",
+            "in": "path",
+            "description": "Session ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "file",
+            "in": "path",
+            "description": "File",
+            "required": true,
+            "type": "string",
+            "pattern": ".*"
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "If-Match value",
+            "required": false,
+            "type": "string",
+            "default": "\"0\""
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/webapps/{id}/war": {
+      "get": {
+        "summary": "Get war file for specified webapp",
+        "description": null,
+        "operationId": "downloadWar",
+        "produces": [
+          "application/zip"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "deprecated": true
+      },
+      "head": {
+        "summary": "Get war file metadata for specified webapp",
+        "description": null,
+        "operationId": "getWarMetadata",
+        "produces": [
+          "application/zip"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "deprecated": true
+      },
+      "put": {
+        "summary": "Upload war file for specified webapp",
+        "description": null,
+        "operationId": "uploadWar",
+        "consumes": [
+          "*/*"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "War file",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/InputStream"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/webapps/{id}/war/manifest": {
+      "get": {
+        "summary": "Get war file manifest for specified webapp",
+        "description": null,
+        "operationId": "getWarManifestAsText",
+        "produces": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Application ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "deprecated": true
+      }
+    }
+  },
+  "definitions": {
+    "SaveAction": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SessionAction"
+        },
+        {
+          "type": "object",
+          "properties": {}
+        }
+      ]
+    },
+    "Entity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "Blob": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "path": {
+          "type": "string",
+          "readOnly": true
+        },
+        "dir": {
+          "type": "string",
+          "readOnly": true
+        },
+        "filename": {
+          "type": "string",
+          "readOnly": true
+        },
+        "contentType": {
+          "type": "string",
+          "readOnly": true
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64",
+          "readOnly": true
+        },
+        "modifiedTime": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "version": {
+          "type": "integer",
+          "format": "int64",
+          "readOnly": true
+        },
+        "md5": {
+          "type": "string",
+          "readOnly": true
+        },
+        "metadata": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "SaveAsAction": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SessionAction"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "appId": {
+              "type": "string",
+              "readOnly": true
+            }
+          }
+        }
+      ]
+    },
+    "EditingSession": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "owner": {
+          "type": "string",
+          "readOnly": true
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "PropertyGroup": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "readOnly": true
+        },
+        "properties": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "InputStream": {
+      "type": "object"
+    },
+    "SessionAction": {
+      "type": "object",
+      "discriminator": "type",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "DiscardAction": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SessionAction"
+        },
+        {
+          "type": "object",
+          "properties": {}
+        }
+      ]
+    },
+    "AppkitAppExportContainer": {
+      "type": "object",
+      "properties": {
+        "appkitApp": {
+          "readOnly": true,
+          "$ref": "#/definitions/AppkitApp"
+        },
+        "editingSessions": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/EditingSession"
+          }
+        }
+      }
+    },
+    "ObjectType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "required": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "additionalProperties": {
+          "type": "object",
+          "readOnly": true
+        },
+        "minProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "maxProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "definitions": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        },
+        "propertyGroups": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/PropertyGroup"
+          }
+        }
+      }
+    },
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "AppkitApp": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "contextPath": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enabled": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "war": {
+          "type": "string",
+          "readOnly": true
+        },
+        "warMd5": {
+          "type": "string",
+          "readOnly": true
+        },
+        "warSize": {
+          "type": "integer",
+          "format": "int64",
+          "readOnly": true
+        },
+        "type": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "AnyType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    },
+    "AnyTypeObjectObject": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    }
+  }
+}

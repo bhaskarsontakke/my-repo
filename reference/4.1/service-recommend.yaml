@@ -1,0 +1,356 @@
+---
+swagger: "2.0"
+info:
+  version: "4.1.3"
+  title: "Fusion Service recommend"
+basePath: "/api/apollo"
+tags:
+- name: "recommend"
+schemes:
+- "http"
+paths:
+  /recommend:
+    post:
+      summary: "NEEDS DEVELOPER REVIEW"
+      description: ""
+      operationId: "postRecommendation"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /recommend/_changed:
+    post:
+      operationId: "changeCallback"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/Feature"
+      responses:
+        default:
+          description: "successful operation"
+  /recommend/status:
+    get:
+      summary: "Get the status of the service"
+      description: ""
+      operationId: "getStatus"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceStatus"
+  /recommend/{collection}/itemsForItem:
+    get:
+      summary: "Retrieve items that are related to a defined item (a document ID)"
+      description: "This can also be thought of as 'People also viewed...'"
+      operationId: "getItemsForItem"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The name of a specific collection"
+        required: true
+        type: "string"
+      - name: "docId"
+        in: "query"
+        description: "The document ID"
+        required: false
+        type: "string"
+      - name: "shinglesLimit"
+        in: "query"
+        description: "The maximum number of shingles (nGrams) to use; the shingles\
+          \ will be joined with a boolean OR statement to find the related documents\
+          \ for the named item"
+        required: false
+        type: "integer"
+        default: 20
+        format: "int32"
+      - name: "termsLimit"
+        in: "query"
+        description: "A limit to the number of terms from queries to use in the calculation"
+        required: false
+        type: "integer"
+        default: 30
+        format: "int32"
+      - name: "aggrRows"
+        in: "query"
+        description: "The number of rows per aggregation"
+        required: false
+        type: "integer"
+        default: 100
+        format: "int32"
+      - name: "rows"
+        in: "query"
+        description: "The number of items to return"
+        required: false
+        type: "integer"
+        default: 10
+        format: "int32"
+      - name: "aggrType"
+        in: "query"
+        description: "The type of aggregation"
+        required: false
+        type: "string"
+        default: "*"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/RecommendationResponseDocumentResult"
+  /recommend/{collection}/itemsForQuery:
+    get:
+      summary: "Get recommendations for a query"
+      description: "The fields document-id and its weight are returned"
+      operationId: "getItemsForQuery"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The name of a specific collection; it must have associated <collectionName_signals>\
+          \ and <collectionName_signals_aggr> collections"
+        required: true
+        type: "string"
+      - name: "q"
+        in: "query"
+        description: "The Solr query string"
+        required: false
+        type: "string"
+      - name: "rows"
+        in: "query"
+        description: "The number of items to return"
+        required: false
+        type: "integer"
+        default: 10
+        format: "int32"
+      - name: "fq"
+        in: "query"
+        description: "A filter query to limit results; if used, the field name must\
+          \ be included along with the value"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      - name: "aggrRows"
+        in: "query"
+        description: "The number of rows per aggregation"
+        required: false
+        type: "integer"
+        default: 100
+        format: "int32"
+      - name: "aggrType"
+        in: "query"
+        description: "The type of aggregation"
+        required: false
+        type: "string"
+        default: "*"
+      - name: "debug"
+        in: "query"
+        description: "If true, debug information will be returned with the results"
+        required: false
+        type: "boolean"
+        default: false
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/RecommendationResponseDocumentResult"
+  /recommend/{collection}/queriesForItem:
+    get:
+      summary: "Retrieve queries that were made for a specified document-id"
+      description: "This finds the top queries that led users to a particular item.\
+        \ The response is a list of query terms and their respective weights"
+      operationId: "getQueriesForItem"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "collection"
+        in: "path"
+        description: "The name of a specific collection"
+        required: true
+        type: "string"
+      - name: "docId"
+        in: "query"
+        description: "The document ID"
+        required: false
+        type: "string"
+      - name: "rows"
+        in: "query"
+        description: "The number of items to return"
+        required: false
+        type: "integer"
+        default: 10
+        format: "int32"
+      - name: "aggrType"
+        in: "query"
+        description: "The type of aggregation"
+        required: false
+        type: "string"
+        default: "*"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/RecommendationResponseQueryResult"
+definitions:
+  RecommendationDebugQuery:
+    type: "object"
+    properties:
+      aggrTime:
+        type: "integer"
+        format: "int64"
+      queryTime:
+        type: "integer"
+        format: "int64"
+      solrParams:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            type: "string"
+  QueryResult:
+    type: "object"
+    properties:
+      query:
+        type: "string"
+      weight:
+        type: "number"
+        format: "float"
+  ResponseHeader:
+    type: "object"
+    properties:
+      queryParams:
+        $ref: "#/definitions/RecommenderQueryParams"
+      totalTime:
+        type: "integer"
+        format: "int64"
+  RecommendationResponseQueryResult:
+    type: "object"
+    properties:
+      items:
+        type: "array"
+        items:
+          $ref: "#/definitions/QueryResult"
+      responseHeader:
+        $ref: "#/definitions/ResponseHeader"
+      debugInfo:
+        $ref: "#/definitions/RecommendationDebugQuery"
+  DocumentResult:
+    type: "object"
+    properties:
+      weight:
+        type: "number"
+        format: "double"
+      docId:
+        type: "string"
+  ServiceStatus:
+    type: "object"
+    properties:
+      node:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "ok"
+        - "warning"
+        - "error"
+        - "shutdown"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/StatusMessage"
+  RecommendationResponseDocumentResult:
+    type: "object"
+    properties:
+      items:
+        type: "array"
+        items:
+          $ref: "#/definitions/DocumentResult"
+      responseHeader:
+        $ref: "#/definitions/ResponseHeader"
+      debugInfo:
+        $ref: "#/definitions/RecommendationDebugQuery"
+  RecommenderQueryParams:
+    type: "object"
+    properties:
+      aggrType:
+        type: "string"
+      modelId:
+        type: "string"
+      rows:
+        type: "integer"
+        format: "int32"
+      collection:
+        type: "string"
+      aggrRows:
+        type: "integer"
+        format: "int32"
+      query:
+        type: "string"
+      filterQueries:
+        type: "array"
+        items:
+          type: "string"
+      docId:
+        type: "string"
+      userId:
+        type: "string"
+      debug:
+        type: "boolean"
+        default: false
+      shinglesLimit:
+        type: "integer"
+        format: "int32"
+      termsLimit:
+        type: "integer"
+        format: "int32"
+      rollupField:
+        type: "string"
+      rollupWeightField:
+        type: "string"
+      rollupWeightStrategy:
+        type: "string"
+        enum:
+        - "sum"
+        - "max"
+  Feature:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      collectionId:
+        type: "string"
+      params:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      enabled:
+        type: "boolean"
+        default: false
+  StatusMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      date:
+        type: "string"
+        format: "date-time"

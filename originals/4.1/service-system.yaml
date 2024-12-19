@@ -1,0 +1,567 @@
+---
+swagger: "2.0"
+info:
+  version: "4.1.3"
+  title: "Fusion Service system"
+basePath: "/api/apollo"
+tags:
+- name: "system"
+schemes:
+- "http"
+paths:
+  /system/buffers:
+    put:
+      summary: "Flush the currently-active buffers"
+      description: ""
+      operationId: "flushBuffers"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /system/gc:
+    post:
+      summary: "Run JVM garbage collection"
+      description: ""
+      operationId: "gc"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /system/log:
+    put:
+      summary: "For internal use by the system"
+      description: ""
+      operationId: "log"
+      parameters:
+      - name: "logLevel"
+        in: "query"
+        description: "The log level: DEBUG, WARN, INFO, or ERROR"
+        required: false
+        type: "string"
+        default: "INFO"
+      - name: "message"
+        in: "query"
+        description: "An arbitrary message to be logged in Fusion"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /system/metric/{name}:
+    get:
+      summary: "Show data about a specific metric"
+      description: ""
+      operationId: "getSingleMetric"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        description: "The name of the metric to display"
+        required: true
+        type: "string"
+      - name: "pretty"
+        in: "query"
+        description: "True to format the data for easier reading"
+        required: false
+        type: "boolean"
+      - name: "rateUnit"
+        in: "query"
+        description: "The time unit ('seconds', 'minutes', and so on) to display rates"
+        required: false
+        type: "string"
+      - name: "durationUnit"
+        in: "query"
+        description: "The time unit ('seconds', 'minutes', and so on) to display durations"
+        required: false
+        type: "string"
+      - name: "showSamples"
+        in: "query"
+        description: "True to display the data values used in calculations"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/MetricResponse"
+  /system/metricNames:
+    get:
+      summary: "Show available metric names"
+      description: "For use with the 'metric' endpoint"
+      operationId: "getMetricNames"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "pattern"
+        in: "query"
+        description: "A regular expression to find all configuration items that contain\
+          \ matching strings"
+        required: false
+        type: "string"
+      - name: "prefix"
+        in: "query"
+        description: "Match all configuration items that start with the specified\
+          \ string"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+            additionalProperties:
+              type: "array"
+              items:
+                type: "string"
+  /system/metrics:
+    get:
+      summary: "Show data about all system metrics"
+      description: ""
+      operationId: "getMetrics"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "pretty"
+        in: "query"
+        description: "True to format the data for easier reading"
+        required: false
+        type: "boolean"
+      - name: "rateUnit"
+        in: "query"
+        description: "The time unit ('seconds', 'minutes', and so on) to display rates"
+        required: false
+        type: "string"
+      - name: "durationUnit"
+        in: "query"
+        description: "The time unit ('seconds', 'minutes', and so on) to display durations"
+        required: false
+        type: "string"
+      - name: "showSamples"
+        in: "query"
+        description: "True to display the data values used in calculations"
+        required: false
+        type: "boolean"
+      - name: "pattern"
+        in: "query"
+        description: "A regular expression to find all configuration items that contain\
+          \ matching strings"
+        required: false
+        type: "string"
+      - name: "prefix"
+        in: "query"
+        description: "Match all configuration items that start with the specified\
+          \ string"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/MetricResponse"
+  /system/ping:
+    get:
+      summary: "Query the system to see whether it is up"
+      description: "If the system is up, it returns 'pong'"
+      operationId: "ping"
+      produces:
+      - "application/json"
+      - "text/plain"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+  /system/ping/zk:
+    get:
+      summary: "Query ZooKeeper to see whether it is up"
+      description: "If ZooKeeper is up, it returns 'pong'"
+      operationId: "pingZK"
+      produces:
+      - "application/json"
+      - "text/plain"
+      parameters:
+      - name: "timeout"
+        in: "query"
+        description: "A timeout value, in seconds"
+        required: false
+        type: "integer"
+        default: 30
+        format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+  /system/resolve:
+    get:
+      summary: "Resolve a Uniform Resource Name (URN)"
+      description: ""
+      operationId: "resolveUrn"
+      parameters:
+      - name: "urn"
+        in: "query"
+        description: "The URN to resolve"
+        required: false
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /system/status:
+    get:
+      summary: "Get the status of the service"
+      description: ""
+      operationId: "getStatus"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceStatus"
+  /system/status_code:
+    get:
+      operationId: "getStatusCode"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /system/teapot:
+    get:
+      summary: "I'm a little teapot..."
+      description: ""
+      operationId: "teapot"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /system/threads:
+    get:
+      summary: "Show all active system threads"
+      description: ""
+      operationId: "threadDump"
+      produces:
+      - "application/json"
+      - "text/plain"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ThreadDump"
+  /system/version:
+    get:
+      summary: "Get system component versions (deprecated)"
+      description: ""
+      operationId: "version"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+            additionalProperties:
+              type: "string"
+definitions:
+  Histogram:
+    type: "object"
+    properties:
+      count:
+        type: "integer"
+        format: "int64"
+      snapshot:
+        $ref: "#/definitions/Snapshot"
+  MonitorInfo:
+    type: "object"
+    properties:
+      className:
+        type: "string"
+      identityHashCode:
+        type: "integer"
+        format: "int32"
+      lockedStackDepth:
+        type: "integer"
+        format: "int32"
+      lockedStackFrame:
+        $ref: "#/definitions/StackTraceElement"
+  Meter:
+    type: "object"
+    properties:
+      count:
+        type: "integer"
+        format: "int64"
+      oneMinuteRate:
+        type: "number"
+        format: "double"
+      fiveMinuteRate:
+        type: "number"
+        format: "double"
+      fifteenMinuteRate:
+        type: "number"
+        format: "double"
+      meanRate:
+        type: "number"
+        format: "double"
+  MetricRegistry:
+    type: "object"
+    properties:
+      metrics:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/Metric"
+      gauges:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/Gauge"
+      counters:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/Counter"
+      histograms:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/Histogram"
+      meters:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/Meter"
+      timers:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/Timer"
+      names:
+        type: "array"
+        uniqueItems: true
+        items:
+          type: "string"
+  StackTraceElement:
+    type: "object"
+    properties:
+      methodName:
+        type: "string"
+      fileName:
+        type: "string"
+      lineNumber:
+        type: "integer"
+        format: "int32"
+      className:
+        type: "string"
+      nativeMethod:
+        type: "boolean"
+        default: false
+  Gauge:
+    type: "object"
+    properties:
+      value:
+        type: "object"
+  StatusMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      date:
+        type: "string"
+        format: "date-time"
+  Snapshot:
+    type: "object"
+    properties:
+      max:
+        type: "integer"
+        format: "int64"
+      mean:
+        type: "number"
+        format: "double"
+      stdDev:
+        type: "number"
+        format: "double"
+      values:
+        type: "array"
+        items:
+          type: "integer"
+          format: "int64"
+      median:
+        type: "number"
+        format: "double"
+      get75thPercentile:
+        type: "number"
+        format: "double"
+      get95thPercentile:
+        type: "number"
+        format: "double"
+      get98thPercentile:
+        type: "number"
+        format: "double"
+      get99thPercentile:
+        type: "number"
+        format: "double"
+      get999thPercentile:
+        type: "number"
+        format: "double"
+      min:
+        type: "integer"
+        format: "int64"
+  Counter:
+    type: "object"
+    properties:
+      count:
+        type: "integer"
+        format: "int64"
+  ThreadInfo:
+    type: "object"
+    properties:
+      threadName:
+        type: "string"
+      threadId:
+        type: "integer"
+        format: "int64"
+      blockedTime:
+        type: "integer"
+        format: "int64"
+      blockedCount:
+        type: "integer"
+        format: "int64"
+      waitedTime:
+        type: "integer"
+        format: "int64"
+      waitedCount:
+        type: "integer"
+        format: "int64"
+      lockName:
+        type: "string"
+      lockOwnerId:
+        type: "integer"
+        format: "int64"
+      lockOwnerName:
+        type: "string"
+      inNative:
+        type: "boolean"
+        default: false
+      suspended:
+        type: "boolean"
+        default: false
+      threadState:
+        type: "string"
+        enum:
+        - "NEW"
+        - "RUNNABLE"
+        - "BLOCKED"
+        - "WAITING"
+        - "TIMED_WAITING"
+        - "TERMINATED"
+      stackTrace:
+        type: "array"
+        items:
+          $ref: "#/definitions/StackTraceElement"
+      lockedMonitors:
+        type: "array"
+        items:
+          $ref: "#/definitions/MonitorInfo"
+      lockedSynchronizers:
+        type: "array"
+        items:
+          $ref: "#/definitions/LockInfo"
+      lockInfo:
+        $ref: "#/definitions/LockInfo"
+  MetricResponse:
+    type: "object"
+    properties:
+      metricRegistry:
+        $ref: "#/definitions/MetricRegistry"
+      metricsList:
+        type: "object"
+        additionalProperties:
+          $ref: "#/definitions/Metric"
+      pretty:
+        type: "boolean"
+        default: false
+      rateUnit:
+        type: "string"
+        enum:
+        - "NANOSECONDS"
+        - "MICROSECONDS"
+        - "MILLISECONDS"
+        - "SECONDS"
+        - "MINUTES"
+        - "HOURS"
+        - "DAYS"
+      durationUnit:
+        type: "string"
+        enum:
+        - "NANOSECONDS"
+        - "MICROSECONDS"
+        - "MILLISECONDS"
+        - "SECONDS"
+        - "MINUTES"
+        - "HOURS"
+        - "DAYS"
+      showSamples:
+        type: "boolean"
+        default: false
+  Timer:
+    type: "object"
+    properties:
+      oneMinuteRate:
+        type: "number"
+        format: "double"
+      fiveMinuteRate:
+        type: "number"
+        format: "double"
+      fifteenMinuteRate:
+        type: "number"
+        format: "double"
+      meanRate:
+        type: "number"
+        format: "double"
+      snapshot:
+        $ref: "#/definitions/Snapshot"
+      count:
+        type: "integer"
+        format: "int64"
+  ServiceStatus:
+    type: "object"
+    properties:
+      node:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "ok"
+        - "warning"
+        - "error"
+        - "shutdown"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/StatusMessage"
+  ThreadDump:
+    type: "object"
+    properties:
+      threads:
+        type: "array"
+        items:
+          $ref: "#/definitions/ThreadInfo"
+  Metric:
+    type: "object"
+  LockInfo:
+    type: "object"
+    properties:
+      className:
+        type: "string"
+      identityHashCode:
+        type: "integer"
+        format: "int32"

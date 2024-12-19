@@ -1,0 +1,4310 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "A Lucidworks Fusion microservice for indexing.",
+        "version": "5.9.0",
+        "title": "Fusion Indexing Service API",
+        "termsOfService": "https://lucidworks.com/legal/developer-license-agreement/",
+        "contact": {
+            "name": "Lucidworks",
+            "url": "www.lucidworks.com",
+            "email": "support@lucidworks.com"
+        },
+        "license": {
+            "name": "License of API",
+            "url": "https://lucidworks.com/legal/developer-license-agreement/"
+        }
+    },
+    "host": "FUSION_HOST.com",
+    "basePath": "/api",
+    "tags": [{
+        "name": "index-pipeline-controller",
+        "description": "Used for indexing documents and managing pipeline definitions"
+    }, {
+        "name": "index-pipeline-template-controller",
+        "description": "Used internally to generate index pipelines from a template."
+    }, {
+        "name": "index-profile-controller",
+        "description": "The Index Profiles API allows users to manage index profiles. Index profiles allow users to change index pipelines during indexing time while pointing the indexing toward a static endpoint. This gives flexibility to test different stage combinations without reconfiguration."
+    }, {
+        "name": "index-profile-crud-controller",
+        "description": "Endpoints to perform Create-Read-Update-Delete operations on Index Profiles."
+    }, {
+        "name": "index-stage-controller",
+        "description": "The Index Stages API provides endpoints to: 1) manage index stage instances, 2) list index stage configuration properties"
+    }, {
+        "name": "parser-controller",
+        "description": "Endpoints to perform Create-Read-Update-Delete operations on Parsers."
+    }, {
+        "name": "parser-template-controller",
+        "description": "Used internally to generate parser configs from a template."
+    }, {
+        "name": "plugin-controller",
+        "description": "Provides endpoints to manage index stage plugins."
+    }, {
+        "name": "subscription-controller",
+        "description": "The Subscriptions API"
+    }, {
+        "name": "system-controller",
+        "description": "System Controller"
+    }],
+    "schemes": ["https"],
+    "paths": {
+        "/index-pipelines/_schema": {
+            "get": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "Get JSON schema for objects managed by this API",
+                "operationId": "getEntitySchemaUsingGET",
+                "produces": ["application/json;qs=0.9", "application/schema+json;qs=1.0"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ObjectType",
+                            "$ref": "#/definitions/ObjectType"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-pipelines/status": {
+            "get": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "getStatus",
+                "operationId": "getStatusUsingGET",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "originalRef": "ServiceStatusRes",
+                                "$ref": "#/definitions/ServiceStatusRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}": {
+            "get": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "Get the entity as JSON by unique ID",
+                "operationId": "getEntityUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "The entity ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "IndexPipelineDefinitionRes",
+                            "$ref": "#/definitions/IndexPipelineDefinitionRes"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/collections/{collection}/debug{?bufferDocsForSolr,echo,echoMaxCount,params,simulate,throwOnError}": {
+            "post": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "Index document and return response with additional debugging info.",
+                "description": "The document format must match application/vnd.lucidworks-document or application/vnd.solr-document. Indexing means that a document will be processed by all of the configured index stages.",
+                "operationId": "debugPipelineDocumentUsingPOST",
+                "consumes": ["application/vnd.solr-document", "application/vnd.lucidworks-document"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "bufferDocsForSolr",
+                    "in": "query",
+                    "description": "Indicates if the SolrIndexStage should buffer docs or not.",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "collection",
+                    "in": "path",
+                    "description": "The target collection Id where indexed documents will be stored.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "documents",
+                    "description": "List of PipelineDocument objects to be processed and ingested. ",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "Iterable«PipelineDocument»",
+                        "$ref": "#/definitions/Iterable«PipelineDocument»"
+                    }
+                }, {
+                    "name": "echo",
+                    "in": "query",
+                    "description": "If true, indexed documents will be returned in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }, {
+                    "name": "echoMaxCount",
+                    "in": "query",
+                    "description": "Indicates how many documents should be included in response from the pipeline with -1 implying all.",
+                    "required": false,
+                    "type": "integer",
+                    "default": -1,
+                    "format": "int32"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "Id of the index pipeline to be used.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "params",
+                    "in": "query",
+                    "description": "Request query params",
+                    "required": true,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }, {
+                    "name": "simulate",
+                    "in": "query",
+                    "description": "Run the pipeline in \"simulate\" mode for these docs. Stages with \"side-effects\" will get skipped",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "throwOnError",
+                    "in": "query",
+                    "description": "Indicates if the indexing should proceed if an error is encountered or if it should throw an exception",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "IndexPipelineDebugResponse",
+                            "$ref": "#/definitions/IndexPipelineDebugResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/collections/{collection}/index{?autoDetectFormat,bufferDocsForSolr,contentSourceName,echo,echoMaxCount,params,parserId,simulate,skipParsing,stageId,stats,throwOnError}": {
+            "post": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "(Deprecated) Index document and return indexing stats.",
+                "description": "The request body should be the document passed as binary data. Indexing means that a document will be processed by all of the configured index stages.",
+                "operationId": "indexUsingPOST",
+                "consumes": ["*/*"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "autoDetectFormat",
+                    "in": "query",
+                    "description": "Deprecated",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }, {
+                    "name": "bufferDocsForSolr",
+                    "in": "query",
+                    "description": "Indicates if the SolrIndexStage should buffer docs or not.",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "collection",
+                    "in": "path",
+                    "description": "The target collection Id where indexed documents will be stored.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "Content-Type",
+                    "in": "header",
+                    "description": "MIME type",
+                    "required": true,
+                    "type": "string",
+                    "default": "application/octet-stream"
+                }, {
+                    "name": "contentSourceName",
+                    "in": "query",
+                    "description": "Content resource name (file name) on the source system",
+                    "required": false,
+                    "type": "string",
+                    "default": "unknown"
+                }, {
+                    "name": "echo",
+                    "in": "query",
+                    "description": "If true, indexed documents will be returned in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "echoMaxCount",
+                    "in": "query",
+                    "description": "Indicates how many documents should be included in response from the pipeline with -1 implying all.",
+                    "required": false,
+                    "type": "integer",
+                    "default": -1,
+                    "format": "int32"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "Id of the index pipeline to be used.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "params",
+                    "in": "query",
+                    "description": "Request query params",
+                    "required": true,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }, {
+                    "name": "parserId",
+                    "in": "query",
+                    "description": "(Deprecated) Id of the parser to be used. Use async-parser instead.",
+                    "required": false,
+                    "type": "string",
+                    "default": "_system"
+                }, {
+                    "name": "simulate",
+                    "in": "query",
+                    "description": "Run the pipeline in \"simulate\" mode for these docs. Stages with \"side-effects\" will get skipped",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "skipParsing",
+                    "in": "query",
+                    "description": "Skip the parsing and treat document as byte stream",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "stageId",
+                    "in": "query",
+                    "description": "Deprecated",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "stats",
+                    "in": "query",
+                    "description": "Collect pipeline processing stats and return them in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "throwOnError",
+                    "in": "query",
+                    "description": "Indicates if the indexing should proceed if an error is encountered or if it should throw an exception",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "IndexPipelineStatResponse",
+                            "$ref": "#/definitions/IndexPipelineStatResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/collections/{collection}/index{?autoDetectFormat,bufferDocsForSolr,contentSourceName,echo,echoMaxCount,params,parserId,simulate,skipParsing,stageId,throwOnError}": {
+            "post": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "(Deprecated) Index document without returning indexing stats.",
+                "description": "The request body should be the document passed as binary data. Indexing means that a document will be processed by all of the configured index stages.",
+                "operationId": "indexNoStatsUsingPOST",
+                "consumes": ["*/*"],
+                "produces": ["application/vnd.lucidworks-document", "application/vnd.solr-document"],
+                "parameters": [{
+                    "name": "autoDetectFormat",
+                    "in": "query",
+                    "description": "Deprecated",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }, {
+                    "name": "bufferDocsForSolr",
+                    "in": "query",
+                    "description": "Indicates if the SolrIndexStage should buffer docs or not.",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "collection",
+                    "in": "path",
+                    "description": "The target collection Id where indexed documents will be stored.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "Content-Type",
+                    "in": "header",
+                    "description": "MIME type",
+                    "required": true,
+                    "type": "string",
+                    "default": "application/octet-stream"
+                }, {
+                    "name": "contentSourceName",
+                    "in": "query",
+                    "description": "Content resource name (file name) on the source system",
+                    "required": false,
+                    "type": "string",
+                    "default": "unknown"
+                }, {
+                    "name": "echo",
+                    "in": "query",
+                    "description": "If true, indexed documents will be returned in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "echoMaxCount",
+                    "in": "query",
+                    "description": "Indicates how many documents should be included in response from the pipeline with -1 implying all.",
+                    "required": false,
+                    "type": "integer",
+                    "default": -1,
+                    "format": "int32"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "Id of the index pipeline to be used.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "params",
+                    "in": "query",
+                    "description": "Request query params",
+                    "required": true,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }, {
+                    "name": "parserId",
+                    "in": "query",
+                    "description": "(Deprecated) Id of the parser to be used. Use async-parser instead.",
+                    "required": false,
+                    "type": "string",
+                    "default": "_system"
+                }, {
+                    "name": "simulate",
+                    "in": "query",
+                    "description": "Run the pipeline in \"simulate\" mode for these docs. Stages with \"side-effects\" will get skipped",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "skipParsing",
+                    "in": "query",
+                    "description": "Skip the parsing and treat document as byte stream",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "stageId",
+                    "in": "query",
+                    "description": "Deprecated",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "throwOnError",
+                    "in": "query",
+                    "description": "Indicates if the indexing should proceed if an error is encountered or if it should throw an exception",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "Iterable«PipelineDocument»",
+                            "$ref": "#/definitions/Iterable«PipelineDocument»"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/collections/{collection}/index{?bufferDocsForSolr,echo,echoMaxCount,params,simulate,stats,throwOnError}": {
+            "post": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "Index documents and return indexing stats.",
+                "description": "The document format must match application/vnd.lucidworks-document or application/vnd.solr-document. Indexing means that a document will be processed by all of the configured index stages.",
+                "operationId": "indexPipelineDocumentUsingPOST",
+                "consumes": ["application/vnd.solr-document", "application/vnd.lucidworks-document"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "bufferDocsForSolr",
+                    "in": "query",
+                    "description": "Indicates if the SolrIndexStage should buffer docs or not.",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "collection",
+                    "in": "path",
+                    "description": "The target collection Id where indexed documents will be stored.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "documents",
+                    "description": "List of PipelineDocument objects to be processed and ingested. ",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "Iterable«PipelineDocument»",
+                        "$ref": "#/definitions/Iterable«PipelineDocument»"
+                    }
+                }, {
+                    "name": "echo",
+                    "in": "query",
+                    "description": "If true, indexed documents will be returned in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "echoMaxCount",
+                    "in": "query",
+                    "description": "Indicates how many documents should be included in response from the pipeline with -1 implying all.",
+                    "required": false,
+                    "type": "integer",
+                    "default": -1,
+                    "format": "int32"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "Id of the index pipeline to be used.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "params",
+                    "in": "query",
+                    "description": "Request query params",
+                    "required": true,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }, {
+                    "name": "simulate",
+                    "in": "query",
+                    "description": "Run the pipeline in \"simulate\" mode for these docs. Stages with \"side-effects\" will get skipped",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "stats",
+                    "in": "query",
+                    "description": "Collect pipeline processing stats and return them in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "throwOnError",
+                    "in": "query",
+                    "description": "Indicates if the indexing should proceed if an error is encountered or if it should throw an exception",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "IndexPipelineStatResponse",
+                            "$ref": "#/definitions/IndexPipelineStatResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/collections/{collection}/index{?bufferDocsForSolr,echo,echoMaxCount,params,simulate,throwOnError}": {
+            "post": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "Index document without returning indexing stats.",
+                "description": "The document format must match application/vnd.lucidworks-document or application/vnd.solr-document. Indexing means that a document will be processed by all of the configured index stages.",
+                "operationId": "indexPipelineDocumentNoStatsUsingPOST",
+                "consumes": ["application/vnd.solr-document", "application/vnd.lucidworks-document"],
+                "produces": ["application/vnd.lucidworks-document", "application/vnd.solr-document"],
+                "parameters": [{
+                    "name": "bufferDocsForSolr",
+                    "in": "query",
+                    "description": "Indicates if the SolrIndexStage should buffer docs or not.",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "collection",
+                    "in": "path",
+                    "description": "The target collection Id where indexed documents will be stored.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "documents",
+                    "description": "List of PipelineDocument objects to be processed and ingested. ",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "Iterable«PipelineDocument»",
+                        "$ref": "#/definitions/Iterable«PipelineDocument»"
+                    }
+                }, {
+                    "name": "echo",
+                    "in": "query",
+                    "description": "If true, indexed documents will be returned in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "echoMaxCount",
+                    "in": "query",
+                    "description": "Indicates how many documents should be included in response from the pipeline with -1 implying all.",
+                    "required": false,
+                    "type": "integer",
+                    "default": -1,
+                    "format": "int32"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "Id of the index pipeline to be used.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "params",
+                    "in": "query",
+                    "description": "Request query params",
+                    "required": true,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }, {
+                    "name": "simulate",
+                    "in": "query",
+                    "description": "Run the pipeline in \"simulate\" mode for these docs. Stages with \"side-effects\" will get skipped",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "throwOnError",
+                    "in": "query",
+                    "description": "Indicates if the indexing should proceed if an error is encountered or if it should throw an exception",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "originalRef": "PipelineDocumentRes",
+                                "$ref": "#/definitions/PipelineDocumentRes"
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}/refresh": {
+            "put": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "Reload the specified pipeline",
+                "description": "When changes are made to a pipeline, the pipeline needs to be refreshed (reloaded). A Fusion restart refreshes all pipelines",
+                "operationId": "refreshPipelineUsingPUT",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "The ID of a specific pipeline",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ResponseEntity",
+                            "$ref": "#/definitions/ResponseEntity"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-pipelines/{id}{?context}": {
+            "put": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "Update pipeline definition",
+                "operationId": "updateEntityUsingPUT",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "entity",
+                    "description": "Updated pipeline definition in JSON format",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "IndexPipelineDefinitionReq",
+                        "$ref": "#/definitions/IndexPipelineDefinitionReq"
+                    }
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The pipeline id",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "IndexPipelineDefinitionRes",
+                            "$ref": "#/definitions/IndexPipelineDefinitionRes"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "Delete an entity by unique ID",
+                "operationId": "deleteEntityUsingDELETE",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The entity ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/index-pipelines{?context}": {
+            "post": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "Create new index pipeline definition",
+                "operationId": "createEntityUsingPOST",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "entity",
+                    "description": "A new index pipeline definition in JSON format",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "IndexPipelineDefinitionReq",
+                        "$ref": "#/definitions/IndexPipelineDefinitionReq"
+                    }
+                }],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "originalRef": "IndexPipelineDefinitionRes",
+                            "$ref": "#/definitions/IndexPipelineDefinitionRes"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-pipelines{?params}": {
+            "get": {
+                "tags": ["index-pipeline-controller"],
+                "summary": "Get all entities with optional params to filter the results.",
+                "operationId": "getAllEntitiesUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "params",
+                    "in": "query",
+                    "description": "Params to filter the results",
+                    "required": false,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "originalRef": "IndexPipelineDefinitionRes",
+                                "$ref": "#/definitions/IndexPipelineDefinitionRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-profiles/_schema": {
+            "get": {
+                "tags": ["index-profile-crud-controller"],
+                "summary": "Get JSON schema for objects managed by this API",
+                "operationId": "getEntitySchemaUsingGET_1",
+                "produces": ["application/json;qs=0.9", "application/schema+json;qs=1.0"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ObjectType",
+                            "$ref": "#/definitions/ObjectType"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-profiles/status": {
+            "get": {
+                "tags": ["index-profile-crud-controller"],
+                "summary": "getStatus",
+                "operationId": "getStatusUsingGET_3",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "originalRef": "ServiceStatusRes",
+                                "$ref": "#/definitions/ServiceStatusRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-profiles/{id}": {
+            "get": {
+                "tags": ["index-profile-crud-controller"],
+                "summary": "Get the entity as JSON by unique ID",
+                "operationId": "getEntityUsingGET_1",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "The entity ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "IndexProfileRes",
+                            "$ref": "#/definitions/IndexProfileRes"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-profiles/{id}{?context}": {
+            "put": {
+                "tags": ["index-profile-crud-controller"],
+                "summary": "Update an entity from JSON",
+                "operationId": "updateEntityUsingPUT_1",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "entity",
+                    "description": "An updated entity serialized to JSON",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "IndexProfileReq",
+                        "$ref": "#/definitions/IndexProfileReq"
+                    }
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The entity ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "IndexProfileRes",
+                            "$ref": "#/definitions/IndexProfileRes"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["index-profile-crud-controller"],
+                "summary": "Delete an entity by unique ID",
+                "operationId": "deleteEntityUsingDELETE_1",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The entity ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/index-profiles{?context}": {
+            "post": {
+                "tags": ["index-profile-crud-controller"],
+                "summary": "Create a new entity from JSON",
+                "operationId": "createEntityUsingPOST_1",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "entity",
+                    "description": "A new entity serialized to JSON",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "IndexProfileReq",
+                        "$ref": "#/definitions/IndexProfileReq"
+                    }
+                }],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "originalRef": "IndexProfileRes",
+                            "$ref": "#/definitions/IndexProfileRes"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-profiles{?params}": {
+            "get": {
+                "tags": ["index-profile-crud-controller"],
+                "summary": "Get all entities with optional params to filter the results.",
+                "operationId": "getAllEntitiesUsingGET_1",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "params",
+                    "in": "query",
+                    "description": "Params to filter the results",
+                    "required": false,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "originalRef": "IndexProfileRes",
+                                "$ref": "#/definitions/IndexProfileRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-stage-plugins": {
+            "get": {
+                "tags": ["plugin-controller"],
+                "summary": "getPlugins",
+                "operationId": "getPluginsUsingGET",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "put": {
+                "tags": ["plugin-controller"],
+                "summary": "Install the plugin or update if exists.",
+                "operationId": "installOrUpdatePluginUsingPUT",
+                "consumes": ["application/octet-stream", "application/x-zip-compressed", "application/zip"],
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-stage-plugins/{pluginId}/refresh{?distrib}": {
+            "put": {
+                "tags": ["plugin-controller"],
+                "summary": "Reload the plugin.",
+                "operationId": "reloadPluginUsingPUT",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "distrib",
+                    "in": "query",
+                    "description": "Broadcast refresh request",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }, {
+                    "name": "pluginId",
+                    "in": "path",
+                    "description": "Plugin id",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-stage-plugins/{pluginId}{?distrib}": {
+            "delete": {
+                "tags": ["plugin-controller"],
+                "summary": "Uninstall the plugin.",
+                "operationId": "uninstallPluginUsingDELETE",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "distrib",
+                    "in": "query",
+                    "description": "Broadcast delete request",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }, {
+                    "name": "pluginId",
+                    "in": "path",
+                    "description": "Plugin id",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/index-stages/schema": {
+            "get": {
+                "tags": ["index-stage-controller"],
+                "summary": "Get all stage schemas and types",
+                "operationId": "listStageSchemasUsingGET",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "originalRef": "ObjectType",
+                                "$ref": "#/definitions/ObjectType"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-stages/schema/{type}": {
+            "get": {
+                "tags": ["index-stage-controller"],
+                "summary": "Get stage schema of type",
+                "operationId": "getStageSchemaUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "type",
+                    "in": "path",
+                    "description": "Stage type (for example solr-index)",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ObjectType",
+                            "$ref": "#/definitions/ObjectType"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index-stages/status": {
+            "get": {
+                "tags": ["index-stage-controller"],
+                "summary": "getStatus",
+                "operationId": "getStatusUsingGET_4",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "originalRef": "ServiceStatusRes",
+                                "$ref": "#/definitions/ServiceStatusRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index/status": {
+            "get": {
+                "tags": ["index-profile-controller"],
+                "summary": "getStatus",
+                "operationId": "getStatusUsingGET_2",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "originalRef": "ServiceStatusRes",
+                                "$ref": "#/definitions/ServiceStatusRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index/{id}/debug{?bufferDocsForSolr,echo,echoMaxCount,params,simulate}": {
+            "post": {
+                "tags": ["index-profile-controller"],
+                "summary": "Index document and return response with additional debugging info.",
+                "description": "The document format must match application/vnd.lucidworks-document or application/vnd.solr-document. ",
+                "operationId": "debugUsingPOST",
+                "consumes": ["application/vnd.lucidworks-document"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "bufferDocsForSolr",
+                    "in": "query",
+                    "description": "Indicates if the SolrIndexStage should buffer docs or not.",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "in": "body",
+                    "name": "documents",
+                    "description": "List of PipelineDocument objects to be processed and ingested. ",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "Iterable«PipelineDocument»",
+                        "$ref": "#/definitions/Iterable«PipelineDocument»"
+                    }
+                }, {
+                    "name": "echo",
+                    "in": "query",
+                    "description": "If true, indexed documents will be returned in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }, {
+                    "name": "echoMaxCount",
+                    "in": "query",
+                    "description": "Indicates how many documents should be included in response from the pipeline with -1 implying all.",
+                    "required": false,
+                    "type": "integer",
+                    "default": -1,
+                    "format": "int32"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "Id of the index profile to be used.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "params",
+                    "in": "query",
+                    "description": "Request query params",
+                    "required": true,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }, {
+                    "name": "simulate",
+                    "in": "query",
+                    "description": "Run the pipeline in \"simulate\" mode for these docs. Stages with \"side-effects\" will get skipped",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "IndexPipelineDebugResponse",
+                            "$ref": "#/definitions/IndexPipelineDebugResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index/{id}{?bufferDocsForSolr,contentSourceName,echo,echoMaxCount,params,simulate,stats}": {
+            "post": {
+                "tags": ["index-profile-controller"],
+                "summary": "Index document and return indexing stats.",
+                "description": "The request body should be the document passed as binary data. Indexing means that a document will be processed by all of the configured index stages.",
+                "operationId": "indexUsingPOST_1",
+                "consumes": ["*/*"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "bufferDocsForSolr",
+                    "in": "query",
+                    "description": "Indicates if the SolrIndexStage should buffer docs or not.",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "Content-Type",
+                    "in": "header",
+                    "description": "MIME type",
+                    "required": true,
+                    "type": "string",
+                    "default": "application/octet-stream"
+                }, {
+                    "name": "contentSourceName",
+                    "in": "query",
+                    "description": "Content resource name (file name) on the source system",
+                    "required": false,
+                    "type": "string",
+                    "default": "unknown"
+                }, {
+                    "name": "echo",
+                    "in": "query",
+                    "description": "If true, indexed documents will be returned in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }, {
+                    "name": "echoMaxCount",
+                    "in": "query",
+                    "description": "Indicates how many documents should be included in response from the pipeline with -1 implying all.",
+                    "required": false,
+                    "type": "integer",
+                    "default": -1,
+                    "format": "int32"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "Id of the index profile to be used.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "params",
+                    "in": "query",
+                    "description": "Request query params",
+                    "required": true,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }, {
+                    "name": "simulate",
+                    "in": "query",
+                    "description": "Run the pipeline in \"simulate\" mode for these docs. Stages with \"side-effects\" will get skipped",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "stats",
+                    "in": "query",
+                    "description": "Collect pipeline processing stats and return them in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "IndexPipelineStatResponse",
+                            "$ref": "#/definitions/IndexPipelineStatResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/index/{id}{?bufferDocsForSolr,echo,echoMaxCount,params,simulate,stats}": {
+            "post": {
+                "tags": ["index-profile-controller"],
+                "summary": "Index documents and return indexing stats.",
+                "description": "The document format must match application/vnd.lucidworks-document or application/vnd.solr-document. Indexing means that a document will be processed by all of the configured index stages.",
+                "operationId": "indexPipelineDocumentUsingPOST_1",
+                "consumes": ["application/vnd.solr-document", "application/vnd.lucidworks-document"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "bufferDocsForSolr",
+                    "in": "query",
+                    "description": "Indicates if the SolrIndexStage should buffer docs or not.",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "in": "body",
+                    "name": "documents",
+                    "description": "List of PipelineDocument objects to be processed and ingested. ",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "Iterable«PipelineDocument»",
+                        "$ref": "#/definitions/Iterable«PipelineDocument»"
+                    }
+                }, {
+                    "name": "echo",
+                    "in": "query",
+                    "description": "If true, indexed documents will be returned in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": true
+                }, {
+                    "name": "echoMaxCount",
+                    "in": "query",
+                    "description": "Indicates how many documents should be included in response from the pipeline with -1 implying all.",
+                    "required": false,
+                    "type": "integer",
+                    "default": -1,
+                    "format": "int32"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "Id of the index profile to be used.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "params",
+                    "in": "query",
+                    "description": "Request query params",
+                    "required": true,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }, {
+                    "name": "simulate",
+                    "in": "query",
+                    "description": "Run the pipeline in \"simulate\" mode for these docs. Stages with \"side-effects\" will get skipped",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }, {
+                    "name": "stats",
+                    "in": "query",
+                    "description": "Collect pipeline processing stats and return them in the response",
+                    "required": false,
+                    "type": "boolean",
+                    "default": false
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "IndexPipelineStatResponse",
+                            "$ref": "#/definitions/IndexPipelineStatResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/parsers/_schema": {
+            "get": {
+                "tags": ["parser-controller"],
+                "summary": "Get JSON schema for objects managed by this API",
+                "operationId": "getEntitySchemaUsingGET_2",
+                "produces": ["application/json;qs=0.9", "application/schema+json;qs=1.0"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ObjectType",
+                            "$ref": "#/definitions/ObjectType"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/parsers/status": {
+            "get": {
+                "tags": ["parser-controller"],
+                "summary": "getStatus",
+                "operationId": "getStatusUsingGET_5",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "originalRef": "ServiceStatusRes",
+                                "$ref": "#/definitions/ServiceStatusRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/parsers/{id}": {
+            "get": {
+                "tags": ["parser-controller"],
+                "summary": "Get the entity as JSON by unique ID",
+                "operationId": "getEntityUsingGET_2",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "The entity ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ParserConfigRes",
+                            "$ref": "#/definitions/ParserConfigRes"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/parsers/{id}/parse": {
+            "post": {
+                "tags": ["parser-controller"],
+                "summary": "Parse document passed as a file in multipart request.",
+                "operationId": "parseFileFormUsingPOST",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "offset",
+                    "in": "formData",
+                    "required": false,
+                    "type": "integer",
+                    "format": "int32"
+                }, {
+                    "name": "limit",
+                    "in": "formData",
+                    "required": false,
+                    "type": "integer",
+                    "format": "int32"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "(Deprecated) Id of the parser to be used. Use async-parser instead.",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ParserResponse",
+                            "$ref": "#/definitions/ParserResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/parsers/{id}/parse{?charset.registered,creationDate,filename,limit,modificationDate,name,offset,readDate,size,type}": {
+            "post": {
+                "tags": ["parser-controller"],
+                "summary": "Parse document passed as binary data.",
+                "operationId": "parseFileDirectUsingPOST",
+                "consumes": ["*/*"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "charset.registered",
+                    "in": "query",
+                    "required": false,
+                    "type": "boolean"
+                }, {
+                    "name": "Content-Type",
+                    "in": "header",
+                    "description": "MIME type",
+                    "required": true,
+                    "type": "string",
+                    "default": "application/octet-stream"
+                }, {
+                    "name": "creationDate",
+                    "in": "query",
+                    "required": false,
+                    "type": "string",
+                    "format": "date-time"
+                }, {
+                    "name": "filename",
+                    "in": "query",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "(Deprecated) Id of the parser to be used. Use async-parser instead.",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "limit",
+                    "in": "query",
+                    "description": "Maximum number of documents to parse",
+                    "required": false,
+                    "type": "integer",
+                    "default": 100,
+                    "format": "int32"
+                }, {
+                    "name": "modificationDate",
+                    "in": "query",
+                    "required": false,
+                    "type": "string",
+                    "format": "date-time"
+                }, {
+                    "name": "name",
+                    "in": "query",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "offset",
+                    "in": "query",
+                    "description": "The index of the first document that will actually be processed. Documents with ordinals from 0 to offset will be skipped.",
+                    "required": false,
+                    "type": "integer",
+                    "default": 0,
+                    "format": "int32"
+                }, {
+                    "name": "readDate",
+                    "in": "query",
+                    "required": false,
+                    "type": "string",
+                    "format": "date-time"
+                }, {
+                    "name": "size",
+                    "in": "query",
+                    "required": false,
+                    "type": "integer",
+                    "format": "int64"
+                }, {
+                    "name": "type",
+                    "in": "query",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ParserResponse",
+                            "$ref": "#/definitions/ParserResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/parsers/{id}{?context}": {
+            "put": {
+                "tags": ["parser-controller"],
+                "summary": "Update an entity from JSON",
+                "operationId": "updateEntityUsingPUT_2",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "entity",
+                    "description": "An updated entity serialized to JSON",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "ParserConfigReq",
+                        "$ref": "#/definitions/ParserConfigReq"
+                    }
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The entity ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ParserConfigRes",
+                            "$ref": "#/definitions/ParserConfigRes"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["parser-controller"],
+                "summary": "Delete an entity by unique ID",
+                "operationId": "deleteEntityUsingDELETE_2",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The entity ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/parsers{?context}": {
+            "post": {
+                "tags": ["parser-controller"],
+                "summary": "Create a new entity from JSON",
+                "operationId": "createEntityUsingPOST_2",
+                "consumes": ["application/json"],
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "entity",
+                    "description": "A new entity serialized to JSON",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "ParserConfigReq",
+                        "$ref": "#/definitions/ParserConfigReq"
+                    }
+                }],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "originalRef": "ParserConfigRes",
+                            "$ref": "#/definitions/ParserConfigRes"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/parsers{?params}": {
+            "get": {
+                "tags": ["parser-controller"],
+                "summary": "Get all entities with optional params to filter the results.",
+                "operationId": "getAllEntitiesUsingGET_2",
+                "produces": ["*/*"],
+                "parameters": [{
+                    "name": "params",
+                    "in": "query",
+                    "description": "Params to filter the results",
+                    "required": false,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "originalRef": "ParserConfigRes",
+                                "$ref": "#/definitions/ParserConfigRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/subscriptions/_schema": {
+            "get": {
+                "tags": ["subscription-controller"],
+                "summary": "Get JSON schema for objects managed by this API",
+                "operationId": "getEntitySchemaUsingGET_3",
+                "produces": ["application/json;qs=0.9", "application/schema+json;qs=1.0"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ObjectType",
+                            "$ref": "#/definitions/ObjectType"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/subscriptions/status": {
+            "get": {
+                "tags": ["subscription-controller"],
+                "summary": "getStatus",
+                "operationId": "getStatusUsingGET_7",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "originalRef": "ServiceStatusRes",
+                                "$ref": "#/definitions/ServiceStatusRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/subscriptions/{id}": {
+            "get": {
+                "tags": ["subscription-controller"],
+                "summary": "Get the entity as JSON by unique ID",
+                "operationId": "getEntityUsingGET_3",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "The entity ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "SubscriptionRes",
+                            "$ref": "#/definitions/SubscriptionRes"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/subscriptions/{id}/refresh{?action}": {
+            "put": {
+                "tags": ["subscription-controller"],
+                "summary": "Refresh the specified subscription",
+                "description": "When changes are made to a subscription, the subscription needs to be refreshed (reloaded). A Fusion restart refreshes all subscriptions.",
+                "operationId": "refreshSubscriptionUsingPUT",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "action",
+                    "in": "query",
+                    "description": "The action to apply when refreshing the subscription. This is currently either start or stop.",
+                    "required": false,
+                    "type": "string",
+                    "default": "start"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The ID of a specific subscription",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ResponseEntity",
+                            "$ref": "#/definitions/ResponseEntity"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/subscriptions/{id}{?context}": {
+            "put": {
+                "tags": ["subscription-controller"],
+                "summary": "Update a Subscription from JSON",
+                "operationId": "updateEntityUsingPUT_3",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The Subscription ID",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "subscription",
+                    "description": "An updated Subscription serialized to JSON",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "SubscriptionReq",
+                        "$ref": "#/definitions/SubscriptionReq"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "SubscriptionRes",
+                            "$ref": "#/definitions/SubscriptionRes"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["subscription-controller"],
+                "summary": "Delete an entity by unique ID",
+                "operationId": "deleteEntityUsingDELETE_3",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "id",
+                    "in": "path",
+                    "description": "The entity ID",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/subscriptions{?context,resource,topics}": {
+            "get": {
+                "tags": ["subscription-controller"],
+                "summary": "Get any subscriptions associated with the given resource and, optionally, topics",
+                "operationId": "getSubscriptionsUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "resource",
+                    "in": "query",
+                    "description": "The subscription resource",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "topics",
+                    "in": "query",
+                    "description": "The topics subscribed to by this resource.",
+                    "required": false,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "originalRef": "SubscriptionRes",
+                                "$ref": "#/definitions/SubscriptionRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "put": {
+                "tags": ["subscription-controller"],
+                "summary": "Update any subscriptions associated with the given resource and, optionally, topics",
+                "operationId": "updateSubscriptionsUsingPUT",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "resource",
+                    "in": "query",
+                    "description": "The subscription resource",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "subscriptionUpdate",
+                    "description": "An updated Subscription",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "SubscriptionUpdate",
+                        "$ref": "#/definitions/SubscriptionUpdate"
+                    }
+                }, {
+                    "name": "topics",
+                    "in": "query",
+                    "description": "The topics subscribed to by this resource. ",
+                    "required": false,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "originalRef": "SubscriptionRes",
+                                "$ref": "#/definitions/SubscriptionRes"
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["subscription-controller"],
+                "summary": "Delete any subscriptions associated with the given resource and, optionally, topics",
+                "operationId": "deleteSubscriptionsUsingDELETE",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "name": "resource",
+                    "in": "query",
+                    "description": "The subscription resource",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "topics",
+                    "in": "query",
+                    "description": "The topics subscribed to by this resource. If an app context is not provided, these topics must include the namespace",
+                    "required": false,
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "collectionFormat": "multi"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "ResponseEntity",
+                            "$ref": "#/definitions/ResponseEntity"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/subscriptions{?context}": {
+            "post": {
+                "tags": ["subscription-controller"],
+                "summary": "Create new Subscription",
+                "operationId": "createEntityUsingPOST_3",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "context",
+                    "in": "query",
+                    "description": "Validates which app the entity should be part of by specifying, for example, \n                                                \"app:SomeApp\". If the entity is not part of the app this request will fail. \n                                                Any other comma-separated contexts in the context parameter are allowed but ignored.",
+                    "required": false,
+                    "type": "string"
+                }, {
+                    "in": "body",
+                    "name": "subscription",
+                    "description": "New Subscription",
+                    "required": true,
+                    "schema": {
+                        "originalRef": "SubscriptionReq",
+                        "$ref": "#/definitions/SubscriptionReq"
+                    }
+                }],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "originalRef": "SubscriptionRes",
+                            "$ref": "#/definitions/SubscriptionRes"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/subscriptions{?params}": {
+            "get": {
+                "tags": ["subscription-controller"],
+                "summary": "Get all entities with optional params to filter the results.",
+                "operationId": "getAllEntitiesUsingGET_3",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "params",
+                    "in": "query",
+                    "description": "Params to filter the results",
+                    "required": false,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "originalRef": "SubscriptionRes",
+                                "$ref": "#/definitions/SubscriptionRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/system/status": {
+            "get": {
+                "tags": ["system-controller"],
+                "summary": "getStatus",
+                "operationId": "getStatusUsingGET_8",
+                "produces": ["*/*"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "originalRef": "ServiceStatusRes",
+                                "$ref": "#/definitions/ServiceStatusRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/templates/index-pipelines": {
+            "get": {
+                "tags": ["index-pipeline-template-controller"],
+                "summary": "Get all available templates",
+                "operationId": "getTemplatesUsingGET",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "Iterable«IndexPipelineDefinition»",
+                            "$ref": "#/definitions/Iterable«IndexPipelineDefinition»"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/templates/index-pipelines/default{?id}": {
+            "get": {
+                "tags": ["index-pipeline-template-controller"],
+                "summary": "Get default pipeline template",
+                "description": "This template is used for the main app pipelines (ones having the same name as app).",
+                "operationId": "getDefaultTemplateUsingGET",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "id",
+                    "in": "query",
+                    "description": "This id will be set as template id. If this is empty a random UUID will be set as the template id.",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "IndexPipelineDefinition",
+                            "$ref": "#/definitions/IndexPipelineDefinition"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/templates/index-pipelines/status": {
+            "get": {
+                "tags": ["index-pipeline-template-controller"],
+                "summary": "getStatus",
+                "operationId": "getStatusUsingGET_1",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "originalRef": "ServiceStatusRes",
+                                "$ref": "#/definitions/ServiceStatusRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/templates/parsers": {
+            "get": {
+                "tags": ["parser-template-controller"],
+                "summary": "getTemplates",
+                "operationId": "getTemplatesUsingGET_1",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "originalRef": "Iterable«ParserConfig»",
+                            "$ref": "#/definitions/Iterable«ParserConfig»"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/templates/parsers/status": {
+            "get": {
+                "tags": ["parser-template-controller"],
+                "summary": "getStatus",
+                "operationId": "getStatusUsingGET_6",
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "uniqueItems": true,
+                            "items": {
+                                "originalRef": "ServiceStatusRes",
+                                "$ref": "#/definitions/ServiceStatusRes"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Fusion Native Realm": {
+            "type": "basic"
+        }
+    },
+    "definitions": {
+        "Annotation": {
+            "type": "object",
+            "properties": {
+                "end": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "featureCount": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "features": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "label": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "title": "Annotation"
+        },
+        "AnnotationReq": {
+            "type": "object",
+            "properties": {
+                "end": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "features": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "label": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "title": "AnnotationReq"
+        },
+        "AnnotationRes": {
+            "type": "object",
+            "properties": {
+                "end": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "featureCount": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "features": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "label": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "title": "AnnotationRes"
+        },
+        "AnyType": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "default": {
+                    "type": "object"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "enum": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "oneOf": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "AnyType«object,object»",
+                        "$ref": "#/definitions/AnyType«object,object»"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["array", "boolean", "integer", "null", "number", "object", "ref", "string"]
+                },
+                "unsafe": {
+                    "type": "boolean"
+                }
+            },
+            "title": "AnyType"
+        },
+        "AnyType«object,object»": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "default": {
+                    "type": "object"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "enum": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "oneOf": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "AnyType«object,object»",
+                        "$ref": "#/definitions/AnyType«object,object»"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["array", "boolean", "integer", "null", "number", "object", "ref", "string"]
+                },
+                "unsafe": {
+                    "type": "boolean"
+                }
+            },
+            "title": "AnyType«object,object»"
+        },
+        "Command": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "Command"
+        },
+        "CommandReq": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "CommandReq"
+        },
+        "CommandRes": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "CommandRes"
+        },
+        "ContextAndDoc": {
+            "type": "object",
+            "properties": {
+                "context": {
+                    "type": "object"
+                },
+                "doc": {
+                    "originalRef": "PipelineDocumentRes",
+                    "$ref": "#/definitions/PipelineDocumentRes"
+                },
+                "error": {
+                    "type": "string"
+                }
+            },
+            "title": "ContextAndDoc"
+        },
+        "Counter": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            },
+            "title": "Counter"
+        },
+        "Gauge": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "object"
+                }
+            },
+            "title": "Gauge"
+        },
+        "Histogram": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "snapshot": {
+                    "originalRef": "Snapshot",
+                    "$ref": "#/definitions/Snapshot"
+                }
+            },
+            "title": "Histogram"
+        },
+        "IndexPipelineDebugResponse": {
+            "type": "object",
+            "properties": {
+                "output": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "originalRef": "ContextAndDoc",
+                            "$ref": "#/definitions/ContextAndDoc"
+                        }
+                    }
+                },
+                "outputEncounteredCount": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "stages": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "StageConfig",
+                        "$ref": "#/definitions/StageConfig"
+                    }
+                }
+            },
+            "title": "IndexPipelineDebugResponse"
+        },
+        "IndexPipelineDefinition": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "stages": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "StageConfig",
+                        "$ref": "#/definitions/StageConfig"
+                    }
+                }
+            },
+            "title": "IndexPipelineDefinition"
+        },
+        "IndexPipelineDefinitionReq": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "stages": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "StageConfig",
+                        "$ref": "#/definitions/StageConfig"
+                    }
+                }
+            },
+            "title": "IndexPipelineDefinitionReq"
+        },
+        "IndexPipelineDefinitionRes": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "stages": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "StageConfig",
+                        "$ref": "#/definitions/StageConfig"
+                    }
+                }
+            },
+            "title": "IndexPipelineDefinitionRes"
+        },
+        "IndexPipelineStatResponse": {
+            "type": "object",
+            "properties": {
+                "docs": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "PipelineDocumentRes",
+                        "$ref": "#/definitions/PipelineDocumentRes"
+                    }
+                },
+                "stats": {
+                    "type": "object"
+                }
+            },
+            "title": "IndexPipelineStatResponse"
+        },
+        "IndexProfileReq": {
+            "type": "object",
+            "properties": {
+                "collection": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "indexPipeline": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "ParamAndValueReq",
+                        "$ref": "#/definitions/ParamAndValueReq"
+                    }
+                },
+                "parser": {
+                    "type": "string"
+                }
+            },
+            "title": "IndexProfileReq"
+        },
+        "IndexProfileRes": {
+            "type": "object",
+            "properties": {
+                "collection": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "indexPipeline": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "ParamAndValueRes",
+                        "$ref": "#/definitions/ParamAndValueRes"
+                    }
+                },
+                "parser": {
+                    "type": "string"
+                }
+            },
+            "title": "IndexProfileRes"
+        },
+        "Iterable«IndexPipelineDefinition»": {
+            "type": "object",
+            "title": "Iterable«IndexPipelineDefinition»"
+        },
+        "Iterable«ParserConfig»": {
+            "type": "object",
+            "title": "Iterable«ParserConfig»"
+        },
+        "Iterable«PipelineDocument»": {
+            "type": "object",
+            "title": "Iterable«PipelineDocument»"
+        },
+        "Meter": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "fifteenMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "fiveMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "meanRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "oneMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                }
+            },
+            "title": "Meter"
+        },
+        "Metric": {
+            "type": "object",
+            "title": "Metric"
+        },
+        "MetricRegistry": {
+            "type": "object",
+            "properties": {
+                "counters": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "Counter",
+                        "$ref": "#/definitions/Counter"
+                    }
+                },
+                "gauges": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "Gauge",
+                        "$ref": "#/definitions/Gauge"
+                    }
+                },
+                "histograms": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "Histogram",
+                        "$ref": "#/definitions/Histogram"
+                    }
+                },
+                "meters": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "Meter",
+                        "$ref": "#/definitions/Meter"
+                    }
+                },
+                "metrics": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "Metric",
+                        "$ref": "#/definitions/Metric"
+                    }
+                },
+                "names": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "timers": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "Timer",
+                        "$ref": "#/definitions/Timer"
+                    }
+                }
+            },
+            "title": "MetricRegistry"
+        },
+        "MetricResponse": {
+            "type": "object",
+            "properties": {
+                "durationUnit": {
+                    "type": "string",
+                    "enum": ["DAYS", "HOURS", "MICROSECONDS", "MILLISECONDS", "MINUTES", "NANOSECONDS", "SECONDS"]
+                },
+                "metricRegistry": {
+                    "originalRef": "MetricRegistry",
+                    "$ref": "#/definitions/MetricRegistry"
+                },
+                "metricsList": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "Metric",
+                        "$ref": "#/definitions/Metric"
+                    }
+                },
+                "pretty": {
+                    "type": "boolean"
+                },
+                "rateUnit": {
+                    "type": "string",
+                    "enum": ["DAYS", "HOURS", "MICROSECONDS", "MILLISECONDS", "MINUTES", "NANOSECONDS", "SECONDS"]
+                },
+                "showSamples": {
+                    "type": "boolean"
+                }
+            },
+            "title": "MetricResponse"
+        },
+        "ObjectType": {
+            "type": "object",
+            "properties": {
+                "additionalProperties": {
+                    "type": "object"
+                },
+                "category": {
+                    "type": "string"
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "default": {
+                    "type": "object"
+                },
+                "definitions": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "AnyType",
+                        "$ref": "#/definitions/AnyType"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "enum": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "maxProperties": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "minProperties": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "oneOf": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "AnyType«object,object»",
+                        "$ref": "#/definitions/AnyType«object,object»"
+                    }
+                },
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "AnyType",
+                        "$ref": "#/definitions/AnyType"
+                    }
+                },
+                "propertyGroups": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "PropertyGroup",
+                        "$ref": "#/definitions/PropertyGroup"
+                    }
+                },
+                "required": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["array", "boolean", "integer", "null", "number", "object", "ref", "string"]
+                },
+                "unsafe": {
+                    "type": "boolean"
+                }
+            },
+            "title": "ObjectType"
+        },
+        "ParamAndValueReq": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "policy": {
+                    "type": "string",
+                    "enum": ["append", "default", "remove", "replace"]
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "title": "ParamAndValueReq"
+        },
+        "ParamAndValueRes": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "policy": {
+                    "type": "string",
+                    "enum": ["append", "default", "remove", "replace"]
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "title": "ParamAndValueRes"
+        },
+        "ParserConfig": {
+            "type": "object",
+            "properties": {
+                "detectMediaTypeBasedOnExtension": {
+                    "type": "boolean"
+                },
+                "enableMediaTypeDetection": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "idField": {
+                    "type": "string"
+                },
+                "maxFieldLength": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "maxParserDepth": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "parserStages": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "ParserStageConfig",
+                        "$ref": "#/definitions/ParserStageConfig"
+                    }
+                }
+            },
+            "title": "ParserConfig"
+        },
+        "ParserConfigReq": {
+            "type": "object",
+            "properties": {
+                "detectMediaTypeBasedOnExtension": {
+                    "type": "boolean"
+                },
+                "enableMediaTypeDetection": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "idField": {
+                    "type": "string"
+                },
+                "maxFieldLength": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "maxParserDepth": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "parserStages": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "ParserStageConfigReq",
+                        "$ref": "#/definitions/ParserStageConfigReq"
+                    }
+                }
+            },
+            "title": "ParserConfigReq"
+        },
+        "ParserConfigRes": {
+            "type": "object",
+            "properties": {
+                "detectMediaTypeBasedOnExtension": {
+                    "type": "boolean"
+                },
+                "enableMediaTypeDetection": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "idField": {
+                    "type": "string"
+                },
+                "maxFieldLength": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "maxParserDepth": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "parserStages": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "ParserStageConfigRes",
+                        "$ref": "#/definitions/ParserStageConfigRes"
+                    }
+                }
+            },
+            "title": "ParserConfigRes"
+        },
+        "ParserDiagnostic": {
+            "type": "object",
+            "properties": {
+                "cause": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "diagnosticId": {
+                    "type": "string"
+                },
+                "filter": {
+                    "type": "string"
+                },
+                "parserStageId": {
+                    "type": "string"
+                },
+                "parserStageType": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "boolean"
+                }
+            },
+            "title": "ParserDiagnostic"
+        },
+        "ParserErrorResponse": {
+            "type": "object",
+            "properties": {
+                "context": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "title": "ParserErrorResponse"
+        },
+        "ParserResponse": {
+            "type": "object",
+            "properties": {
+                "diagnostics": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "ParserDiagnostic",
+                        "$ref": "#/definitions/ParserDiagnostic"
+                    }
+                },
+                "documents": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "PipelineDocument",
+                        "$ref": "#/definitions/PipelineDocument"
+                    }
+                },
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "ParserErrorResponse",
+                        "$ref": "#/definitions/ParserErrorResponse"
+                    }
+                },
+                "parsedStreams": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalDocuments": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalTimeMs": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "ParserResponse"
+        },
+        "ParserStageConfig": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "errorHandling": {
+                    "type": "string",
+                    "enum": ["fail", "ignore", "log", "mark"]
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ignoredMediaTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "inheritMediaTypes": {
+                    "type": "boolean"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "mediaTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "outputFieldPrefix": {
+                    "type": "string"
+                },
+                "pathPatterns": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "SyntaxAndPattern",
+                        "$ref": "#/definitions/SyntaxAndPattern"
+                    }
+                }
+            },
+            "title": "ParserStageConfig"
+        },
+        "ParserStageConfigReq": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "errorHandling": {
+                    "type": "string",
+                    "enum": ["fail", "ignore", "log", "mark"]
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ignoredMediaTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "inheritMediaTypes": {
+                    "type": "boolean"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "mediaTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "outputFieldPrefix": {
+                    "type": "string"
+                },
+                "pathPatterns": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "SyntaxAndPatternReq",
+                        "$ref": "#/definitions/SyntaxAndPatternReq"
+                    }
+                }
+            },
+            "title": "ParserStageConfigReq"
+        },
+        "ParserStageConfigRes": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "errorHandling": {
+                    "type": "string",
+                    "enum": ["fail", "ignore", "log", "mark"]
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ignoredMediaTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "inheritMediaTypes": {
+                    "type": "boolean"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "mediaTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "outputFieldPrefix": {
+                    "type": "string"
+                },
+                "pathPatterns": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "SyntaxAndPatternRes",
+                        "$ref": "#/definitions/SyntaxAndPatternRes"
+                    }
+                }
+            },
+            "title": "ParserStageConfigRes"
+        },
+        "PipelineDocument": {
+            "type": "object",
+            "properties": {
+                "commands": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "Command",
+                        "$ref": "#/definitions/Command"
+                    }
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "PipelineField",
+                        "$ref": "#/definitions/PipelineField"
+                    }
+                },
+                "hints": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "PipelineDocument"
+        },
+        "PipelineDocumentReq": {
+            "type": "object",
+            "properties": {
+                "commands": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "CommandReq",
+                        "$ref": "#/definitions/CommandReq"
+                    }
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "PipelineFieldReq",
+                        "$ref": "#/definitions/PipelineFieldReq"
+                    }
+                },
+                "hints": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "PipelineDocumentReq"
+        },
+        "PipelineDocumentRes": {
+            "type": "object",
+            "properties": {
+                "commands": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "CommandRes",
+                        "$ref": "#/definitions/CommandRes"
+                    }
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "PipelineFieldRes",
+                        "$ref": "#/definitions/PipelineFieldRes"
+                    }
+                },
+                "hints": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "PipelineDocumentRes"
+        },
+        "PipelineField": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "Annotation",
+                        "$ref": "#/definitions/Annotation"
+                    }
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "object"
+                }
+            },
+            "title": "PipelineField"
+        },
+        "PipelineFieldReq": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "AnnotationReq",
+                        "$ref": "#/definitions/AnnotationReq"
+                    }
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "object"
+                }
+            },
+            "title": "PipelineFieldReq"
+        },
+        "PipelineFieldRes": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "AnnotationRes",
+                        "$ref": "#/definitions/AnnotationRes"
+                    }
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "object"
+                }
+            },
+            "title": "PipelineFieldRes"
+        },
+        "PropertyGroup": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "PropertyGroup"
+        },
+        "ResponseEntity": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "object"
+                },
+                "statusCode": {
+                    "type": "string",
+                    "enum": ["ACCEPTED", "ALREADY_REPORTED", "BAD_GATEWAY", "BAD_REQUEST", "BANDWIDTH_LIMIT_EXCEEDED", "CHECKPOINT", "CONFLICT", "CONTINUE", "CREATED", "DESTINATION_LOCKED", "EXPECTATION_FAILED", "FAILED_DEPENDENCY", "FORBIDDEN", "FOUND", "GATEWAY_TIMEOUT", "GONE", "HTTP_VERSION_NOT_SUPPORTED", "IM_USED", "INSUFFICIENT_SPACE_ON_RESOURCE", "INSUFFICIENT_STORAGE", "INTERNAL_SERVER_ERROR", "I_AM_A_TEAPOT", "LENGTH_REQUIRED", "LOCKED", "LOOP_DETECTED", "METHOD_FAILURE", "METHOD_NOT_ALLOWED", "MOVED_PERMANENTLY", "MOVED_TEMPORARILY", "MULTIPLE_CHOICES", "MULTI_STATUS", "NETWORK_AUTHENTICATION_REQUIRED", "NON_AUTHORITATIVE_INFORMATION", "NOT_ACCEPTABLE", "NOT_EXTENDED", "NOT_FOUND", "NOT_IMPLEMENTED", "NOT_MODIFIED", "NO_CONTENT", "OK", "PARTIAL_CONTENT", "PAYLOAD_TOO_LARGE", "PAYMENT_REQUIRED", "PERMANENT_REDIRECT", "PRECONDITION_FAILED", "PRECONDITION_REQUIRED", "PROCESSING", "PROXY_AUTHENTICATION_REQUIRED", "REQUESTED_RANGE_NOT_SATISFIABLE", "REQUEST_ENTITY_TOO_LARGE", "REQUEST_HEADER_FIELDS_TOO_LARGE", "REQUEST_TIMEOUT", "REQUEST_URI_TOO_LONG", "RESET_CONTENT", "SEE_OTHER", "SERVICE_UNAVAILABLE", "SWITCHING_PROTOCOLS", "TEMPORARY_REDIRECT", "TOO_EARLY", "TOO_MANY_REQUESTS", "UNAUTHORIZED", "UNAVAILABLE_FOR_LEGAL_REASONS", "UNPROCESSABLE_ENTITY", "UNSUPPORTED_MEDIA_TYPE", "UPGRADE_REQUIRED", "URI_TOO_LONG", "USE_PROXY", "VARIANT_ALSO_NEGOTIATES"]
+                },
+                "statusCodeValue": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "ResponseEntity"
+        },
+        "Serializable": {
+            "type": "object",
+            "title": "Serializable"
+        },
+        "ServiceStatusReq": {
+            "type": "object",
+            "properties": {
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "StatusMessageReq",
+                        "$ref": "#/definitions/StatusMessageReq"
+                    }
+                },
+                "node": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": ["error", "ok", "shutdown", "starting", "warning"]
+                }
+            },
+            "title": "ServiceStatusReq"
+        },
+        "ServiceStatusRes": {
+            "type": "object",
+            "properties": {
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "originalRef": "StatusMessageRes",
+                        "$ref": "#/definitions/StatusMessageRes"
+                    }
+                },
+                "node": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": ["error", "ok", "shutdown", "starting", "warning"]
+                }
+            },
+            "title": "ServiceStatusRes"
+        },
+        "Snapshot": {
+            "type": "object",
+            "properties": {
+                "75thPercentile": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "95thPercentile": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "98thPercentile": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "999thPercentile": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "99thPercentile": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "max": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "mean": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "median": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "min": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "stdDev": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
+            "title": "Snapshot"
+        },
+        "StageConfig": {
+            "type": "object",
+            "properties": {
+                "condition": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "skip": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "title": "StageConfig"
+        },
+        "StatusMessageReq": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "title": "StatusMessageReq"
+        },
+        "StatusMessageRes": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "title": "StatusMessageRes"
+        },
+        "SubscriptionReq": {
+            "type": "object",
+            "properties": {
+                "contextProperties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "Serializable",
+                        "$ref": "#/definitions/Serializable"
+                    }
+                },
+                "initialPosition": {
+                    "type": "string"
+                },
+                "maxRetries": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "numberOfListenerThreads": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "topic": {
+                    "type": "string"
+                }
+            },
+            "title": "SubscriptionReq"
+        },
+        "SubscriptionRes": {
+            "type": "object",
+            "properties": {
+                "contextProperties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "Serializable",
+                        "$ref": "#/definitions/Serializable"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "initialPosition": {
+                    "type": "string"
+                },
+                "maxRetries": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "numberOfListenerThreads": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "topic": {
+                    "type": "string"
+                }
+            },
+            "title": "SubscriptionRes"
+        },
+        "SubscriptionUpdate": {
+            "type": "object",
+            "properties": {
+                "contextProperties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "originalRef": "Serializable",
+                        "$ref": "#/definitions/Serializable"
+                    }
+                },
+                "initialPosition": {
+                    "type": "string"
+                },
+                "maxRetries": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "numberOfListenerThreads": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "SubscriptionUpdate"
+        },
+        "SyntaxAndPattern": {
+            "type": "object",
+            "properties": {
+                "pattern": {
+                    "type": "string"
+                },
+                "syntax": {
+                    "type": "string",
+                    "enum": ["glob", "regex"]
+                }
+            },
+            "title": "SyntaxAndPattern"
+        },
+        "SyntaxAndPatternReq": {
+            "type": "object",
+            "properties": {
+                "pattern": {
+                    "type": "string"
+                },
+                "syntax": {
+                    "type": "string",
+                    "enum": ["glob", "regex"]
+                }
+            },
+            "title": "SyntaxAndPatternReq"
+        },
+        "SyntaxAndPatternRes": {
+            "type": "object",
+            "properties": {
+                "pattern": {
+                    "type": "string"
+                },
+                "syntax": {
+                    "type": "string",
+                    "enum": ["glob", "regex"]
+                }
+            },
+            "title": "SyntaxAndPatternRes"
+        },
+        "Timer": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "fifteenMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "fiveMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "meanRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "oneMinuteRate": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "snapshot": {
+                    "originalRef": "Snapshot",
+                    "$ref": "#/definitions/Snapshot"
+                }
+            },
+            "title": "Timer"
+        }
+    }
+}

@@ -1,0 +1,1407 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service query-rewrite"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "query-rewrite"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/query-rewrite/instances": {
+      "get": {
+        "summary": "List query rewrite instances for an application",
+        "description": "",
+        "operationId": "list",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/QueryRewrite"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new query rewrite",
+        "description": "",
+        "operationId": "create",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The content body of created query rewrite",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/QueryRewrite"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/QueryRewrite"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Create, update or delete multiple objects",
+        "description": "",
+        "operationId": "doBulkOperation",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The content body of operation-object mapping",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/query-rewrite/instances/{id}": {
+      "get": {
+        "summary": "Get details for an existing query rewrite",
+        "description": "",
+        "operationId": "getQueryRewrite",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The query rewrite instance Id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/QueryRewrite"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an existing query rewrite",
+        "description": "",
+        "operationId": "updateQueryRewrite",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The query rewrite instance Id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The content body of query rewrite to be updated",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/QueryRewrite"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/QueryRewrite"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an existing query rewrite",
+        "description": "",
+        "operationId": "deleteQueryRewrite",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The query rewrite instance Id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/query-rewrite/instances/{id}/publish": {
+      "put": {
+        "summary": "Publish un-deployed query rewrites with specific id",
+        "description": "",
+        "operationId": "publishById",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/query-rewrite/publish": {
+      "put": {
+        "summary": "Publish un-deployed query rewrites",
+        "description": "",
+        "operationId": "publish",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete un-deployed query rewrites",
+        "description": "",
+        "operationId": "rollback",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/query-rewrite/publish/{type}": {
+      "put": {
+        "summary": "Publish un-deployed query rewrites with an optional type filter",
+        "description": "",
+        "operationId": "publishType",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "description": "The type of query rewrite to be published",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete un-deployed query rewrites with an optional type filter",
+        "description": "",
+        "operationId": "rollbackType",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "description": "The type of query rewrite to be published",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/query-rewrite/schema": {
+      "get": {
+        "summary": "Get the JSON schema for creating a query rewrite object",
+        "description": "",
+        "operationId": "getSchema",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ObjectType"
+            }
+          }
+        }
+      }
+    },
+    "/query-rewrite/schema/{type}": {
+      "get": {
+        "summary": "Get the JSON schema for creating a specific type of object, such as a rule",
+        "description": "",
+        "operationId": "getSchemaType",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "description": "The type of query rewrite",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ObjectType"
+            }
+          }
+        }
+      }
+    },
+    "/query-rewrite/search": {
+      "get": {
+        "summary": "Search the query rewrite staging collection to get facets and hits",
+        "description": "",
+        "operationId": "search",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/SearchResponse"
+            }
+          }
+        }
+      }
+    },
+    "/query-rewrite/search/{type}": {
+      "get": {
+        "summary": "Search the query rewrite staging collection to get facets and hits",
+        "description": "",
+        "operationId": "searchType",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "description": "The type of query rewrite to be searched",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "description": "The current user session Id",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/SearchResponse"
+            }
+          }
+        }
+      }
+    },
+    "/query-rewrite/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/query-rewrite/undo/{id}": {
+      "delete": {
+        "summary": "Undo all pending changes to a specific doc that has not been published; this is not an ACID transactional operation in that we remove all changes made to a doc in a session and not just the last operation.",
+        "description": "",
+        "operationId": "undo",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "context",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "editSessionId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/query-rewrite/{type}": {
+      "get": {
+        "summary": "Get status information for a specific query rewrite type, such as rules or spell correction",
+        "description": "",
+        "operationId": "getQueryRewriteTypeStatus",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "description": "The type of query rewrite",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/QueryRewriteTypeStatus"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update the enabled status of a query rewrite type",
+        "description": "",
+        "operationId": "updateQueryRewriteTypeEnabled",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "The current Fusion application Id",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "description": "The type of query rewrite",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The new status to be updated",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/QueryRewriteTypeStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/QueryRewriteTypeStatus"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "QueryRewriteTypeStatus": {
+      "type": "object",
+      "properties": {
+        "app": {
+          "type": "string",
+          "readOnly": true
+        },
+        "type": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enabled": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "numDeployed": {
+          "type": "integer",
+          "format": "int64",
+          "readOnly": true
+        },
+        "collection": {
+          "type": "string",
+          "readOnly": true
+        },
+        "job": {
+          "type": "string",
+          "readOnly": true
+        },
+        "lastDeployedOn": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "lastJobStatus": {
+          "readOnly": true,
+          "$ref": "#/definitions/JobRunView"
+        }
+      }
+    },
+    "ResponseHeader": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "QTime": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "PropertyGroup": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "readOnly": true
+        },
+        "properties": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "JobRunView": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "readOnly": true,
+          "$ref": "#/definitions/FusionResource"
+        },
+        "runId": {
+          "type": "string",
+          "readOnly": true
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "status": {
+          "type": "string",
+          "readOnly": true
+        },
+        "error": {
+          "readOnly": true,
+          "$ref": "#/definitions/JobExecutionErrorView"
+        },
+        "extra": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "startedBy": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "SearchResponse": {
+      "type": "object",
+      "properties": {
+        "response": {
+          "$ref": "#/definitions/Response"
+        },
+        "responseHeader": {
+          "$ref": "#/definitions/ResponseHeader"
+        },
+        "facet_counts": {
+          "$ref": "#/definitions/FacetCountsCollection"
+        },
+        "facets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "stats": {
+          "$ref": "#/definitions/Stats"
+        },
+        "debug": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "highlighting": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "fusionResponse": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "JobExecutionErrorView": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "readOnly": true
+        },
+        "detail": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "Response": {
+      "type": "object",
+      "properties": {
+        "numFound": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "start": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "maxScore": {
+          "type": "number",
+          "format": "double"
+        },
+        "docs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "ObjectType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "required": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "additionalProperties": {
+          "type": "object",
+          "readOnly": true
+        },
+        "minProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "maxProperties": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "definitions": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/AnyType"
+          }
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        },
+        "propertyGroups": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/PropertyGroup"
+          }
+        }
+      }
+    },
+    "QueryRewrite": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "source": {
+          "type": "string",
+          "readOnly": true
+        },
+        "sourceType": {
+          "type": "string",
+          "readOnly": true
+        },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewer": {
+          "type": "string",
+          "readOnly": true
+        },
+        "reviewedOn": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "review": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "auto",
+            "pending",
+            "approved",
+            "denied"
+          ]
+        },
+        "deployed": {
+          "type": "boolean",
+          "default": false
+        },
+        "tags": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "doc_type": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "FacetCountsCollection": {
+      "type": "object",
+      "properties": {
+        "facet_fields": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "facet_ranges": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "$ref": "#/definitions/FacetRange"
+          }
+        }
+      }
+    },
+    "FusionResource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "APPKIT_APP",
+            "WEBAPP_ADMIN_APP",
+            "APP",
+            "COLLECTION",
+            "INDEX_PIPELINE",
+            "INDEX_STAGE",
+            "QUERY_STAGE",
+            "QUERY_PIPELINE",
+            "INDEX_PROFILE",
+            "QUERY_PROFILE",
+            "BLOB",
+            "PARSER",
+            "DATASOURCE",
+            "TASK",
+            "SCHEDULE",
+            "SEARCH_CLUSTER",
+            "EXPERIMENT",
+            "SPARK_JOB",
+            "GROUP",
+            "CUSTOM_RULE_TYPE",
+            "TYPE",
+            "RESOURCE",
+            "NULL"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "canonicalName": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "FacetRange": {
+      "type": "object",
+      "properties": {
+        "counts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "gap": {
+          "type": "object"
+        },
+        "start": {
+          "type": "object"
+        },
+        "end": {
+          "type": "object"
+        },
+        "after": {
+          "type": "object"
+        },
+        "before": {
+          "type": "object"
+        },
+        "between": {
+          "type": "object"
+        }
+      }
+    },
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "Stats": {
+      "type": "object",
+      "properties": {
+        "stats_fields": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "AnyType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    },
+    "AnyTypeObjectObject": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "String",
+            "Number",
+            "Integer",
+            "Boolean",
+            "Object",
+            "Array",
+            "Null",
+            "Ref"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "enum": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object"
+          }
+        },
+        "default": {
+          "type": "object",
+          "readOnly": true
+        },
+        "category": {
+          "type": "string",
+          "readOnly": true
+        },
+        "categoryPriority": {
+          "type": "integer",
+          "format": "int32",
+          "readOnly": true
+        },
+        "hints": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsafe": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "oneOf": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/AnyTypeObjectObject"
+          }
+        }
+      }
+    }
+  }
+}

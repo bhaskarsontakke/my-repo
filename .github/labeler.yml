@@ -1,0 +1,8 @@
+Config spec:
+- any: ['reference/**/*']
+
+CSearch Query API:
+- any: ['reference/query-conf.yaml']
+
+Auth API:
+- any: ['reference/authentication.yaml']

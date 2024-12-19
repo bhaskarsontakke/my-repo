@@ -1,0 +1,244 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service zk-import-export"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "zk-import-export"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/zk/export/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/zk/export/{path}": {
+      "get": {
+        "summary": "Download information from ZooKeeper",
+        "description": "",
+        "operationId": "getNodeInfo",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "description": "NEEDS DEVELOPER REVIEW",
+            "required": false,
+            "type": "string",
+            "pattern": ".*"
+          },
+          {
+            "name": "recursive",
+            "in": "query",
+            "description": "NEEDS DEVELOPER REVIEW",
+            "required": false,
+            "type": "boolean",
+            "default": true
+          },
+          {
+            "name": "excludePaths",
+            "in": "query",
+            "description": "NEEDS DEVELOPER REVIEW",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "includePaths",
+            "in": "query",
+            "description": "NEEDS DEVELOPER REVIEW",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "encodeValues",
+            "in": "query",
+            "description": "NEEDS DEVELOPER REVIEW",
+            "required": false,
+            "type": "string",
+            "default": "base64"
+          },
+          {
+            "name": "ephemeral",
+            "in": "query",
+            "description": "NEEDS DEVELOPER REVIEW",
+            "required": false,
+            "type": "boolean",
+            "default": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ZNodeDump"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ZNodeDump": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "readOnly": true,
+          "$ref": "#/definitions/ZNodeDumpRequest"
+        },
+        "getzNode": {
+          "readOnly": true,
+          "$ref": "#/definitions/ZNode"
+        }
+      }
+    },
+    "ZNode": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "readOnly": true
+        },
+        "children": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/ZNode"
+          }
+        },
+        "data": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "Params": {
+      "type": "object",
+      "properties": {
+        "zkHost": {
+          "type": "string",
+          "readOnly": true
+        },
+        "path": {
+          "type": "string",
+          "readOnly": true
+        },
+        "encodeValues": {
+          "type": "string",
+          "readOnly": true
+        },
+        "includePaths": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "excludePaths": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "recursive": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "ephemeral": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        }
+      }
+    },
+    "ZNodeDumpRequest": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "params": {
+          "readOnly": true,
+          "$ref": "#/definitions/Params"
+        }
+      }
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    }
+  }
+}

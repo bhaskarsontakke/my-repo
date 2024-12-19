@@ -1,0 +1,1094 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "4.2.6-rc1",
+        "title": "Fusion Service catalog"
+    },
+    "basePath": "/api/apollo",
+    "tags": [
+        {
+            "name": "catalog"
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/catalog": {
+            "get": {
+                "summary": "Get a list of analytics projects",
+                "description": "",
+                "operationId": "getProjects",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/DataAsset"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new analytics project",
+                "description": "",
+                "operationId": "createProject",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "JSON-formatted configuration values",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/DataAsset"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/DataAsset"
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/_schema": {
+            "get": {
+                "summary": "Get the JSON schema for creating a data asset",
+                "description": "",
+                "operationId": "getDataAssetSchema",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/ObjectType"
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/_search": {
+            "get": {
+                "summary": "Search for data assets of interest across all projects",
+                "description": "Results are filtered by permissions of the requesting user; query parameters are used to specify filters",
+                "operationId": "findAssets",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/DataAsset"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/status": {
+            "get": {
+                "summary": "Get the status of the service",
+                "description": "",
+                "operationId": "getStatus",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ServiceStatus"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/{project}": {
+            "get": {
+                "summary": "Get details about an analytics project",
+                "description": "",
+                "operationId": "getProject",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "The name of a project",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/DataAsset"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a project and all of its data assets",
+                "description": "",
+                "operationId": "deleteProject",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "The name of a project",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/catalog/{project}/assets": {
+            "get": {
+                "summary": "Get a list of assets in a project",
+                "description": "",
+                "operationId": "getAssetsForProject",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "The name of a project",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/DataAsset"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new data asset in a project",
+                "description": "",
+                "operationId": "createAsset",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "The name of a project",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "JSON-formatted configuration values",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/DataAsset"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/DataAsset"
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/{project}/assets/{asset}": {
+            "get": {
+                "summary": "Get details for a data asset in a project",
+                "description": "",
+                "operationId": "getAsset",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "The name of a project",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "asset",
+                        "in": "path",
+                        "description": "The name of an asset",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/DataAsset"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update a data asset in a project",
+                "description": "",
+                "operationId": "updateAsset",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "The name of a project",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "asset",
+                        "in": "path",
+                        "description": "The name of an asset",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "JSON-formatted configuration values",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/DataAsset"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/DataAsset"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Remove a data asset from a project",
+                "description": "",
+                "operationId": "deleteAsset",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "The name of a project",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "asset",
+                        "in": "path",
+                        "description": "The name of an asset",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "version",
+                        "in": "query",
+                        "description": "The asset version to delete, for optimistic concurrency control",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        },
+        "/catalog/{project}/assets/{asset}/columns/{column}": {
+            "get": {
+                "summary": "Explore facets and basic summary stats for a field in this asset",
+                "description": "",
+                "operationId": "getColumnInfo",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "The name of a project",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "asset",
+                        "in": "path",
+                        "description": "The name of an asset",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "column",
+                        "in": "path",
+                        "description": "The name of a column in the table",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/ColumnInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/{project}/assets/{asset}/count": {
+            "get": {
+                "summary": "Count the number of rows in the table backed by this asset",
+                "description": "",
+                "operationId": "getCount",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "asset",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/CatalogQueryResults"
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/{project}/assets/{asset}/rows": {
+            "get": {
+                "summary": "Get the top N rows from the table backed by this asset",
+                "description": "",
+                "operationId": "getRows",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "asset",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/CatalogQueryResults"
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/{project}/assets/{asset}/schema": {
+            "get": {
+                "summary": "Get schema information about a data asset in a project",
+                "description": "",
+                "operationId": "getAssetSchema",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "asset",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/ObjectType"
+                        }
+                    }
+                }
+            }
+        },
+        "/catalog/{project}/query": {
+            "post": {
+                "summary": "Execute a SQL query, Solr query, or streaming expression against one or more assets of a project",
+                "description": "",
+                "operationId": "executeQuery",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "The name of a project",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "JSON-formatted query parameters",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/CatalogQuery"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/CatalogQueryResults"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "ObjectType": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "String",
+                        "Number",
+                        "Integer",
+                        "Boolean",
+                        "Object",
+                        "Array",
+                        "Null",
+                        "Ref"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "description": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "required": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "properties": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "$ref": "#/definitions/AnyType"
+                    }
+                },
+                "additionalProperties": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "minProperties": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "maxProperties": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "definitions": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "$ref": "#/definitions/AnyType"
+                    }
+                },
+                "category": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "enum": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "unsafe": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "default": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "oneOf": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/AnyTypeObjectObject"
+                    }
+                },
+                "propertyGroups": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/PropertyGroup"
+                    }
+                }
+            }
+        },
+        "CatalogQuery": {
+            "type": "object",
+            "properties": {
+                "sql": {
+                    "type": "string"
+                },
+                "cacheResultsAs": {
+                    "type": "string"
+                },
+                "flushCaches": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "params": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "PropertyGroup": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "properties": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "DataAsset": {
+            "type": "object",
+            "properties": {
+                "projectId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "assetType": {
+                    "type": "string",
+                    "enum": [
+                        "project",
+                        "table",
+                        "view",
+                        "field",
+                        "udf",
+                        "metric"
+                    ]
+                },
+                "description": {
+                    "type": "string"
+                },
+                "sourceUri": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "string"
+                },
+                "ownerEmail": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "format": {
+                    "type": "string"
+                },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "filters": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "sql": {
+                    "type": "string"
+                },
+                "cacheOnLoad": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "cacheStrategy": {
+                    "$ref": "#/definitions/CacheStrategy"
+                },
+                "dependsOn": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "createdOn": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "additionalSettings": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "updatedOn": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "ColumnStats": {
+            "type": "object",
+            "properties": {
+                "min": {
+                    "type": "object"
+                },
+                "max": {
+                    "type": "object"
+                },
+                "sum": {
+                    "type": "object"
+                },
+                "count": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "cardinality": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "missing": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "mean": {
+                    "type": "object"
+                },
+                "sumOfSquares": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "stddev": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "percentiles": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                }
+            }
+        },
+        "ServiceStatus": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "starting",
+                        "ok",
+                        "warning",
+                        "error",
+                        "shutdown"
+                    ]
+                },
+                "node": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "messages": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/StatusMessage"
+                    }
+                }
+            }
+        },
+        "CatalogQueryResults": {
+            "type": "object"
+        },
+        "ColumnInfo": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "hints": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "stats": {
+                    "$ref": "#/definitions/ColumnStats"
+                },
+                "facets": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                },
+                "pivots": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "AnyType": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "String",
+                        "Number",
+                        "Integer",
+                        "Boolean",
+                        "Object",
+                        "Array",
+                        "Null",
+                        "Ref"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "description": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "enum": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "default": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "category": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "hints": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "unsafe": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "oneOf": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/AnyTypeObjectObject"
+                    }
+                }
+            }
+        },
+        "CacheStrategy": {
+            "type": "object",
+            "properties": {
+                "timeToLive": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "refreshFrequency": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "autoRefresh": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        "AnyTypeObjectObject": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "String",
+                        "Number",
+                        "Integer",
+                        "Boolean",
+                        "Object",
+                        "Array",
+                        "Null",
+                        "Ref"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "description": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "enum": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "default": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "category": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "hints": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "unsafe": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "oneOf": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/AnyTypeObjectObject"
+                    }
+                }
+            }
+        },
+        "StatusMessage": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "message": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        }
+    }
+}

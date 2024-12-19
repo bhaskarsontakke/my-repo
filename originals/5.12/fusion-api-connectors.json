@@ -1,0 +1,2201 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Fusion Connectors Service API",
+    "description": "A Lucidworks Fusion microservice for Connectors management.",
+    "contact": {
+      "name": "Lucidworks",
+      "url": "www.lucidworks.com",
+      "email": "support@lucidworks.com"
+    },
+    "license": {
+      "name": "License of API",
+      "url": "https://lucidworks.com/legal/developer-license-agreement/"
+    },
+    "version": "5.12.0"
+  },
+  "externalDocs": {
+    "description": "Lucidworks Documentation",
+    "url": "https://doc.lucidworks.com/"
+  },
+  "servers": [
+    {
+      "url": "FUSION_HOST.com/api/connectors"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Connectors Datasource Configuration API",
+      "description": "The Datasource Configuration API allows to manage both Classic and V2 (SDK) datasource configurations. These are the configurations that define settings for crawling a specific repository, database, API or other content source."
+    },
+    {
+      "name": "Connectors Schema API",
+      "description": "The Connectors Schema API allows to retrieve available configuration properties for a specific connector plugin type."
+    },
+    {
+      "name": "Connector Repository Plugins API",
+      "description": "The Connector Repository Plugins API allows to list connector plugins from the plugin repository."
+    },
+    {
+      "name": "Connectors Security Filter API",
+      "description": "The Connectors Security Filters API provides security filter queries generated for a specific collection, user and connector type. These filter queries are used by the query pipeline to filter out documents returned to specific users and group of users depending on their permissions."
+    },
+    {
+      "name": "Connector Plugins API",
+      "description": "The Connector Plugins API allows to manage (list, install, update and uninstall) connector plugins."
+    },
+    {
+      "name": "V2 Datasource Configuration API",
+      "description": "The V2 Datasource Configuration API allows to manage V2 (SDK) datasource configurations. These are the configurations that define settings for crawling a specific repository, database, API or other content source."
+    },
+    {
+      "name": "Datasource Jobs API",
+      "description": "The Datasource Jobs API provides control over datasource crawl jobs. It allows to list, check status, start and stop datasource crawl jobs."
+    },
+    {
+      "name": "Connectors Configuration Suggestion API",
+      "description": "The Configuration Suggestion API allows to get suggestion on which connector plugin can be used for crawling provided content source."
+    }
+  ],
+  "paths": {
+    "/plugins": {
+      "get": {
+        "tags": [
+          "Connector Plugins API"
+        ],
+        "summary": "List installed plugins",
+        "operationId": "pluginStatuses",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Connector Plugins API"
+        ],
+        "summary": "Install plugin",
+        "operationId": "installOrUpdatePlugin",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginInstallResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Connector Plugins API"
+        ],
+        "summary": "Install a plugin from the plugins repository",
+        "operationId": "installOrUpdatePluginFromRepository",
+        "parameters": [
+          {
+            "name": "The plugin id to be installed",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "The specific plugin version to be installed. Leave empty to use the most recent plugin version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginInstallResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datasources/{id}": {
+      "get": {
+        "tags": [
+          "Connectors Datasource Configuration API"
+        ],
+        "summary": "Return a data source configuration",
+        "operationId": "getDataSource",
+        "parameters": [
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Connectors Datasource Configuration API"
+        ],
+        "summary": "Update a data source connector configuration",
+        "operationId": "updateDataSource",
+        "parameters": [
+          {
+            "name": "Indicates if the configuration should be validated",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Connectors Datasource Configuration API"
+        ],
+        "summary": "Remove specific data source configuration",
+        "operationId": "removeDataSource",
+        "parameters": [
+          {
+            "name": "Indicates if the configuration should be removed even if a job is currently running",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Indicates if the documents indexed should be also removed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/configs/{id}": {
+      "get": {
+        "tags": [
+          "V2 Datasource Configuration API"
+        ],
+        "summary": "Get specific connector V2 configuration",
+        "operationId": "getConnectorConfig",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "V2 Datasource Configuration API"
+        ],
+        "summary": "Update a connector V2 configuration",
+        "operationId": "updateConnectorConfig",
+        "parameters": [
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "V2 Datasource Configuration API"
+        ],
+        "summary": "Remove specific connector V2 configuration",
+        "operationId": "removeConnectorConfig",
+        "parameters": [
+          {
+            "name": "Indicates if the configuration should be removed even if a job is currently running",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Indicates if the documents indexed should be also removed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/security-filter": {
+      "post": {
+        "tags": [
+          "Connectors Security Filter API"
+        ],
+        "summary": "Build security filter",
+        "operationId": "getSecurityFilter",
+        "parameters": [
+          {
+            "name": "A list of collection names. Security filters will be built for the configurations linked to these collections",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "A sub set of configuration IDs to build filters for. Leave empty to include all configurations",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Subject"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityFilter"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/security_filter": {
+      "post": {
+        "tags": [
+          "Connectors Security Filter API"
+        ],
+        "summary": "Build security filter",
+        "operationId": "getSecurityFilter_1",
+        "parameters": [
+          {
+            "name": "A list of collection names. Security filters will be built for the configurations linked to these collections",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "A sub set of configuration IDs to build filters for. Leave empty to include all configurations",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Subject"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityFilter"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}": {
+      "get": {
+        "tags": [
+          "Datasource Jobs API"
+        ],
+        "summary": "Get the connector job status",
+        "operationId": "getJobStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobStatus"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Datasource Jobs API"
+        ],
+        "summary": "Update the connector job state",
+        "operationId": "transitionJobState",
+        "parameters": [
+          {
+            "name": "Indicates if the job should be aborted",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "The amount of time(in milliseconds) to wait for the update",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 60000
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobState"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datasources": {
+      "get": {
+        "tags": [
+          "Connectors Datasource Configuration API"
+        ],
+        "summary": "Return a list of data source configurations",
+        "description": "Lists the data source configurations linked to a collection. If no collection is provided, then all available configurations are listed",
+        "operationId": "getDataSources",
+        "parameters": [
+          {
+            "name": "The collection name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Connectors Datasource Configuration API"
+        ],
+        "summary": "Create a new connector data source configuration",
+        "operationId": "addDataSource",
+        "parameters": [
+          {
+            "name": "Indicates if the configuration should be created(persisted) or just validated",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Connectors Datasource Configuration API"
+        ],
+        "summary": "Remove data source configurations",
+        "description": "Remove all data source configurations linked to the given collection. A list of the removed data source configuration IDs is returned",
+        "operationId": "removeDataSources",
+        "parameters": [
+          {
+            "name": "The collection name, linked configurations will be removed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Indicates if the configuration should be removed even if a job is currently running",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Indicates if the documents indexed should be also removed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/configs": {
+      "get": {
+        "tags": [
+          "V2 Datasource Configuration API"
+        ],
+        "summary": "List the connector V2 configurations",
+        "description": "Lists the V2 configurations linked to a collection. If no collection is provided, then all available configurations are listed",
+        "operationId": "getConnectorConfigs",
+        "parameters": [
+          {
+            "name": "The collection name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "V2 Datasource Configuration API"
+        ],
+        "summary": "Create a connector V2 configuration",
+        "operationId": "addConnectorConfig",
+        "parameters": [
+          {
+            "name": "Indicates if the configuration should be created(persisted) or just validated",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "V2 Datasource Configuration API"
+        ],
+        "summary": "Remove connector V2 configurations",
+        "description": "Remove all V2 configurations linked to the given collection. A list of the removed configuration IDs is returned",
+        "operationId": "removeConnectorConfigs",
+        "parameters": [
+          {
+            "name": "The collection name, linked configurations will be removed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Indicates if the configuration should be removed even if a job is currently running",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Indicates if the documents indexed should be also removed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/suggestions/datasources": {
+      "get": {
+        "tags": [
+          "Connectors Configuration Suggestion API"
+        ],
+        "summary": "List possible connectors that can handle given input value",
+        "operationId": "suggestConnectorConfig",
+        "parameters": [
+          {
+            "name": "The input value. It could be an URL, a file path, an FTP URL, etc.",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectorConfigSuggestion"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/partial-config": {
+      "get": {
+        "tags": [
+          "Connectors Configuration Suggestion API"
+        ],
+        "summary": "List possible connectors that can handle given input value",
+        "operationId": "suggestConnectorConfig_1",
+        "parameters": [
+          {
+            "name": "The input value. It could be an URL, a file path, an FTP URL, etc.",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectorConfigSuggestion"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/security-filter/{collection}": {
+      "get": {
+        "tags": [
+          "Connectors Security Filter API"
+        ],
+        "summary": "Build security filter",
+        "operationId": "getSecurityFilter_2",
+        "parameters": [
+          {
+            "name": "The username to built the filter for",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "A sub set of configuration IDs to build filters for. Leave empty to include all configurations",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityFilter"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/security_filter/{collection}": {
+      "get": {
+        "tags": [
+          "Connectors Security Filter API"
+        ],
+        "summary": "Build security filter",
+        "operationId": "getSecurityFilter_3",
+        "parameters": [
+          {
+            "name": "The username to built the filter for",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "A sub set of configuration IDs to build filters for. Leave empty to include all configurations",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityFilter"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/repository": {
+      "get": {
+        "tags": [
+          "Connector Repository Plugins API"
+        ],
+        "summary": "List plugins from repository",
+        "operationId": "listPlugins",
+        "parameters": [
+          {
+            "name": "The plugin name or partial name. Plugins containing this value will be included in the response",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PluginArtifact"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pluginsByCategory": {
+      "get": {
+        "tags": [
+          "plugins-by-category-controller"
+        ],
+        "operationId": "getConnectorTypesByCategory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/schema/{type}": {
+      "get": {
+        "tags": [
+          "Connectors Schema API"
+        ],
+        "summary": "Return the plugin schema definition. V2 plugins only",
+        "operationId": "getConnectorInfo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorPluginInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plugins/{type}": {
+      "get": {
+        "tags": [
+          "Connectors Schema API"
+        ],
+        "summary": "Return the plugin schema definition. V2 plugins only",
+        "operationId": "getConnectorInfo_1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorPluginInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plugins/{connector}/types/{type}": {
+      "get": {
+        "tags": [
+          "Connectors Schema API"
+        ],
+        "summary": "Return the plugin schema definition",
+        "operationId": "getPluginTypeSchema",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schema/{connector}/types/{type}": {
+      "get": {
+        "tags": [
+          "Connectors Schema API"
+        ],
+        "summary": "Return the plugin schema definition",
+        "operationId": "getPluginTypeSchema_1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plugins/{connector}/types": {
+      "get": {
+        "tags": [
+          "Connectors Schema API"
+        ],
+        "summary": "List the plugin sub-types",
+        "operationId": "listPluginTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schema/{connector}/types": {
+      "get": {
+        "tags": [
+          "Connectors Schema API"
+        ],
+        "summary": "List the plugin sub-types",
+        "operationId": "listPluginTypes_1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs": {
+      "get": {
+        "tags": [
+          "Datasource Jobs API"
+        ],
+        "summary": "List running connector jobs",
+        "description": "Return the status of all running jobs of the given connector type",
+        "operationId": "listJobs",
+        "parameters": [
+          {
+            "name": "The connector type. If specified, running jobs of that type will be listed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobStatus"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Datasource Jobs API"
+        ],
+        "summary": "Stop or abort all jobs for a particular connector type and collection",
+        "operationId": "finishAllJobs",
+        "parameters": [
+          {
+            "name": "The connector type. All jobs from that type will be stopped",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "The collection name. Linked jobs to that collection will be stopped",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Indicates if job should be aborted",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "The amount of time(in milliseconds) to wait for each job to be stopped",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobStatus"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}/db": {
+      "get": {
+        "tags": [
+          "Datasource Jobs API"
+        ],
+        "summary": "Return crawlDB metrics",
+        "description": "Method not implemented, do not use",
+        "operationId": "getDb",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Datasource Jobs API"
+        ],
+        "summary": "Clear crawlDB collection",
+        "operationId": "dropDb",
+        "parameters": [
+          {
+            "name": "Indicates if the content collection should be cleared as well",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/datasources/{id}/sample": {
+      "get": {
+        "tags": [
+          "Connectors Datasource Configuration API"
+        ],
+        "summary": "Run a connector sample job  and return the results. Classic datasource configurations only",
+        "operationId": "datasourceDocsSample",
+        "parameters": [
+          {
+            "name": "The maximum number of results to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "An specific amount of time to run the sample, in seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Indicates if the sampling cache should be cleared",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "The maximum length of fields returned in the response",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1024
+            }
+          },
+          {
+            "name": "Indicates if fields with a byte array as value should be excluded or not",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PipelineDocument"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/datasources/{id}/sample/pipeline-debug": {
+      "get": {
+        "tags": [
+          "Connectors Datasource Configuration API"
+        ],
+        "summary": "Run a connector sample job and return the results with extra information from the pipeline",
+        "operationId": "datasourceDocsSamplePipelineDebug",
+        "parameters": [
+          {
+            "name": "The maximum number of results to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          },
+          {
+            "name": "An specific amount of time to run the sample, in seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 300
+            }
+          },
+          {
+            "name": "Indicates if the sampling cache should be cleared",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "The maximum length of fields returned in the response",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1024
+            }
+          },
+          {
+            "name": "Indicates if fields with a byte array as value should be excluded or not",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "The Pipeline ID to be used in the sampling process",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "The Parser ID to be used in the sampling process",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexPipelineDebugResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plugins/{pluginId}": {
+      "delete": {
+        "tags": [
+          "Connector Plugins API"
+        ],
+        "summary": "Uninstall plugin",
+        "operationId": "uninstallPlugin",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginInstallResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}/output": {
+      "delete": {
+        "tags": [
+          "Datasource Jobs API"
+        ],
+        "summary": "Delete indexed documents",
+        "description": "documents indexed by the given configuration ID will be deleted from content collection",
+        "operationId": "deleteContent",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/datasources/{id}/output": {
+      "delete": {
+        "tags": [
+          "Connectors Datasource Configuration API"
+        ],
+        "summary": "Deletes documents indexed by the given data source configuration",
+        "operationId": "deleteOutputData",
+        "parameters": [
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/datasources/{id}/db": {
+      "delete": {
+        "tags": [
+          "Connectors Datasource Configuration API"
+        ],
+        "summary": "Clear crawlDB of the given data source configuration",
+        "operationId": "dropDb_1",
+        "parameters": [
+          {
+            "name": "Indicates if the documents indexed should be removed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "The context of resource. It usually is the app inside which the resource is created",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PluginInstallActionStatus": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "INSTALL",
+              "UPDATE",
+              "UNINSTALL"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SUCCESS",
+              "FAIL",
+              "NOOP"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "PluginInstallResponse": {
+        "type": "object",
+        "properties": {
+          "pluginId": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PluginInstallActionStatus"
+          }
+        }
+      },
+      "GlobPermission": {
+        "type": "object",
+        "properties": {
+          "methods": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE",
+                "HEAD",
+                "PATCH",
+                "OPTIONS"
+              ]
+            }
+          },
+          "path": {
+            "type": "string"
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Subject": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GlobPermission"
+            }
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "realm": {
+            "$ref": "#/components/schemas/SubjectRealm"
+          },
+          "principal": {
+            "type": "string"
+          }
+        }
+      },
+      "SubjectRealm": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "principal": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "SecurityFilter": {
+        "type": "object",
+        "properties": {
+          "filter": {
+            "type": "string"
+          },
+          "nestedClauses": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "JobState": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "START",
+              "STOP"
+            ]
+          }
+        }
+      },
+      "JobStatus": {
+        "required": [
+          "extra"
+        ],
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string"
+          },
+          "runId": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "READY",
+              "RUNNING",
+              "PAUSED",
+              "ABORTED",
+              "FAILED",
+              "SUCCESS"
+            ]
+          },
+          "time": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "error": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "extra": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "ConnectorConfigSuggestion": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "valid": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            }
+          },
+          "installed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "PluginArtifact": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "sdkVersion": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          }
+        }
+      },
+      "AnyType": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "object",
+              "array",
+              "null",
+              "ref"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "enum": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "default": {
+            "type": "object"
+          },
+          "hints": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "oneOf": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnyTypeObjectObject"
+            }
+          }
+        }
+      },
+      "AnyTypeObjectObject": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "object",
+              "array",
+              "null",
+              "ref"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "enum": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "default": {
+            "type": "object"
+          },
+          "hints": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ConnectorPluginInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "pluginVersion": {
+            "type": "string"
+          },
+          "sdkVersion": {
+            "type": "string"
+          },
+          "schema": {
+            "$ref": "#/components/schemas/RootSchemaType"
+          }
+        }
+      },
+      "RootSchemaType": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "object",
+              "array",
+              "null",
+              "ref"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "required": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AnyType"
+            }
+          },
+          "category": {
+            "type": "string"
+          },
+          "enum": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "hints": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "type": "object"
+          },
+          "oneOf": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnyTypeObjectObject"
+            }
+          },
+          "interfaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Annotation": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "start": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "end": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "features": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "deprecated": true
+            },
+            "deprecated": true
+          },
+          "label": {
+            "type": "string"
+          },
+          "featureCount": {
+            "type": "integer",
+            "format": "int32",
+            "deprecated": true
+          }
+        }
+      },
+      "Command": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PipelineDocument": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PipelineField"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "commands": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Command"
+            }
+          },
+          "hints": {
+            "type": "object",
+            "additionalProperties": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "PipelineField": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "annotations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Annotation"
+            }
+          }
+        }
+      },
+      "ContextAndDoc": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "error": {
+            "type": "string"
+          },
+          "doc": {
+            "$ref": "#/components/schemas/PipelineDocument"
+          }
+        }
+      },
+      "IndexPipelineDebugResponse": {
+        "type": "object",
+        "properties": {
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StageConfig"
+            }
+          },
+          "output": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ContextAndDoc"
+              }
+            }
+          },
+          "outputEncounteredCount": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "StageConfig": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

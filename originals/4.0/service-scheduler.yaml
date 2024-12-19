@@ -1,0 +1,406 @@
+---
+swagger: "2.0"
+info:
+  version: "4.0.2-SNAPSHOT"
+  title: "Fusion Service scheduler"
+basePath: "/api/apollo"
+tags:
+- name: "scheduler"
+schemes:
+- "http"
+paths:
+  /scheduler/jobs:
+    get:
+      summary: "List all running jobs"
+      description: ""
+      operationId: "getRunningJobs"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              type: "object"
+              additionalProperties:
+                type: "object"
+    delete:
+      summary: "Stop all running jobs"
+      description: ""
+      operationId: "stopRunningJobs"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+  /scheduler/jobs/{id}:
+    get:
+      summary: "Display a scheduled job"
+      description: ""
+      operationId: "getRunningJob"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The schedule ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+            additionalProperties:
+              type: "object"
+    delete:
+      summary: "Stop a running job"
+      description: ""
+      operationId: "stopRunningJob"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The schedule ID"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /scheduler/schedules:
+    get:
+      summary: "Retrieve all matching schedules"
+      description: ""
+      operationId: "getSchedules"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "creatorType"
+        in: "query"
+        description: "The type of user that created the schedule"
+        required: false
+        type: "string"
+      - name: "creatorId"
+        in: "query"
+        description: "The ID of the user that created the schedule"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Schedule"
+    post:
+      summary: "Create a new schedule"
+      description: ""
+      operationId: "addSchedule"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted schedule configuration values"
+        required: false
+        schema:
+          $ref: "#/definitions/Schedule"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+            additionalProperties:
+              type: "object"
+    delete:
+      summary: "Delete a schedule"
+      description: ""
+      operationId: "deleteSchedules"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "creatorType"
+        in: "query"
+        description: "The type of user that created the schedule"
+        required: false
+        type: "string"
+      - name: "creatorId"
+        in: "query"
+        description: "The ID of the user that created the schedule"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+  /scheduler/schedules/{id}:
+    get:
+      summary: "Retrieve the specified schedule"
+      description: ""
+      operationId: "getSchedule"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The schedule ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Schedule"
+    put:
+      summary: "Update a schedule"
+      description: ""
+      operationId: "updateSchedule"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The schedule ID"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "JSON-formatted schedule configuration values"
+        required: false
+        schema:
+          $ref: "#/definitions/Schedule"
+      responses:
+        default:
+          description: "successful operation"
+    delete:
+      summary: "Delete a schedule"
+      description: ""
+      operationId: "deleteSchedule"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The schedule ID"
+        required: true
+        type: "string"
+      responses:
+        default:
+          description: "successful operation"
+  /scheduler/status:
+    get:
+      summary: "Get the status of the service"
+      description: ""
+      operationId: "getStatus"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceStatus"
+definitions:
+  CallParams:
+    type: "object"
+    properties:
+      uri:
+        type: "string"
+      method:
+        type: "string"
+        enum:
+        - "GET"
+        - "PUT"
+        - "POST"
+        - "DELETE"
+      queryParams:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      headers:
+        type: "object"
+        additionalProperties:
+          type: "string"
+      entity:
+        type: "object"
+  Task:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      type:
+        type: "string"
+  FusionResource:
+    type: "object"
+    properties:
+      type:
+        type: "string"
+        enum:
+        - "APPKIT_APP"
+        - "APP"
+        - "COLLECTION"
+        - "INDEX_PIPELINE"
+        - "INDEX_STAGE"
+        - "QUERY_STAGE"
+        - "QUERY_PIPELINE"
+        - "INDEX_PROFILE"
+        - "QUERY_PROFILE"
+        - "BLOB"
+        - "PARSER"
+        - "DATASOURCE"
+        - "TASK"
+        - "SCHEDULE"
+        - "SEARCH_CLUSTER"
+        - "EXPERIMENT"
+        - "SPARK_JOB"
+        - "GROUP"
+        - "TYPE"
+        - "RESOURCE"
+        - "NULL"
+      id:
+        type: "string"
+      simpleName:
+        type: "string"
+      canonicalName:
+        type: "string"
+      uri:
+        type: "string"
+        format: "uri"
+  ServiceStatus:
+    type: "object"
+    properties:
+      node:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "starting"
+        - "ok"
+        - "warning"
+        - "error"
+        - "shutdown"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      messages:
+        type: "array"
+        items:
+          $ref: "#/definitions/StatusMessage"
+  Schedule:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      createTime:
+        type: "string"
+        format: "date-time"
+      startTime:
+        type: "string"
+        format: "date-time"
+      endTime:
+        type: "string"
+        format: "date-time"
+      repeatUnit:
+        type: "string"
+        enum:
+        - "MILLISECOND"
+        - "SECOND"
+        - "MINUTE"
+        - "HOUR"
+        - "DAY"
+        - "WEEK"
+        - "MONTH"
+      interval:
+        type: "integer"
+        format: "int32"
+      active:
+        type: "boolean"
+        default: false
+      creatorType:
+        type: "string"
+      creatorId:
+        type: "string"
+      callParams:
+        $ref: "#/definitions/CallParams"
+  TaskAndJobConfig:
+    type: "object"
+    properties:
+      task:
+        $ref: "#/definitions/Task"
+      jobConfig:
+        $ref: "#/definitions/JobConfig"
+  JobConfig:
+    type: "object"
+    properties:
+      jobResource:
+        $ref: "#/definitions/FusionResource"
+      enabled:
+        type: "boolean"
+        default: false
+      triggers:
+        type: "array"
+        items:
+          $ref: "#/definitions/JobTriggerConfig"
+      additionalProperties:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      default:
+        type: "boolean"
+        default: false
+  JobTriggerConfig:
+    type: "object"
+    properties:
+      enabled:
+        type: "boolean"
+        default: false
+      type:
+        type: "string"
+  StatusMessage:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      date:
+        type: "string"
+        format: "date-time"

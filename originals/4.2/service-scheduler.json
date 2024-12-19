@@ -1,0 +1,748 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service scheduler"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "scheduler"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/scheduler/jobs": {
+      "get": {
+        "summary": "List all running jobs",
+        "description": "",
+        "operationId": "getRunningJobs",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Stop all running jobs",
+        "description": "",
+        "operationId": "stopRunningJobs",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/scheduler/jobs/{id}": {
+      "get": {
+        "summary": "Display a scheduled job",
+        "description": "",
+        "operationId": "getRunningJob",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The schedule ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Stop a running job",
+        "description": "",
+        "operationId": "stopRunningJob",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The schedule ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/scheduler/schedules": {
+      "get": {
+        "summary": "Retrieve all matching schedules",
+        "description": "",
+        "operationId": "getSchedules",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "creatorType",
+            "in": "query",
+            "description": "The type of user that created the schedule",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "creatorId",
+            "in": "query",
+            "description": "The ID of the user that created the schedule",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Schedule"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new schedule",
+        "description": "",
+        "operationId": "addSchedule",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "JSON-formatted schedule configuration values",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/Schedule"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a schedule",
+        "description": "",
+        "operationId": "deleteSchedules",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "creatorType",
+            "in": "query",
+            "description": "The type of user that created the schedule",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "creatorId",
+            "in": "query",
+            "description": "The ID of the user that created the schedule",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/scheduler/schedules/{id}": {
+      "get": {
+        "summary": "Retrieve the specified schedule",
+        "description": "",
+        "operationId": "getSchedule",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The schedule ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Schedule"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a schedule",
+        "description": "",
+        "operationId": "updateSchedule",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The schedule ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "JSON-formatted schedule configuration values",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/Schedule"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a schedule",
+        "description": "",
+        "operationId": "deleteSchedule",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The schedule ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/scheduler/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "CronTrigger": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/JobTriggerConfig"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "expression": {
+              "type": "string",
+              "readOnly": true
+            }
+          }
+        }
+      ]
+    },
+    "Task": {
+      "type": "object",
+      "discriminator": "type",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "type": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "TaskAndJobConfig": {
+      "type": "object",
+      "properties": {
+        "task": {
+          "$ref": "#/definitions/Task"
+        },
+        "jobConfig": {
+          "$ref": "#/definitions/JobConfig"
+        }
+      }
+    },
+    "JobChainTriggerConfig": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/JobTriggerConfig"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "triggerType": {
+              "type": "string",
+              "readOnly": true,
+              "enum": [
+                "ON_SUCCESS",
+                "ON_FAILURE",
+                "ON_SUCCESS_OR_FAILURE"
+              ]
+            },
+            "otherJob": {
+              "type": "string",
+              "readOnly": true
+            }
+          }
+        }
+      ]
+    },
+    "ConfigCallParams": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE"
+          ]
+        },
+        "queryParams": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "entity": {
+          "type": "string"
+        }
+      }
+    },
+    "IntervalTrigger": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/JobTriggerConfig"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "interval": {
+              "type": "integer",
+              "format": "int32",
+              "readOnly": true
+            },
+            "timeUnit": {
+              "type": "string",
+              "readOnly": true,
+              "enum": [
+                "SECOND",
+                "MINUTE",
+                "HOUR",
+                "DAY",
+                "WEEK",
+                "MONTH"
+              ]
+            },
+            "startTime": {
+              "type": "string",
+              "format": "date-time",
+              "readOnly": true
+            }
+          }
+        }
+      ]
+    },
+    "JobConfig": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "readOnly": true,
+          "$ref": "#/definitions/FusionResource"
+        },
+        "enabled": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "triggers": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/JobTriggerConfig"
+          }
+        },
+        "default": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        }
+      }
+    },
+    "BlobDownloadTask": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Task"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "readOnly": true
+            },
+            "blobId": {
+              "type": "string",
+              "readOnly": true
+            }
+          }
+        }
+      ]
+    },
+    "JobTriggerConfig": {
+      "type": "object",
+      "discriminator": "type",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "readOnly": true,
+          "default": false
+        },
+        "type": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "SystemLogsCleanupTask": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Task"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "collection": {
+              "type": "string",
+              "readOnly": true
+            },
+            "days": {
+              "type": "integer",
+              "format": "int32",
+              "readOnly": true
+            }
+          }
+        }
+      ]
+    },
+    "CallParams": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE"
+          ]
+        },
+        "queryParams": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "entity": {
+          "type": "object"
+        }
+      }
+    },
+    "FusionResource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "APPKIT_APP",
+            "WEBAPP_ADMIN_APP",
+            "APP",
+            "COLLECTION",
+            "INDEX_PIPELINE",
+            "INDEX_STAGE",
+            "QUERY_STAGE",
+            "QUERY_PIPELINE",
+            "INDEX_PROFILE",
+            "QUERY_PROFILE",
+            "BLOB",
+            "PARSER",
+            "DATASOURCE",
+            "TASK",
+            "SCHEDULE",
+            "SEARCH_CLUSTER",
+            "EXPERIMENT",
+            "SPARK_JOB",
+            "GROUP",
+            "CUSTOM_RULE_TYPE",
+            "TYPE",
+            "RESOURCE",
+            "NULL"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "canonicalName": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "Schedule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "creatorType": {
+          "type": "string"
+        },
+        "creatorId": {
+          "type": "string"
+        },
+        "createTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "repeatUnit": {
+          "type": "string",
+          "enum": [
+            "MILLISECOND",
+            "SECOND",
+            "MINUTE",
+            "HOUR",
+            "DAY",
+            "WEEK",
+            "MONTH"
+          ]
+        },
+        "interval": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "active": {
+          "type": "boolean",
+          "default": false
+        },
+        "callParams": {
+          "$ref": "#/definitions/CallParams"
+        }
+      }
+    },
+    "ServiceCallTask": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Task"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "callParams": {
+              "readOnly": true,
+              "$ref": "#/definitions/ConfigCallParams"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

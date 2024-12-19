@@ -1,0 +1,883 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "4.2.6-rc1",
+        "title": "Fusion Service jobs"
+    },
+    "basePath": "/api/apollo",
+    "tags": [
+        {
+            "name": "jobs"
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/jobs": {
+            "get": {
+                "summary": "List all jobs",
+                "description": "",
+                "operationId": "listJobs",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter jobs by status, one of: `ready`, `running`, `success`, `aborted`, or `failed`",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi"
+                    },
+                    {
+                        "name": "enabled",
+                        "in": "query",
+                        "description": "Filter jobs by whether they are enabled (`true`) or disabled (`false`)",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter jobs by type, one of: `task`, `spark`, or `datasource`",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/JobView"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/jobs/_schema": {
+            "get": {
+                "operationId": "getJobConfigSchema",
+                "produces": [
+                    "application/schema+json; qs=1.0",
+                    "application/json; qs=0.9"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/ObjectType"
+                        },
+                        "headers": {}
+                    }
+                }
+            }
+        },
+        "/jobs/status": {
+            "get": {
+                "summary": "Get the status of the service",
+                "description": "",
+                "operationId": "getStatus",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ServiceStatus"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/jobs/{resource}": {
+            "get": {
+                "summary": "Get the status and configuration for the specified job",
+                "description": "",
+                "operationId": "getJob",
+                "parameters": [
+                    {
+                        "name": "resource",
+                        "in": "path",
+                        "description": "The job ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/JobView"
+                        }
+                    }
+                }
+            }
+        },
+        "/jobs/{resource}/actions": {
+            "post": {
+                "summary": "Start, pause, or abort the specified job",
+                "description": "",
+                "operationId": "controlJob",
+                "parameters": [
+                    {
+                        "name": "resource",
+                        "in": "path",
+                        "description": "The job ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "One of: `start` or `abort`",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/JobActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/JobActionResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/jobs/{resource}/history": {
+            "get": {
+                "summary": "Get the run history for the specified job",
+                "description": "",
+                "operationId": "listJobHistory",
+                "parameters": [
+                    {
+                        "name": "resource",
+                        "in": "path",
+                        "description": "The job ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Return first N history items",
+                        "required": false,
+                        "type": "integer",
+                        "default": 100,
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/JobRunView"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/jobs/{resource}/schedule": {
+            "get": {
+                "summary": "Get the schedule for the specified job",
+                "description": "",
+                "operationId": "getJobConfig",
+                "parameters": [
+                    {
+                        "name": "resource",
+                        "in": "path",
+                        "description": "The job ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/JobConfig"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Configure the schedule for the specified job",
+                "description": "",
+                "operationId": "setJobConfig",
+                "parameters": [
+                    {
+                        "name": "resource",
+                        "in": "path",
+                        "description": "The job ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "JSON-formatted configuration values",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/JobConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/JobConfig"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Reset the schedule for the specified job",
+                "description": "",
+                "operationId": "resetJobConfig",
+                "parameters": [
+                    {
+                        "name": "resource",
+                        "in": "path",
+                        "description": "The job ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "successful operation"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "CronTrigger": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/JobTriggerConfig"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "expression": {
+                            "type": "string",
+                            "readOnly": true
+                        }
+                    }
+                }
+            ]
+        },
+        "PropertyGroup": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "properties": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "JobActionResponse": {
+            "type": "object",
+            "properties": {
+                "resource": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "action": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "START",
+                        "PAUSE",
+                        "ABORT"
+                    ]
+                },
+                "accepted": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "message": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "JobRunView": {
+            "type": "object",
+            "properties": {
+                "resource": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/FusionResource"
+                },
+                "runId": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "startTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "endTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "status": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "error": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/JobExecutionErrorView"
+                },
+                "extra": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                },
+                "startedBy": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "JobView": {
+            "type": "object",
+            "properties": {
+                "resource": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/FusionResource"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "startedBy": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "status": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "extra": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                },
+                "lastStartTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "lastEndTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "nextStartTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            }
+        },
+        "JobChainTriggerConfig": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/JobTriggerConfig"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "triggerType": {
+                            "type": "string",
+                            "readOnly": true,
+                            "enum": [
+                                "ON_SUCCESS",
+                                "ON_FAILURE",
+                                "ON_SUCCESS_OR_FAILURE"
+                            ]
+                        },
+                        "otherJob": {
+                            "type": "string",
+                            "readOnly": true
+                        }
+                    }
+                }
+            ]
+        },
+        "IntervalTrigger": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/JobTriggerConfig"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "interval": {
+                            "type": "integer",
+                            "format": "int32",
+                            "readOnly": true
+                        },
+                        "timeUnit": {
+                            "type": "string",
+                            "readOnly": true,
+                            "enum": [
+                                "SECOND",
+                                "MINUTE",
+                                "HOUR",
+                                "DAY",
+                                "WEEK",
+                                "MONTH"
+                            ]
+                        },
+                        "startTime": {
+                            "type": "string",
+                            "format": "date-time",
+                            "readOnly": true
+                        }
+                    }
+                }
+            ]
+        },
+        "JobConfig": {
+            "type": "object",
+            "properties": {
+                "resource": {
+                    "readOnly": true,
+                    "$ref": "#/definitions/FusionResource"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "triggers": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/JobTriggerConfig"
+                    }
+                },
+                "default": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                }
+            }
+        },
+        "JobTriggerConfig": {
+            "type": "object",
+            "discriminator": "type",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "type": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "JobExecutionErrorView": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "detail": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "StatusMessage": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "message": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "ObjectType": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "String",
+                        "Number",
+                        "Integer",
+                        "Boolean",
+                        "Object",
+                        "Array",
+                        "Null",
+                        "Ref"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "description": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "required": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "properties": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "$ref": "#/definitions/AnyType"
+                    }
+                },
+                "additionalProperties": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "minProperties": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "maxProperties": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "definitions": {
+                    "type": "object",
+                    "readOnly": true,
+                    "additionalProperties": {
+                        "$ref": "#/definitions/AnyType"
+                    }
+                },
+                "category": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "enum": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "hints": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "unsafe": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "default": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "oneOf": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/AnyTypeObjectObject"
+                    }
+                },
+                "propertyGroups": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/PropertyGroup"
+                    }
+                }
+            }
+        },
+        "FusionResource": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "APPKIT_APP",
+                        "WEBAPP_ADMIN_APP",
+                        "APP",
+                        "COLLECTION",
+                        "INDEX_PIPELINE",
+                        "INDEX_STAGE",
+                        "QUERY_STAGE",
+                        "QUERY_PIPELINE",
+                        "INDEX_PROFILE",
+                        "QUERY_PROFILE",
+                        "BLOB",
+                        "PARSER",
+                        "DATASOURCE",
+                        "TASK",
+                        "SCHEDULE",
+                        "SEARCH_CLUSTER",
+                        "EXPERIMENT",
+                        "SPARK_JOB",
+                        "GROUP",
+                        "CUSTOM_RULE_TYPE",
+                        "TYPE",
+                        "RESOURCE",
+                        "NULL"
+                    ]
+                },
+                "id": {
+                    "type": "string"
+                },
+                "canonicalName": {
+                    "type": "string"
+                },
+                "uri": {
+                    "type": "string",
+                    "format": "uri"
+                }
+            }
+        },
+        "ServiceStatus": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "starting",
+                        "ok",
+                        "warning",
+                        "error",
+                        "shutdown"
+                    ]
+                },
+                "node": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "messages": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/StatusMessage"
+                    }
+                }
+            }
+        },
+        "AnyType": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "String",
+                        "Number",
+                        "Integer",
+                        "Boolean",
+                        "Object",
+                        "Array",
+                        "Null",
+                        "Ref"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "description": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "enum": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "default": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "category": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "hints": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "unsafe": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "oneOf": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/AnyTypeObjectObject"
+                    }
+                }
+            }
+        },
+        "JobActionRequest": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "START",
+                        "PAUSE",
+                        "ABORT"
+                    ]
+                },
+                "comment": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "AnyTypeObjectObject": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                        "String",
+                        "Number",
+                        "Integer",
+                        "Boolean",
+                        "Object",
+                        "Array",
+                        "Null",
+                        "Ref"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "description": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "enum": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "default": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "category": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "categoryPriority": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "hints": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "unsafe": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "oneOf": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "$ref": "#/definitions/AnyTypeObjectObject"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,973 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "4.2.6-rc1",
+    "title": "Fusion Service query-pipelines"
+  },
+  "basePath": "/api/apollo",
+  "tags": [
+    {
+      "name": "query-pipelines"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/query-pipelines": {
+      "get": {
+        "summary": "List all pipeline definitions",
+        "description": "",
+        "operationId": "listPipelines",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new pipeline",
+        "description": "The pipeline name is omitted from the path; it must be included in the definition in the request body",
+        "operationId": "createPipeline",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/QueryPipelineDefinition"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/PipelineDefinitionObject"
+            }
+          }
+        }
+      }
+    },
+    "/query-pipelines/status": {
+      "get": {
+        "summary": "Get the status of the service",
+        "description": "",
+        "operationId": "getStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceStatus"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/query-pipelines/{id}": {
+      "get": {
+        "summary": "Get the definition for a specific pipeline",
+        "description": "",
+        "operationId": "getPipeline",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/PipelineDefinitionObject"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Modify an existing pipeline",
+        "description": "This allows you to add, remove, re-order, or configure the pipeline's stages",
+        "operationId": "createOrUpdatePipeline",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "An entity tag to match against the specified blob",
+            "required": false,
+            "type": "string",
+            "default": "\"-1\""
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/QueryPipelineDefinition"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/PipelineDefinitionObject"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete the specified pipeline",
+        "description": "",
+        "operationId": "deletePipeline",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of a specific pipeline",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "An entity tag to match against the specified blob",
+            "required": false,
+            "type": "string",
+            "default": "\"-1\""
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/query-pipelines/{id}/collections/{collection}/{handler}": {
+      "get": {
+        "summary": "Send a query through a pipeline",
+        "description": "Append a Solr query string to the request, as in '/api/apollo/query-pipelines/<id>/collections/<collectionName>/<handler>?<solrQuery>'",
+        "operationId": "query",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "A pipeline ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collection",
+            "in": "path",
+            "description": "The name of a collection",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "handler",
+            "in": "path",
+            "description": "The name of a Solr request handler",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/WriteableResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Send a query through a pipeline",
+        "description": "Use this method if the length of your query exceeds normal GET limitations.  Append a Solr query string to the request, as in '/api/apollo/query-pipelines/<id>/collections/<collectionName>/<handler>?<solrQuery>'",
+        "operationId": "queryWithAudio",
+        "consumes": [
+          "audio/wav"
+        ],
+        "produces": [
+          "application/*",
+          "text/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "A pipeline ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "collection",
+            "in": "path",
+            "description": "The name of a collection",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "handler",
+            "in": "path",
+            "description": "The name of a Solr request handler",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Query parameters",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/InputStream"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/WriteableResponse"
+            }
+          }
+        }
+      }
+    },
+    "/query-pipelines/{id}/metrics": {
+      "get": {
+        "summary": "For internal use by the system",
+        "description": "",
+        "operationId": "getPipelineMetrics",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The name of a specific pipeline",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pretty",
+            "in": "query",
+            "description": "Format the output for easier reading",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "rateUnit",
+            "in": "query",
+            "description": "The time unit for rate values (`seconds`, `minutes`, and so on)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "durationUnit",
+            "in": "query",
+            "description": "The time unit for duration values (`seconds`, `minutes`, and so on)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "showSamples",
+            "in": "query",
+            "description": "Show the data values used in calculations",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/MetricResponse"
+            }
+          }
+        }
+      }
+    },
+    "/query-pipelines/{id}/refresh": {
+      "put": {
+        "summary": "Reload the specified pipeline",
+        "description": "When changes are made to a pipeline, the pipeline needs to be refreshed (reloaded). A Fusion restart refreshes all pipelines",
+        "operationId": "refreshPipeline",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of a specific pipeline",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "delete": {
+        "summary": "For internal use by the system",
+        "description": "",
+        "operationId": "stopPipeline",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of a specific pipeline",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Histogram": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "snapshot": {
+          "$ref": "#/definitions/Snapshot"
+        }
+      }
+    },
+    "QueryRequestAndResponse": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "$ref": "#/definitions/Request"
+        },
+        "response": {
+          "$ref": "#/definitions/Response"
+        },
+        "totalTime": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "startTime": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "fieldNames": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Meter": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "oneMinuteRate": {
+          "type": "number",
+          "format": "double"
+        },
+        "fiveMinuteRate": {
+          "type": "number",
+          "format": "double"
+        },
+        "fifteenMinuteRate": {
+          "type": "number",
+          "format": "double"
+        },
+        "meanRate": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "PipelineManager": {
+      "type": "object"
+    },
+    "AuthorizationContext": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "$ref": "#/definitions/Subject"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "OptionalString": {
+      "type": "object",
+      "properties": {
+        "present": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "Gauge": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object"
+        }
+      }
+    },
+    "ProviderHttpServletResponse": {
+      "type": "object"
+    },
+    "GlobPermission": {
+      "type": "object",
+      "properties": {
+        "methods": {
+          "type": "array",
+          "readOnly": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "DELETE",
+              "HEAD",
+              "PATCH",
+              "OPTIONS"
+            ]
+          }
+        },
+        "path": {
+          "type": "string",
+          "readOnly": true
+        },
+        "params": {
+          "readOnly": true,
+          "$ref": "#/definitions/PermissionParams"
+        }
+      }
+    },
+    "Counter": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "MetricResponse": {
+      "type": "object",
+      "properties": {
+        "metricRegistry": {
+          "$ref": "#/definitions/MetricRegistry"
+        },
+        "metricsList": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Metric"
+          }
+        },
+        "pretty": {
+          "type": "boolean",
+          "default": false
+        },
+        "rateUnit": {
+          "type": "string",
+          "enum": [
+            "NANOSECONDS",
+            "MICROSECONDS",
+            "MILLISECONDS",
+            "SECONDS",
+            "MINUTES",
+            "HOURS",
+            "DAYS"
+          ]
+        },
+        "durationUnit": {
+          "type": "string",
+          "enum": [
+            "NANOSECONDS",
+            "MICROSECONDS",
+            "MILLISECONDS",
+            "SECONDS",
+            "MINUTES",
+            "HOURS",
+            "DAYS"
+          ]
+        },
+        "showSamples": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "ok",
+            "warning",
+            "error",
+            "shutdown"
+          ]
+        },
+        "node": {
+          "type": "string",
+          "readOnly": true
+        },
+        "messages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StatusMessage"
+          }
+        }
+      }
+    },
+    "MediaType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "subtype": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "wildcardType": {
+          "type": "boolean",
+          "default": false
+        },
+        "wildcardSubtype": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "InputStream": {
+      "type": "object"
+    },
+    "MetricRegistry": {
+      "type": "object",
+      "properties": {
+        "metrics": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Metric"
+          }
+        },
+        "meters": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Meter"
+          }
+        },
+        "names": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "counters": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Counter"
+          }
+        },
+        "timers": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Timer"
+          }
+        },
+        "histograms": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Histogram"
+          }
+        },
+        "gauges": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Gauge"
+          }
+        }
+      }
+    },
+    "Request": {
+      "type": "object",
+      "properties": {
+        "initialParams": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "headers": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "params": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "httpMethod": {
+          "type": "string",
+          "readOnly": true
+        },
+        "entityBytes": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string",
+            "format": "byte"
+          }
+        },
+        "entityMediaType": {
+          "readOnly": true,
+          "$ref": "#/definitions/MediaType"
+        }
+      }
+    },
+    "PermissionParams": {
+      "type": "object",
+      "properties": {
+        "paramNames": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Subject": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "readOnly": true
+        },
+        "permissions": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/GlobPermission"
+          }
+        },
+        "roles": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "realm": {
+          "readOnly": true,
+          "$ref": "#/definitions/SubjectRealm"
+        },
+        "principal": {
+          "type": "string"
+        }
+      }
+    },
+    "StageConfig": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true
+        },
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "skip": {
+          "type": "boolean",
+          "default": false
+        },
+        "label": {
+          "type": "string"
+        },
+        "condition": {
+          "type": "string"
+        }
+      }
+    },
+    "StatusMessage": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "Response": {
+      "type": "object",
+      "properties": {
+        "headers": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "Snapshot": {
+      "type": "object",
+      "properties": {
+        "max": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "mean": {
+          "type": "number",
+          "format": "double"
+        },
+        "stdDev": {
+          "type": "number",
+          "format": "double"
+        },
+        "median": {
+          "type": "number",
+          "format": "double"
+        },
+        "get75thPercentile": {
+          "type": "number",
+          "format": "double"
+        },
+        "get95thPercentile": {
+          "type": "number",
+          "format": "double"
+        },
+        "get98thPercentile": {
+          "type": "number",
+          "format": "double"
+        },
+        "get99thPercentile": {
+          "type": "number",
+          "format": "double"
+        },
+        "get999thPercentile": {
+          "type": "number",
+          "format": "double"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "min": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "PipelineDefinitionObject": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "stages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StageConfig"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Timer": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "oneMinuteRate": {
+          "type": "number",
+          "format": "double"
+        },
+        "fiveMinuteRate": {
+          "type": "number",
+          "format": "double"
+        },
+        "fifteenMinuteRate": {
+          "type": "number",
+          "format": "double"
+        },
+        "meanRate": {
+          "type": "number",
+          "format": "double"
+        },
+        "snapshot": {
+          "$ref": "#/definitions/Snapshot"
+        }
+      }
+    },
+    "SubjectRealm": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "principal": {
+          "type": "string",
+          "readOnly": true
+        },
+        "data": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "Metric": {
+      "type": "object"
+    },
+    "WriteableResponse": {
+      "type": "object",
+      "properties": {
+        "contentType": {
+          "type": "string"
+        },
+        "contentCharset": {
+          "type": "string"
+        },
+        "mediaType": {
+          "$ref": "#/definitions/MediaType"
+        }
+      }
+    },
+    "QueryPipelineDefinition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "stages": {
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/StageConfig"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
