@@ -10,7 +10,7 @@ info:
   license:
     name: Lucidworks
     url: 'https://lucidworks.com/legal/developer-license-agreement/'
-  description: kjhkhk hjkd fd
+  description: kjhkhk hjkd fd sd sds
 servers:
   - url: 'https://identity.lucidworks.com'
     description: Production
